@@ -26,7 +26,7 @@ export default function SitterRegisterStep3({
   const activityPhotos = useMultiFileUpload();
 
   return (
-    <div className="bg-white rounded-2xl border border-[#ffe9d6] p-7">
+    <div className="bg-white rounded-2xl border border-orange-100 p-7">
       <h2 className="text-stone-900 text-xl font-bold leading-7">
         자격증을 등록해주세요
       </h2>
