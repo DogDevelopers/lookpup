@@ -34,7 +34,7 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
       <h2 className="text-lg font-semibold text-stone-900">
         기본 정보를 입력해주세요
       </h2>
-      <p className="text-gray-400 text-sm mt-1">
+      <p className="text-stone-400 text-sm mt-1">
         펫시터로 활동하기 위한 정보를 입력합니다
       </p>
 
@@ -57,7 +57,7 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
                   }}
                 />
               ) : (
-                <Camera className="w-7 h-7 text-gray-500" strokeWidth={2} />
+                <Camera className="w-7 h-7 text-stone-500" strokeWidth={2} />
               )}
               <input
                 type="file"
@@ -118,7 +118,7 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
         />
         <div className="flex justify-between pt-1">
           <span className="text-red-500 text-xs">{errors.introduction?.message}</span>
-          <span className="text-gray-400 text-xs font-normal leading-4">
+          <span className="text-stone-400 text-xs font-normal leading-4">
             {introduction.length}/500
           </span>
         </div>

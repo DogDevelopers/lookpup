@@ -30,7 +30,7 @@ export default function SitterRegisterStep3({
       <h2 className="text-stone-900 text-xl font-bold leading-7">
         자격증을 등록해주세요
       </h2>
-      <p className="text-gray-500 text-sm font-normal leading-5 pt-2">
+      <p className="text-stone-500 text-sm font-normal leading-5 pt-2">
         선택사항이지만 신뢰도를 높일 수 있습니다
       </p>
 
@@ -40,8 +40,8 @@ export default function SitterRegisterStep3({
         render={({ field }) => (
           <>
             <label className="mt-6 w-full h-28 rounded-2xl outline-2 outline-orange-100 flex flex-col items-center justify-center gap-2 hover:bg-orange-50 transition-colors cursor-pointer">
-              <Camera className="w-8 h-8 text-gray-500" strokeWidth={2} />
-              <span className="text-gray-500 text-sm font-normal leading-5">
+              <Camera className="w-8 h-8 text-stone-500" strokeWidth={2} />
+              <span className="text-stone-500 text-sm font-normal leading-5">
                 자격증 파일 추가
               </span>
               <input
@@ -69,7 +69,7 @@ export default function SitterRegisterStep3({
                       onClick={() =>
                         field.onChange(field.value.filter((_, idx) => idx !== i))
                       }
-                      className="text-gray-400 hover:text-red-400 shrink-0"
+                      className="text-stone-400 hover:text-red-400 shrink-0"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -141,7 +141,7 @@ export default function SitterRegisterStep3({
               ))}
               {activityPhotos.previews.length < 10 && (
                 <label className="w-full aspect-square rounded-xl outline-2 outline-orange-100 flex items-center justify-center hover:bg-orange-50 transition-colors cursor-pointer">
-                  <Plus className="w-6 h-6 text-gray-500" strokeWidth={2} />
+                  <Plus className="w-6 h-6 text-stone-500" strokeWidth={2} />
                   <input
                     type="file"
                     accept="image/*"

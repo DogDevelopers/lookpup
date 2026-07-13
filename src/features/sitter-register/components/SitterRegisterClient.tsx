@@ -69,13 +69,13 @@ export default function SitterRegisterClient() {
           <button
             type="button"
             onClick={() => (step > 1 ? goPrev() : window.history.back())}
-            className="h-11 px-6 rounded-xl border border-orange-100 flex items-center gap-1.5 text-gray-500 text-[15px] font-medium hover:bg-orange-50 transition-colors"
+            className="h-11 px-6 rounded-xl border border-orange-100 flex items-center gap-1.5 text-stone-500 text-[15px] font-medium hover:bg-orange-50 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             이전
           </button>
 
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-stone-500">
             {step} / {totalSteps}
           </span>
 
