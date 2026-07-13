@@ -10,7 +10,7 @@ import { COMMON_NOTES } from "../schema";
 import type { PetRegisterFormValues } from "../types";
 
 const inputCls =
-  "w-full h-12 px-4 py-3 bg-white rounded-xl border border-orange-100 text-base font-normal text-stone-900 placeholder:text-gray-400 focus:outline-none focus:border-[var(--color-orange-500)] transition-all";
+  "w-full h-12 px-4 py-3 bg-white rounded-xl border border-orange-100 text-base font-normal text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[var(--color-orange-500)] transition-all";
 const numberInputCls = `${inputCls} [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`;
 
 // TODO: 페이지 서버 컴포넌트에서 로그인 여부를 확인해 리다이렉트 처리
@@ -102,8 +102,8 @@ export default function PetRegisterClient() {
                     style={{ width: "128px", height: "128px", minWidth: "128px" }}
                     className="shrink-0 bg-orange-50 rounded-2xl border border-orange-100 flex flex-col justify-center items-center gap-2 hover:bg-orange-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
                   >
-                    <Camera className="w-8 h-8 text-gray-500" strokeWidth={2} />
-                    <span className="text-gray-500 text-xs font-normal leading-4">사진 추가</span>
+                    <Camera className="w-8 h-8 text-stone-500" strokeWidth={2} />
+                    <span className="text-stone-500 text-xs font-normal leading-4">사진 추가</span>
                   </button>
                 )}
                 <input
@@ -218,7 +218,7 @@ export default function PetRegisterClient() {
               >
                 <div
                   className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-                    neutered ? "bg-[var(--color-orange-500)] border-[var(--color-orange-500)]" : "bg-white border-gray-300"
+                    neutered ? "bg-[var(--color-orange-500)] border-[var(--color-orange-500)]" : "bg-white border-stone-300"
                   }`}
                 >
                   {neutered && (
@@ -241,7 +241,7 @@ export default function PetRegisterClient() {
                 {...register("notes")}
               />
               <div className="pt-1 flex justify-end">
-                <span className="text-gray-500 text-xs font-normal leading-4">{notes.length}/500</span>
+                <span className="text-stone-500 text-xs font-normal leading-4">{notes.length}/500</span>
               </div>
             </section>
 
@@ -271,7 +271,7 @@ export default function PetRegisterClient() {
                 onClick={() => router.back()}
                 className="flex-1 h-12 px-6 bg-white rounded-xl border border-orange-100 flex justify-center items-center hover:bg-orange-50 hover:border-[var(--color-orange-500)]/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400"
               >
-                <span className="text-gray-500 text-base font-semibold leading-6">취소</span>
+                <span className="text-stone-500 text-base font-semibold leading-6">취소</span>
               </button>
               <button
                 type="submit"
