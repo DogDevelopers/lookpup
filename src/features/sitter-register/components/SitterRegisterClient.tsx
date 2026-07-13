@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CustomModal } from "@/components/common/CustomModal";
 import { Progress } from "@/components/ui/progress";
+import { createSitter } from "../actions";
 import { useSitterRegisterForm } from "../hooks/useSitterRegisterForm";
 import SitterRegisterStep1 from "./SitterRegisterStep1";
 import SitterRegisterStep2 from "./SitterRegisterStep2";
 import SitterRegisterStep3 from "./SitterRegisterStep3";
 import type { SitterRegisterFormValues } from "../types";
 
-// TODO: 페이지 서버 컴포넌트에서 로그인/본인인증/기존 시터 여부를 확인해 리다이렉트
-// 처리 (features/auth 이식 후). 지금은 항상 폼을 렌더링한다.
 export default function SitterRegisterClient() {
   const router = useRouter();
   const { form, step, goNext, goPrev, totalSteps } = useSitterRegisterForm();
@@ -20,12 +19,31 @@ export default function SitterRegisterClient() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
 
-  const handleSubmit = form.handleSubmit((_values: SitterRegisterFormValues) => {
+  const handleSubmit = form.handleSubmit(async (values: SitterRegisterFormValues) => {
+    if (!values.location) {
+      setSubmitError("활동 지역을 검색해주세요.");
+      return;
+    }
+
     setIsSubmitting(true);
     setSubmitError(null);
-    // TODO: features/sitter-register/actions.ts의 createSitter로 교체
-    // (프로필/자격증/활동 사진 업로드 포함).
+
+    // TODO: 사진 업로드(Cloudinary) 연동 후 프로필/자격증/활동 사진 전달.
+    const result = await createSitter({
+      introduction: values.introduction,
+      career: values.career,
+      location: values.location,
+      selectedServices: values.selectedServices,
+      selectedAnimals: values.selectedAnimals,
+    });
+
     setIsSubmitting(false);
+
+    if (!result.ok) {
+      setSubmitError(result.error);
+      return;
+    }
+
     setShowApprovalModal(true);
   });
 

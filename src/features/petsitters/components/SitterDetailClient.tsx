@@ -16,9 +16,9 @@ import SitterLocationTab from "./SitterLocationTab";
 import type { ReviewRow, SitterDetail } from "../types";
 
 const SERVICE_TYPE_LABEL: Record<string, string> = {
+  visit: "방문돌봄",
+  foster: "위탁돌봄",
   walk: "산책",
-  care: "방문돌봄",
-  hotel: "위탁돌봄",
   pickup: "픽업",
 };
 

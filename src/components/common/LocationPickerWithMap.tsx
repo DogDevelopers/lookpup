@@ -161,7 +161,7 @@ export default function LocationPickerWithMap({
   return (
     <div className={`flex flex-col gap-3 ${className}`}>
       <Script
-        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${clientEnv.NEXT_PUBLIC_KAKAO_MAP_APP_KEY}&autoload=false&libraries=services`}
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${clientEnv.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false&libraries=services`}
         strategy="afterInteractive"
         onReady={() => window.kakao.maps.load(initMap)}
       />

@@ -2,7 +2,7 @@ export interface HeaderUser {
   fullName: string | null;
   email: string | null;
   profileImage: string | null;
-  role: "user" | "sitter" | "admin";
+  role: "owner" | "both" | "admin";
   isVerified: boolean;
 }
 

@@ -389,7 +389,7 @@ export default function KakaoMap({
   return (
     <div style={{ width: "100%", height: "100%" }} className={className}>
       <Script
-        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${clientEnv.NEXT_PUBLIC_KAKAO_MAP_APP_KEY}&autoload=false&libraries=services`}
+        src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${clientEnv.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false&libraries=services`}
         strategy="afterInteractive"
         onReady={() => window.kakao.maps.load(initMap)}
       />

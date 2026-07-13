@@ -35,3 +35,27 @@ export const petRegisterSchema = baseSchema.superRefine((data, ctx) => {
     ctx.addIssue({ code: "custom", message: "성별을 선택해주세요.", path: ["gender"] });
   }
 });
+
+export const petUpdateSchema = z.object({
+  name: z
+    .string()
+    .min(1, "이름을 입력해주세요.")
+    .max(20, "이름은 20자 이하로 입력해주세요."),
+  breed: z.string().max(50, "품종은 50자 이하로 입력해주세요."),
+  age: z
+    .string()
+    .refine(
+      (v) => v === "" || (/^\d+$/.test(v) && Number(v) <= 240),
+      "나이를 올바르게 입력해주세요.",
+    ),
+  weight: z
+    .string()
+    .refine(
+      (v) => v === "" || (/^\d+(\.\d+)?$/.test(v) && Number(v) <= 100),
+      "체중을 올바르게 입력해주세요.",
+    ),
+  gender: z.enum(["male", "female"]),
+  neutered: z.boolean(),
+  caution: z.string().max(500, "특이사항은 500자 이하로 입력해주세요."),
+});
+export type PetUpdateInput = z.infer<typeof petUpdateSchema>;
