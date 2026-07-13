@@ -83,7 +83,7 @@ export default function LegalPage({
           </button>
           <div>
             <h2 className="text-2xl font-bold text-stone-900">{title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+            <p className="text-sm text-stone-500 mt-1">{subtitle}</p>
           </div>
         </div>
 
@@ -141,7 +141,7 @@ export default function LegalPage({
             <p className="text-sm font-semibold text-[var(--color-orange-500)]">
               적용일자
             </p>
-            <p className="text-sm text-gray-500 mt-1">{effectiveDate}</p>
+            <p className="text-sm text-stone-500 mt-1">{effectiveDate}</p>
           </div>
         </div>
       </div>
