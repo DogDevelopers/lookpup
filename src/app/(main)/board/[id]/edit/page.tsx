@@ -1,11 +1,32 @@
+import { redirect, notFound } from "next/navigation";
 import BoardEditClient from "@/features/board/components/BoardEditClient";
+import { getRequestForEdit, getUserPets } from "@/features/board/queries";
+import { createClient } from "@/lib/supabase/server";
 
-// TODO: 로그인 여부 확인 후 리다이렉트, features/board/queries.ts로 post/pets 실데이터 조회.
 export default async function BoardEditPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  return <BoardEditClient id={id} />;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/login");
+
+  const { data: request } = await supabase
+    .from("requests")
+    .select("owner_id")
+    .eq("id", id)
+    .maybeSingle();
+  if (!request) notFound();
+  if (request.owner_id !== user.id) redirect(`/board/${id}`);
+
+  const [initialData, pets] = await Promise.all([
+    getRequestForEdit(id),
+    getUserPets(user.id),
+  ]);
+
+  return <BoardEditClient id={id} initialData={initialData} initialPets={pets} />;
 }

@@ -1,6 +1,15 @@
+import { redirect } from "next/navigation";
 import BoardWriteClient from "@/features/board/components/BoardWriteClient";
+import { getUserPets } from "@/features/board/queries";
+import { createClient } from "@/lib/supabase/server";
 
-// TODO: 로그인 여부 확인 후 리다이렉트, features/pet-register 이식 후 pets 실데이터 조회.
-export default function BoardWritePage() {
-  return <BoardWriteClient />;
+export default async function BoardWritePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/auth/login");
+
+  const pets = await getUserPets(user.id);
+  return <BoardWriteClient userId={user.id} pets={pets} />;
 }
