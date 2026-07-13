@@ -42,7 +42,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast:
             "bg-white! text-stone-900! border! border-orange-100! rounded-xl! shadow-[0px_4px_20px_0px_rgba(232,116,42,0.15)]!",
-          description: "text-gray-500!",
+          description: "text-stone-500!",
           actionButton:
             "rounded-lg! bg-orange-50! text-orange-600! font-medium! hover:bg-orange-100!",
           closeButton: "border-orange-100! text-stone-400! hover:bg-orange-50!",

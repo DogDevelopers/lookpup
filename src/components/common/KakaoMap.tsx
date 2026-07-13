@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Script from "next/script";
 import { clientEnv } from "@/lib/env";
 import { formatDistance } from "@/lib/distance";
+import { ORANGE_MARKER_SIZE, ORANGE_MARKER_URL } from "@/lib/map-marker";
 
 export interface MapMarker {
   lat: number;
@@ -30,27 +31,21 @@ interface KakaoMapProps {
   onMarkerDragEnd?: (lat: number, lng: number) => void;
 }
 
+const SELECTED_MARKER_SVG = encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="#FF6900" stroke="white" stroke-width="2.5"/>
+    <circle cx="12" cy="12" r="4" fill="white"/>
+  </svg>`,
+);
+const SELECTED_MARKER_URL = `data:image/svg+xml,${SELECTED_MARKER_SVG}`;
+const SELECTED_MARKER_SIZE = { width: 24, height: 24, offsetX: 12, offsetY: 12 };
+
 function markerImageUrl(selected = false): string {
-  const svg = selected
-    ? encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" fill="#FF6900" stroke="white" stroke-width="2.5"/>
-          <circle cx="12" cy="12" r="4" fill="white"/>
-        </svg>`,
-      )
-    : encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-          <path d="M16 0C7.163 0 0 7.163 0 16c0 10.667 16 26 16 26S32 26.667 32 16C32 7.163 24.837 0 16 0z" fill="#FF6900" stroke="white" stroke-width="1.5"/>
-          <circle cx="16" cy="16" r="6" fill="white"/>
-        </svg>`,
-      );
-  return `data:image/svg+xml,${svg}`;
+  return selected ? SELECTED_MARKER_URL : ORANGE_MARKER_URL;
 }
 
 function getMarkerSize(selected = false) {
-  return selected
-    ? { width: 24, height: 24, offsetX: 12, offsetY: 12 }
-    : { width: 32, height: 42, offsetX: 16, offsetY: 42 };
+  return selected ? SELECTED_MARKER_SIZE : ORANGE_MARKER_SIZE;
 }
 
 export default function KakaoMap({
@@ -347,7 +342,7 @@ export default function KakaoMap({
     inner.appendChild(nameEl);
 
     const areaEl = document.createElement("div");
-    areaEl.style.cssText = "color:var(--color-gray-500); font-size:12px; margin-top:2px;";
+    areaEl.style.cssText = "color:var(--color-stone-500); font-size:12px; margin-top:2px;";
     areaEl.textContent = [district, neighborhood].filter(Boolean).join(" ");
     inner.appendChild(areaEl);
 

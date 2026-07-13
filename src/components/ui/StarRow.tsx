@@ -15,7 +15,7 @@ export default function StarRow({ size, count = 5 }: Props) {
           className={
             i < count
               ? "fill-amber-400 text-amber-400"
-              : "fill-gray-200 text-gray-200"
+              : "fill-stone-200 text-stone-200"
           }
         />
       ))}

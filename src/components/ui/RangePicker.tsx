@@ -130,7 +130,7 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
           onClick={() => setMonth((m) => subMonths(m, 1))}
           className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 hover:bg-orange-50 transition-colors"
         >
-          <ChevronLeft size={16} className="text-gray-500" />
+          <ChevronLeft size={16} className="text-stone-500" />
         </button>
         <span className="text-stone-900 text-base font-semibold">
           {format(month, "yyyy년 M월", { locale: ko })}
@@ -139,7 +139,7 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
           onClick={() => setMonth((m) => addMonths(m, 1))}
           className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 hover:bg-orange-50 transition-colors"
         >
-          <ChevronRight size={16} className="text-gray-500" />
+          <ChevronRight size={16} className="text-stone-500" />
         </button>
       </div>
 
@@ -147,7 +147,7 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
         {DAY_LABELS.map((d) => (
           <div
             key={d}
-            className="text-center text-xs font-medium text-gray-400 py-1"
+            className="text-center text-xs font-medium text-stone-400 py-1"
           >
             {d}
           </div>
@@ -197,8 +197,8 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
                     disabled={disabled}
                     className={[
                       "relative z-10 w-9 h-9 rounded-full text-sm font-medium transition-colors",
-                      past ? "text-gray-300 cursor-not-allowed" : "",
-                      booked ? "text-gray-300 cursor-not-allowed line-through" : "",
+                      past ? "text-stone-300 cursor-not-allowed" : "",
+                      booked ? "text-stone-300 cursor-not-allowed line-through" : "",
                       !disabled && (kind === "start" || kind === "end" || kind === "single")
                         ? "bg-[var(--color-orange-500)] text-white"
                         : !disabled && kind === "middle"
