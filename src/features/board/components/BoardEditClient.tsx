@@ -251,7 +251,7 @@ export default function BoardEditClient({
                       }
                       placeholder="0"
                       min={0}
-                      className="w-full text-lg text-gray-500 placeholder:text-gray-500 outline-none bg-transparent"
+                      className="w-full text-lg text-stone-500 placeholder:text-stone-500 outline-none bg-transparent"
                     />
                   </div>
                   <span className="text-[15px] font-medium text-brown-900">
@@ -334,7 +334,7 @@ export default function BoardEditClient({
               </h2>
 
               <div className="relative mt-4">
-                <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <MapPin className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   value={form.location}
@@ -353,7 +353,7 @@ export default function BoardEditClient({
                     }
                   }}
                   placeholder="주소 검색 후 Enter"
-                  className="w-full h-12 pl-9 pr-20 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition"
+                  className="w-full h-12 pl-9 pr-20 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none focus:border-[var(--color-orange-500)] transition"
                 />
                 <button
                   type="button"
@@ -365,7 +365,7 @@ export default function BoardEditClient({
                 </button>
               </div>
 
-              <p className="text-gray-400 text-xs mt-2">
+              <p className="text-stone-400 text-xs mt-2">
                 도로명 주소를 입력하거나, 지도를 누르거나 마커를 드래그해 위치를
                 지정하세요.
               </p>
@@ -424,7 +424,7 @@ export default function BoardEditClient({
                 {addressSearching ? "위치 확인 중..." : "현재 위치 사용"}
               </button>
 
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-stone-400 mt-2">
                 개인정보 보호를 위해 좌표는 약 100m 오차 내로 저장돼요. 지도 핀
                 위치가 입력한 주소와 약간 다르게 보일 수 있어요.
               </p>
@@ -472,7 +472,7 @@ export default function BoardEditClient({
                         <div className="text-brown-900 text-base font-bold">
                           {pet.name}
                         </div>
-                        <div className="text-gray-400 text-xs mt-0.5">
+                        <div className="text-stone-400 text-xs mt-0.5">
                           {pet.age}살 · {pet.weight}kg
                         </div>
                       </div>
@@ -488,7 +488,7 @@ export default function BoardEditClient({
                   <label className="text-sm font-bold text-brown-900">
                     게시글 제목
                   </label>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-stone-400">
                     {form.title.length} / 50
                   </span>
                 </div>
@@ -500,7 +500,7 @@ export default function BoardEditClient({
                       setForm((prev) => ({ ...prev, title: e.target.value }));
                   }}
                   placeholder="예: 이번 주말 강아지 산책 펫시터 구해요"
-                  className="w-full h-12 px-4 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition"
+                  className="w-full h-12 px-4 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none focus:border-[var(--color-orange-500)] transition"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -508,7 +508,7 @@ export default function BoardEditClient({
                   <label className="text-sm font-bold text-brown-900">
                     상세 내용
                   </label>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-stone-400">
                     {form.content.length} / 500
                   </span>
                 </div>
@@ -523,7 +523,7 @@ export default function BoardEditClient({
                   }}
                   placeholder="펫시터에게 전달하고 싶은 내용을 입력해주세요"
                   rows={7}
-                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
+                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
                 />
               </div>
             </div>
@@ -537,21 +537,21 @@ export default function BoardEditClient({
                       선택
                     </span>
                   </label>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-stone-400">
                     {form.conditions.length} / 500
                   </span>
                 </div>
-                <p className="text-xs text-gray-400 -mt-1">
+                <p className="text-xs text-stone-400 -mt-1">
                   원하는 펫시터 조건을 자유롭게 작성하세요
                 </p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs text-gray-400">조건 추가하기</span>
+                  <span className="text-xs text-stone-400">조건 추가하기</span>
                   {SITTER_CONDITIONS.map((condition) => (
                     <button
                       key={condition}
                       type="button"
                       onClick={() => appendCondition(condition)}
-                      className="px-3 py-1 rounded-full text-xs font-medium border border-orange-100 text-gray-500 hover:border-[var(--color-orange-500)]/50 hover:text-[var(--color-orange-500)] transition-colors"
+                      className="px-3 py-1 rounded-full text-xs font-medium border border-orange-100 text-stone-500 hover:border-[var(--color-orange-500)]/50 hover:text-[var(--color-orange-500)] transition-colors"
                     >
                       {condition}
                     </button>
@@ -568,7 +568,7 @@ export default function BoardEditClient({
                   }}
                   placeholder="예: - 책임감 있고 성실하신 분"
                   rows={6}
-                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
+                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
                 />
               </div>
             </div>

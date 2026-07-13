@@ -119,7 +119,7 @@ export default function BoardDetailClient({
     return (
       <>
         <main className="flex-1 bg-orange-50 min-h-screen">
-          <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-20 text-center text-gray-400">
+          <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-20 text-center text-stone-400">
             게시글을 찾을 수 없습니다.
           </div>
         </main>
@@ -174,21 +174,21 @@ export default function BoardDetailClient({
                   {post.status === "open" && (
                     <button
                       onClick={handleClose}
-                      className="px-3 py-1.5 bg-gray-100 rounded-lg text-gray-500 text-xs font-medium hover:bg-gray-200 transition-colors"
+                      className="px-3 py-1.5 bg-stone-100 rounded-lg text-stone-500 text-xs font-medium hover:bg-stone-200 transition-colors"
                     >
                       모집마감
                     </button>
                   )}
                   <Link
                     href={`/board/${post.id}/edit`}
-                    className="px-3 py-1.5 bg-gray-100 rounded-lg text-gray-500 text-xs font-medium flex items-center gap-1 hover:bg-gray-200 transition-colors"
+                    className="px-3 py-1.5 bg-stone-100 rounded-lg text-stone-500 text-xs font-medium flex items-center gap-1 hover:bg-stone-200 transition-colors"
                   >
                     <Pencil size={12} />
                     수정
                   </Link>
                   <button
                     onClick={() => setDeleteTargetId(post.id)}
-                    className="px-3 py-1.5 bg-gray-100 rounded-lg text-gray-500 text-xs font-medium flex items-center gap-1 hover:bg-gray-200 transition-colors"
+                    className="px-3 py-1.5 bg-stone-100 rounded-lg text-stone-500 text-xs font-medium flex items-center gap-1 hover:bg-stone-200 transition-colors"
                   >
                     <Trash2 size={12} />
                     삭제
@@ -228,7 +228,7 @@ export default function BoardDetailClient({
                     <span className="px-3 py-1 bg-emerald-50 text-emerald-500 text-xs font-medium rounded-full">
                       {STATUS_MAP[post.status] ?? post.status}
                     </span>
-                    <div className="flex items-center gap-3 md:gap-4 text-gray-500 text-sm">
+                    <div className="flex items-center gap-3 md:gap-4 text-stone-500 text-sm">
                       <span>{formatRelativeTime(post.created_at)}</span>
                       <span>조회 {post.view_count}</span>
                       <span>지원 {post.applications.length}명</span>
@@ -243,7 +243,7 @@ export default function BoardDetailClient({
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-gray-500 text-xs">위치</p>
+                        <p className="text-stone-500 text-xs">위치</p>
                         <p className="text-brown-900 text-base font-medium">
                           {post.location}
                         </p>
@@ -252,7 +252,7 @@ export default function BoardDetailClient({
                     <div className="flex items-start gap-3">
                       <Calendar className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-gray-500 text-xs">기간</p>
+                        <p className="text-stone-500 text-xs">기간</p>
                         <p className="text-brown-900 text-base font-medium">
                           {formatPeriod(post.start_datetime, post.end_datetime)}
                         </p>
@@ -261,7 +261,7 @@ export default function BoardDetailClient({
                     <div className="flex items-start gap-3">
                       <Clock className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-gray-500 text-xs">시간</p>
+                        <p className="text-stone-500 text-xs">시간</p>
                         <p className="text-brown-900 text-base font-medium">
                           {formatTimeRange(
                             post.start_datetime,
@@ -273,7 +273,7 @@ export default function BoardDetailClient({
                     <div className="flex items-start gap-3">
                       <DollarSign className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
-                        <p className="text-gray-500 text-xs">급여</p>
+                        <p className="text-stone-500 text-xs">급여</p>
                         <p className="text-orange-500 text-base font-medium">
                           {post.budget
                             ? `${post.budget.toLocaleString()}원`
@@ -327,7 +327,7 @@ export default function BoardDetailClient({
                       <span className="text-sm font-semibold text-brown-900">
                         {post.pets.name}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-stone-500">
                         {post.pets.breed ?? post.pets.animal_type}
                       </span>
                     </div>
@@ -341,7 +341,7 @@ export default function BoardDetailClient({
                     지원자 {post.applications.length}명
                   </h2>
                   {post.applications.length === 0 ? (
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-stone-500 text-sm">
                       아직 지원자가 없습니다.
                     </p>
                   ) : (
@@ -406,7 +406,7 @@ export default function BoardDetailClient({
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-stone-500 text-xs">
                         가입{" "}
                         {post.users?.created_at
                           ? formatJoinDate(post.users.created_at)
@@ -431,11 +431,11 @@ export default function BoardDetailClient({
                 </div>
                 <div className="flex flex-col gap-3">
                   {otherPosts === null ? (
-                    <p className="text-gray-400 text-sm py-3 text-center">
+                    <p className="text-stone-400 text-sm py-3 text-center">
                       불러오는 중...
                     </p>
                   ) : otherPosts.length === 0 ? (
-                    <p className="text-gray-400 text-sm py-3 text-center">
+                    <p className="text-stone-400 text-sm py-3 text-center">
                       다른 게시물이 없습니다.
                     </p>
                   ) : (
@@ -468,8 +468,8 @@ export default function BoardDetailClient({
                               </span>
                             </div>
                             <div className="flex items-center gap-1 mb-1">
-                              <MapPin className="w-3 h-3 text-gray-400" />
-                              <span className="text-gray-500 text-xs">
+                              <MapPin className="w-3 h-3 text-stone-400" />
+                              <span className="text-stone-500 text-xs">
                                 {p.district}
                               </span>
                             </div>
@@ -477,7 +477,7 @@ export default function BoardDetailClient({
                               <span className="text-orange-500 text-xs font-semibold">
                                 {p.price}
                               </span>
-                              <span className="text-gray-500 text-xs">
+                              <span className="text-stone-500 text-xs">
                                 {p.createdAt}
                               </span>
                             </div>

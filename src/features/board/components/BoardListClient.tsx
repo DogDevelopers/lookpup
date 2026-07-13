@@ -36,18 +36,18 @@ function PostCard({ post, index = 0 }: { post: PostListItem; index?: number }) {
             </span>
           </div>
 
-          <p className="text-gray-500 text-base leading-6 line-clamp-1">
+          <p className="text-stone-500 text-base leading-6 line-clamp-1">
             {post.desc}
           </p>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
             <div className="flex items-center gap-1">
-              <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="text-gray-500 text-sm">{post.location}</span>
+              <MapPin className="w-4 h-4 text-stone-400 shrink-0" />
+              <span className="text-stone-500 text-sm">{post.location}</span>
             </div>
             <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
-              <span className="text-gray-500 text-sm">{post.period}</span>
+              <Calendar className="w-4 h-4 text-stone-400 shrink-0" />
+              <span className="text-stone-500 text-sm">{post.period}</span>
             </div>
             <div className="flex items-center gap-1">
               <DollarSign className="w-4 h-4 text-orange-400 shrink-0" />
@@ -59,8 +59,8 @@ function PostCard({ post, index = 0 }: { post: PostListItem; index?: number }) {
         </div>
 
         <div className="flex flex-col items-end gap-2 shrink-0">
-          <span className="text-gray-400 text-xs">{post.createdAt}</span>
-          <ChevronRight className="w-5 h-5 text-gray-400 mt-1" />
+          <span className="text-stone-400 text-xs">{post.createdAt}</span>
+          <ChevronRight className="w-5 h-5 text-stone-400 mt-1" />
         </div>
       </div>
     </Link>
@@ -146,7 +146,7 @@ export default function BoardListClient({
                 <h1 className="text-3xl font-bold text-brown-900">
                   구인게시판
                 </h1>
-                <p className="text-gray-500 text-base mt-2">
+                <p className="text-stone-500 text-base mt-2">
                   펫시터를 찾거나 구인 정보를 확인하세요
                 </p>
               </div>
@@ -177,7 +177,7 @@ export default function BoardListClient({
             </div>
 
             <div className="mb-4">
-              <span className="text-gray-500 text-sm">
+              <span className="text-stone-500 text-sm">
                 총 {filtered.length}개의 구인글
               </span>
             </div>
@@ -188,7 +188,7 @@ export default function BoardListClient({
                   <PostCard key={post.id} post={post} index={i} />
                 ))
               ) : (
-                <div className="py-20 text-center text-gray-400 text-base bg-white rounded-2xl border border-orange-100">
+                <div className="py-20 text-center text-stone-400 text-base bg-white rounded-2xl border border-orange-100">
                   검색 결과가 없습니다.
                 </div>
               )}
@@ -200,7 +200,7 @@ export default function BoardListClient({
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   disabled={safePage === 1}
                   aria-label="이전 페이지"
-                  className="w-10 h-10 rounded-lg bg-white text-gray-500 hover:bg-orange-50 disabled:opacity-40 disabled:hover:bg-white transition-colors flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg bg-white text-stone-500 hover:bg-orange-50 disabled:opacity-40 disabled:hover:bg-white transition-colors flex items-center justify-center"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -212,7 +212,7 @@ export default function BoardListClient({
                     className={`w-10 h-10 rounded-lg text-base font-medium transition-colors ${
                       n === safePage
                         ? "bg-orange-500 text-white"
-                        : "bg-white text-gray-500 hover:bg-orange-50"
+                        : "bg-white text-stone-500 hover:bg-orange-50"
                     }`}
                   >
                     {n}
@@ -225,7 +225,7 @@ export default function BoardListClient({
                   }
                   disabled={safePage === totalPages}
                   aria-label="다음 페이지"
-                  className="w-10 h-10 rounded-lg bg-white text-gray-500 hover:bg-orange-50 disabled:opacity-40 disabled:hover:bg-white transition-colors flex items-center justify-center"
+                  className="w-10 h-10 rounded-lg bg-white text-stone-500 hover:bg-orange-50 disabled:opacity-40 disabled:hover:bg-white transition-colors flex items-center justify-center"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
