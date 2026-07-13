@@ -1111,10 +1111,10 @@ export function ConfirmationCard({
     <div className="flex justify-end">
       <div className="w-79.5 p-4 bg-white rounded-2xl outline-[1.11px] outline-orange-200 outline-offset-[-1.11px] flex flex-col">
         <div className="flex flex-col">
-          <span className="text-[#6B7280] text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
+          <span className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
             예약 확정
           </span>
-          <span className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <span className="text-stone-900 text-sm leading-5 mt-0.5">
             예약이 완료되었습니다!
             <br />
             1:1 채팅에서 결제를 진행해주세요.
@@ -1141,7 +1141,7 @@ export function ConfirmationCard({
                 </span>
               )}
             </div>
-            <span className="text-[#374151] text-sm leading-5 truncate flex-1">
+            <span className="text-gray-700 text-sm leading-5 truncate flex-1">
               {postTitle}
             </span>
           </button>
@@ -1180,7 +1180,7 @@ export function SitterConfirmationCard({
           <span className="text-orange-500 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
             예약 확정
           </span>
-          <span className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <span className="text-stone-900 text-sm leading-5 mt-0.5">
             예약이 완료되었습니다!
             <br />
             1:1 채팅에서 결제 내용을 확인해주세요.
@@ -1207,7 +1207,7 @@ export function SitterConfirmationCard({
                 </span>
               )}
             </div>
-            <span className="text-[#374151] text-sm leading-5 truncate flex-1">
+            <span className="text-gray-700 text-sm leading-5 truncate flex-1">
               {postTitle}
             </span>
           </button>
@@ -1236,12 +1236,12 @@ export function OwnerRejectionCard() {
             <span className="text-red-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               지원 거절
             </span>
-            <span className="text-[#111827] text-sm leading-5 mt-0.5">
+            <span className="text-gray-900 text-sm leading-5 mt-0.5">
               지원을 거절했습니다.
             </span>
           </div>
         </div>
-        <p className="pt-3 text-[#6B7280] text-xs leading-5">
+        <p className="pt-3 text-gray-500 text-xs leading-5">
           아쉽게도 이번 지원은 거절되었습니다.
         </p>
       </div>
@@ -1261,12 +1261,12 @@ export function SitterRejectionCard() {
             <span className="text-red-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               지원 거절
             </span>
-            <span className="text-[#111827] text-sm leading-5 mt-0.5">
+            <span className="text-gray-900 text-sm leading-5 mt-0.5">
               지원이 거절되었습니다.
             </span>
           </div>
         </div>
-        <p className="pt-3 text-[#6B7280] text-xs leading-5">
+        <p className="pt-3 text-gray-500 text-xs leading-5">
           아쉽게도 이번 지원은 거절되었습니다.
         </p>
         <div className="pt-3">
@@ -1293,12 +1293,12 @@ export function ReservationCanceledCard({ sentByMe }: { sentByMe: boolean }) {
             <span className="text-red-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               예약 취소
             </span>
-            <span className="text-[#111827] text-sm leading-5 mt-0.5">
+            <span className="text-gray-900 text-sm leading-5 mt-0.5">
               {sentByMe ? "예약을 취소했습니다." : "예약이 취소되었습니다."}
             </span>
           </div>
         </div>
-        <p className="pt-3 text-[#6B7280] text-xs leading-5">
+        <p className="pt-3 text-gray-500 text-xs leading-5">
           {sentByMe
             ? "취소된 예약은 되돌릴 수 없습니다."
             : "상대방이 예약을 취소했습니다."}
@@ -1684,15 +1684,15 @@ export function PaymentRequestCard({
       <Avatar initial={otherInitial} src={otherProfileImage} size="sm" />
       <div className="w-79.5 p-4 bg-white rounded-2xl outline-[1.11px] outline-orange-200 outline-offset-[-1.11px] flex flex-col gap-3">
         <div className="flex flex-col">
-          <span className="text-[#6B7280] text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
+          <span className="text-gray-500 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
             {isExtra ? "추가금 결제 요청" : "결제 요청"}
           </span>
-          <span className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <span className="text-stone-900 text-sm leading-5 mt-0.5">
             {isExtra
               ? "추가금 결제 요청이 도착했어요."
               : "결제 요청이 도착했어요."}
           </span>
-          <span className="text-[#6B7280] text-xs mt-1 leading-[19.5px]">
+          <span className="text-gray-500 text-xs mt-1 leading-[19.5px]">
             완료될 때까지 봐주개가 결제 금액을 안전하게 보관해요.
           </span>
         </div>
@@ -1718,7 +1718,7 @@ export function PaymentRequestCard({
                 </span>
               )}
             </div>
-            <span className="text-[#374151] text-sm leading-5 truncate flex-1">
+            <span className="text-gray-700 text-sm leading-5 truncate flex-1">
               {reason}
             </span>
           </button>
@@ -1726,14 +1726,14 @@ export function PaymentRequestCard({
 
         {costItems && costItems.length > 0 && (
           <div className="flex flex-col gap-1 px-1">
-            <span className="text-[#6B7280] text-[10px] font-semibold uppercase tracking-[0.3px]">
+            <span className="text-gray-500 text-[10px] font-semibold uppercase tracking-[0.3px]">
               비용 상세 내역
             </span>
             <div className="flex flex-col gap-1 mt-0.5">
               {costItems.map((item) => (
                 <div key={item.id} className="flex flex-col">
                   <div className="flex justify-between items-center">
-                    <span className="text-[#374151] text-xs font-medium">
+                    <span className="text-gray-700 text-xs font-medium">
                       {item.name}
                     </span>
                     <span className="text-orange-500 text-xs font-medium">
@@ -1744,7 +1744,7 @@ export function PaymentRequestCard({
                     </span>
                   </div>
                   {item.description && (
-                    <span className="text-[#9CA3AF] text-[10px] leading-4">
+                    <span className="text-gray-400 text-[10px] leading-4">
                       {item.description}
                     </span>
                   )}
@@ -1757,14 +1757,14 @@ export function PaymentRequestCard({
 
         <div className="flex flex-col gap-1.5">
           <div className="flex justify-between items-center">
-            <span className="text-[#6B7280] text-xs">요청 금액</span>
+            <span className="text-gray-500 text-xs">요청 금액</span>
             <span className="text-orange-500 text-xs">
               {amount.toLocaleString("ko-KR")} 원
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-[#6B7280] text-xs">결제 기한</span>
-            <span className="text-[#374151] text-xs">{deadline}</span>
+            <span className="text-gray-500 text-xs">결제 기한</span>
+            <span className="text-gray-700 text-xs">{deadline}</span>
           </div>
         </div>
 
@@ -1829,7 +1829,7 @@ export function SitterPaymentRequestCard({
         <span className="text-orange-500 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
           {isExtra ? "추가금 결제 요청" : "결제 요청"}
         </span>
-        <span className="text-[#281A0E] text-sm leading-5 mt-0.5">
+        <span className="text-stone-900 text-sm leading-5 mt-0.5">
           {isExtra ? "추가금 결제가 요청되었습니다." : "결제가 요청되었습니다."}
         </span>
         {onPostClick && (
@@ -1853,7 +1853,7 @@ export function SitterPaymentRequestCard({
                 </span>
               )}
             </div>
-            <span className="text-[#374151] text-sm leading-5 truncate flex-1">
+            <span className="text-gray-700 text-sm leading-5 truncate flex-1">
               {reason}
             </span>
           </button>
@@ -1861,14 +1861,14 @@ export function SitterPaymentRequestCard({
 
         {costItems && costItems.length > 0 && (
           <div className="mt-3 flex flex-col gap-1 px-1">
-            <span className="text-[#6B7280] text-[10px] font-semibold uppercase tracking-[0.3px]">
+            <span className="text-gray-500 text-[10px] font-semibold uppercase tracking-[0.3px]">
               비용 상세 내역
             </span>
             <div className="flex flex-col gap-1 mt-0.5">
               {costItems.map((item) => (
                 <div key={item.id} className="flex flex-col">
                   <div className="flex justify-between items-center">
-                    <span className="text-[#374151] text-xs font-medium">
+                    <span className="text-gray-700 text-xs font-medium">
                       {item.name}
                     </span>
                     <span className="text-orange-500 text-xs font-medium">
@@ -1879,7 +1879,7 @@ export function SitterPaymentRequestCard({
                     </span>
                   </div>
                   {item.description && (
-                    <span className="text-[#9CA3AF] text-[10px] leading-4">
+                    <span className="text-gray-400 text-[10px] leading-4">
                       {item.description}
                     </span>
                   )}
@@ -1892,13 +1892,13 @@ export function SitterPaymentRequestCard({
 
         <div className="mt-3 flex flex-col gap-1.5">
           <div className="flex justify-between items-center">
-            <span className="text-[#6B7280] text-xs">요청 금액</span>
+            <span className="text-gray-500 text-xs">요청 금액</span>
             <span className="text-orange-500 text-xs font-medium">
               {amount.toLocaleString("ko-KR")} 원
             </span>
           </div>
         </div>
-        <p className="mt-3 text-[#6B7280] text-xs leading-relaxed">
+        <p className="mt-3 text-gray-500 text-xs leading-relaxed">
           보호자가 결제를 완료하면 알림을 드릴게요.
         </p>
       </div>
@@ -1949,14 +1949,14 @@ export function ServiceCompleteCard({
       <Avatar initial={otherInitial} src={otherProfileImage} size="sm" />
       <div className="w-79.5 p-4 bg-white rounded-2xl outline-[1.11px] outline-orange-200 outline-offset-[-1.11px] flex flex-col gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center shrink-0">
-            <CheckCircle size={18} className="text-[#10B981]" />
+          <div className="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
+            <CheckCircle size={18} className="text-emerald-500" />
           </div>
           <div>
-            <span className="text-[#065F46] text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
+            <span className="text-emerald-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               서비스 완료
             </span>
-            <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+            <p className="text-stone-900 text-sm leading-5 mt-0.5">
               펫시터가 서비스를 완료했어요.
             </p>
           </div>
@@ -1980,8 +1980,8 @@ export function ServiceCompleteCard({
             )}
             {data?.startDatetime && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">일정</span>
-                <span className="text-[#374151] text-xs">
+                <span className="text-gray-500 text-xs shrink-0">일정</span>
+                <span className="text-gray-700 text-xs">
                   {formatServiceDate(data.startDatetime)}
                   {data.endDatetime
                     ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -1991,7 +1991,7 @@ export function ServiceCompleteCard({
             )}
             {data?.totalPrice !== undefined && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+                <span className="text-gray-500 text-xs shrink-0">금액</span>
                 <span className="text-orange-500 text-xs font-medium">
                   {data.totalPrice.toLocaleString("ko-KR")}원
                 </span>
@@ -1999,7 +1999,7 @@ export function ServiceCompleteCard({
             )}
           </div>
         )}
-        <p className="text-[#6B7280] text-xs leading-relaxed">
+        <p className="text-gray-500 text-xs leading-relaxed">
           서비스가 완료되었다면 확인 버튼을 눌러주세요.
         </p>
         {confirmed ? (
@@ -2038,14 +2038,14 @@ export function SitterServiceCompleteCard({
     <div className="flex justify-end">
       <div className="w-79.5 p-4 bg-orange-100 rounded-2xl outline-[1.11px] outline-orange-400 outline-offset-[-1.11px] flex flex-col gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center shrink-0">
-            <CheckCircle size={18} className="text-[#10B981]" />
+          <div className="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
+            <CheckCircle size={18} className="text-emerald-500" />
           </div>
           <div>
             <span className="text-orange-500 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               서비스 완료
             </span>
-            <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+            <p className="text-stone-900 text-sm leading-5 mt-0.5">
               서비스를 완료했습니다.
             </p>
           </div>
@@ -2069,8 +2069,8 @@ export function SitterServiceCompleteCard({
             )}
             {data?.startDatetime && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">일정</span>
-                <span className="text-[#374151] text-xs">
+                <span className="text-gray-500 text-xs shrink-0">일정</span>
+                <span className="text-gray-700 text-xs">
                   {formatServiceDate(data.startDatetime)}
                   {data.endDatetime
                     ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -2080,7 +2080,7 @@ export function SitterServiceCompleteCard({
             )}
             {data?.totalPrice !== undefined && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+                <span className="text-gray-500 text-xs shrink-0">금액</span>
                 <span className="text-orange-500 text-xs font-medium">
                   {data.totalPrice.toLocaleString("ko-KR")}원
                 </span>
@@ -2088,7 +2088,7 @@ export function SitterServiceCompleteCard({
             )}
           </div>
         )}
-        <p className="text-[#6B7280] text-xs leading-relaxed">
+        <p className="text-gray-500 text-xs leading-relaxed">
           보호자의 확인 후 서비스가 완료됩니다.
         </p>
       </div>
@@ -2130,18 +2130,18 @@ export function ServiceCompletedCard({
       }`}
     >
       <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center shrink-0">
-          <CheckCircle size={18} className="text-[#10B981]" />
+        <div className="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
+          <CheckCircle size={18} className="text-emerald-500" />
         </div>
         <div>
           <span
             className={`text-[10px] font-bold uppercase tracking-[0.3px] leading-4 ${
-              sentByMe ? "text-orange-500" : "text-[#065F46]"
+              sentByMe ? "text-orange-500" : "text-emerald-800"
             }`}
           >
             서비스 완료
           </span>
-          <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <p className="text-stone-900 text-sm leading-5 mt-0.5">
             {sentByMe
               ? "서비스 완료를 확인했어요."
               : "보호자가 서비스 완료를 확인했어요."}
@@ -2171,8 +2171,8 @@ export function ServiceCompletedCard({
           )}
           {data?.startDatetime && (
             <div className="flex items-center gap-2">
-              <span className="text-[#6B7280] text-xs shrink-0">일정</span>
-              <span className="text-[#374151] text-xs">
+              <span className="text-gray-500 text-xs shrink-0">일정</span>
+              <span className="text-gray-700 text-xs">
                 {formatServiceDate(data.startDatetime)}
                 {data.endDatetime
                   ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -2182,7 +2182,7 @@ export function ServiceCompletedCard({
           )}
           {data?.totalPrice !== undefined && (
             <div className="flex items-center gap-2">
-              <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+              <span className="text-gray-500 text-xs shrink-0">금액</span>
               <span className="text-orange-500 text-xs font-medium">
                 {data.totalPrice.toLocaleString("ko-KR")}원
               </span>
@@ -2190,7 +2190,7 @@ export function ServiceCompletedCard({
           )}
         </div>
       )}
-      <p className="text-[#6B7280] text-xs leading-relaxed">
+      <p className="text-gray-500 text-xs leading-relaxed">
         {sentByMe
           ? "펫시터에게 완료 확인 소식이 전달되었어요."
           : "정산 및 리뷰 작성이 가능해요."}
@@ -2255,7 +2255,7 @@ export function ServiceStartCard({
             <span className="text-orange-600 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               서비스 시작
             </span>
-            <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+            <p className="text-stone-900 text-sm leading-5 mt-0.5">
               서비스를 시작했습니다.
             </p>
           </div>
@@ -2279,8 +2279,8 @@ export function ServiceStartCard({
             )}
             {data?.startDatetime && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">일정</span>
-                <span className="text-[#374151] text-xs">
+                <span className="text-gray-500 text-xs shrink-0">일정</span>
+                <span className="text-gray-700 text-xs">
                   {formatServiceDate(data.startDatetime)}
                   {data.endDatetime
                     ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -2290,7 +2290,7 @@ export function ServiceStartCard({
             )}
             {data?.totalPrice !== undefined && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+                <span className="text-gray-500 text-xs shrink-0">금액</span>
                 <span className="text-orange-500 text-xs font-medium">
                   {data.totalPrice.toLocaleString("ko-KR")}원
                 </span>
@@ -2324,7 +2324,7 @@ export function SitterServiceStartCard({
             <span className="text-orange-500 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               서비스 시작
             </span>
-            <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+            <p className="text-stone-900 text-sm leading-5 mt-0.5">
               서비스를 시작했습니다.
             </p>
           </div>
@@ -2348,8 +2348,8 @@ export function SitterServiceStartCard({
             )}
             {data?.startDatetime && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">일정</span>
-                <span className="text-[#374151] text-xs">
+                <span className="text-gray-500 text-xs shrink-0">일정</span>
+                <span className="text-gray-700 text-xs">
                   {formatServiceDate(data.startDatetime)}
                   {data.endDatetime
                     ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -2359,7 +2359,7 @@ export function SitterServiceStartCard({
             )}
             {data?.totalPrice !== undefined && (
               <div className="flex items-center gap-2">
-                <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+                <span className="text-gray-500 text-xs shrink-0">금액</span>
                 <span className="text-orange-500 text-xs font-medium">
                   {data.totalPrice.toLocaleString("ko-KR")}원
                 </span>
@@ -2367,7 +2367,7 @@ export function SitterServiceStartCard({
             )}
           </div>
         )}
-        <p className="text-[#6B7280] text-xs leading-relaxed">
+        <p className="text-gray-500 text-xs leading-relaxed">
           서비스가 시작되었습니다.
         </p>
       </div>
@@ -2391,28 +2391,28 @@ export function PaymentCompleteCard({
   const inner = (
     <div className="w-79.5 p-4 bg-white rounded-2xl outline-[1.11px] outline-orange-200 outline-offset-[-1.11px] flex flex-col gap-3">
       <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center shrink-0">
-          <CheckCircle size={18} className="text-[#10B981]" />
+        <div className="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
+          <CheckCircle size={18} className="text-emerald-500" />
         </div>
         <div>
-          <span className="text-[#065F46] text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
+          <span className="text-emerald-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
             결제 완료
           </span>
-          <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <p className="text-stone-900 text-sm leading-5 mt-0.5">
             결제가 완료되었어요!
           </p>
         </div>
       </div>
 
       <div className="w-full px-3 py-2 bg-orange-100 rounded-xl outline-[1.11px] outline-orange-200 outline-offset-[-1.11px] flex justify-between items-center">
-        <span className="text-[#6B7280] text-xs">결제 금액</span>
+        <span className="text-gray-500 text-xs">결제 금액</span>
         <span className="text-orange-500 text-sm font-bold">
           {amount.toLocaleString("ko-KR")}원
         </span>
       </div>
 
       <div className="pt-3 border-t border-orange-200">
-        <p className="text-[#9CA3AF] text-[11px] leading-[17.6px]">
+        <p className="text-gray-400 text-[11px] leading-[17.6px]">
           봐주개가 결제 금액을 안전하게 보관하고 있어요. 예약 완료 후 펫시터에게
           지급됩니다.
         </p>
@@ -2453,12 +2453,12 @@ export function ReservationRequestMessageCard({
       <div>
         <span
           className={`text-[10px] font-bold uppercase tracking-[0.3px] leading-4 ${
-            data.sentByMe ? "text-orange-500" : "text-[#6B7280]"
+            data.sentByMe ? "text-orange-500" : "text-gray-500"
           }`}
         >
           예약 요청
         </span>
-        <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+        <p className="text-stone-900 text-sm leading-5 mt-0.5">
           {data.sentByMe ? "예약을 요청했습니다." : "예약 요청이 도착했어요."}
         </p>
       </div>
@@ -2468,14 +2468,14 @@ export function ReservationRequestMessageCard({
         }`}
       >
         <div className="flex justify-between items-center">
-          <span className="text-[#6B7280] text-xs shrink-0">서비스</span>
-          <span className="text-[#374151] text-xs font-medium">
+          <span className="text-gray-500 text-xs shrink-0">서비스</span>
+          <span className="text-gray-700 text-xs font-medium">
             {data.serviceTitle}
           </span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-[#6B7280] text-xs shrink-0">날짜</span>
-          <span className="text-[#374151] text-xs">
+          <span className="text-gray-500 text-xs shrink-0">날짜</span>
+          <span className="text-gray-700 text-xs">
             {formatServiceDate(data.startDatetime)}
             {data.endDatetime
               ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -2484,14 +2484,14 @@ export function ReservationRequestMessageCard({
         </div>
         {data.petNames.length > 0 && (
           <div className="flex justify-between items-center">
-            <span className="text-[#6B7280] text-xs shrink-0">반려동물</span>
-            <span className="text-[#374151] text-xs">
+            <span className="text-gray-500 text-xs shrink-0">반려동물</span>
+            <span className="text-gray-700 text-xs">
               {data.petNames.join(", ")}
             </span>
           </div>
         )}
         <div className="flex justify-between items-center">
-          <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+          <span className="text-gray-500 text-xs shrink-0">금액</span>
           <span className="text-orange-500 text-xs font-medium">
             {data.totalPrice.toLocaleString("ko-KR")}원
           </span>
@@ -2531,18 +2531,18 @@ export function ReservationAcceptedMessageCard({
       }`}
     >
       <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center shrink-0">
-          <CheckCircle size={18} className="text-[#10B981]" />
+        <div className="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
+          <CheckCircle size={18} className="text-emerald-500" />
         </div>
         <div>
           <span
             className={`text-[10px] font-bold uppercase tracking-[0.3px] leading-4 ${
-              data.sentByMe ? "text-orange-500" : "text-[#065F46]"
+              data.sentByMe ? "text-orange-500" : "text-emerald-800"
             }`}
           >
             예약 확정
           </span>
-          <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <p className="text-stone-900 text-sm leading-5 mt-0.5">
             {data.sentByMe ? "예약을 수락했습니다." : "예약이 확정되었어요!"}
           </p>
         </div>
@@ -2554,8 +2554,8 @@ export function ReservationAcceptedMessageCard({
       >
         {data.startDatetime && (
           <div className="flex justify-between items-center">
-            <span className="text-[#6B7280] text-xs shrink-0">날짜</span>
-            <span className="text-[#374151] text-xs">
+            <span className="text-gray-500 text-xs shrink-0">날짜</span>
+            <span className="text-gray-700 text-xs">
               {formatServiceDate(data.startDatetime)}
               {data.endDatetime
                 ? ` ~ ${formatServiceDate(data.endDatetime)}`
@@ -2564,14 +2564,14 @@ export function ReservationAcceptedMessageCard({
           </div>
         )}
         <div className="flex justify-between items-center">
-          <span className="text-[#6B7280] text-xs shrink-0">금액</span>
+          <span className="text-gray-500 text-xs shrink-0">금액</span>
           <span className="text-orange-500 text-xs font-medium">
             {data.totalPrice.toLocaleString("ko-KR")}원
           </span>
         </div>
       </div>
       {!data.sentByMe && (
-        <p className="text-[#6B7280] text-xs leading-relaxed">
+        <p className="text-gray-500 text-xs leading-relaxed">
           채팅에서 결제를 진행해주세요.
         </p>
       )}
@@ -2605,14 +2605,14 @@ export function ReservationRejectedMessageCard({
             <span className="text-red-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
               예약 거절
             </span>
-            <span className="text-[#111827] text-sm leading-5 mt-0.5">
+            <span className="text-gray-900 text-sm leading-5 mt-0.5">
               {sentByMe
                 ? "예약 요청을 거절했습니다."
                 : "예약 요청이 거절되었습니다."}
             </span>
           </div>
         </div>
-        <p className="pt-3 text-[#6B7280] text-xs leading-5">
+        <p className="pt-3 text-gray-500 text-xs leading-5">
           {sentByMe
             ? "거절된 예약은 되돌릴 수 없습니다."
             : "다른 펫시터에게 예약을 요청해보세요."}
@@ -2635,21 +2635,21 @@ export function ReservationEditAcceptedCard({
   return (
     <div className="w-79.5 p-4 bg-white rounded-2xl outline-[1.11px] outline-orange-200 outline-offset-[-1.11px] flex flex-col">
       <div className="flex items-center gap-2.5">
-        <div className="w-9 h-9 bg-[#ECFDF5] rounded-full flex items-center justify-center shrink-0">
-          <CheckCircle size={18} className="text-[#10B981]" />
+        <div className="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
+          <CheckCircle size={18} className="text-emerald-500" />
         </div>
         <div className="flex flex-col">
-          <span className="text-[#065F46] text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
+          <span className="text-emerald-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
             예약 수정 승인
           </span>
-          <span className="text-[#111827] text-sm leading-5 mt-0.5">
+          <span className="text-gray-900 text-sm leading-5 mt-0.5">
             {sentByMe
               ? "예약 수정 요청을 승인했습니다."
               : "예약 수정이 승인되었습니다."}
           </span>
         </div>
       </div>
-      <p className="pt-3 text-[#6B7280] text-xs leading-5">
+      <p className="pt-3 text-gray-500 text-xs leading-5">
         {sentByMe
           ? "예약 정보가 변경되었습니다."
           : "예약 일정이 변경되었습니다."}
@@ -2673,14 +2673,14 @@ export function ReservationEditRejectedCard({
           <span className="text-red-800 text-[10px] font-bold uppercase tracking-[0.3px] leading-4">
             예약 수정 거절
           </span>
-          <span className="text-[#111827] text-sm leading-5 mt-0.5">
+          <span className="text-gray-900 text-sm leading-5 mt-0.5">
             {sentByMe
               ? "예약 수정 요청을 거절했습니다."
               : "예약 수정 요청이 거절되었습니다."}
           </span>
         </div>
       </div>
-      <p className="pt-3 text-[#6B7280] text-xs leading-5">
+      <p className="pt-3 text-gray-500 text-xs leading-5">
         기존 예약 일정이 유지됩니다.
       </p>
     </div>
@@ -2757,12 +2757,12 @@ function ReservationEditCard({
         <div>
           <span
             className={`text-[10px] font-bold uppercase tracking-[0.3px] leading-4 ${
-              data.sentByMe ? "text-orange-500" : "text-[#6B7280]"
+              data.sentByMe ? "text-orange-500" : "text-gray-500"
             }`}
           >
             예약 수정 요청
           </span>
-          <p className="text-[#281A0E] text-sm leading-5 mt-0.5">
+          <p className="text-stone-900 text-sm leading-5 mt-0.5">
             {data.sentByMe
               ? "예약 수정을 요청했습니다."
               : "예약 수정 요청이 도착했어요."}
