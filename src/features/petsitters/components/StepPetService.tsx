@@ -76,7 +76,7 @@ export default function StepPetService({
     <div className="flex flex-col gap-4">
       <div className="bg-white rounded-2xl border border-orange-100 p-4 sm:p-7">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-stone-900">반려동물을 선택하세요</h2>
+          <h2 className="text-lg font-semibold text-brown-900">반려동물을 선택하세요</h2>
           <span className="text-xs text-gray-400">중복 선택 가능</span>
         </div>
         {errors.petIds && (
@@ -104,7 +104,7 @@ export default function StepPetService({
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-stone-900 text-sm sm:text-base font-semibold">{pet.name}</span>
+                    <span className="text-brown-900 text-sm sm:text-base font-semibold">{pet.name}</span>
                     <span className="px-2 py-0.5 bg-white border border-orange-100 text-orange-500 text-[10px] font-medium rounded-full shrink-0">
                       {pet.type}
                     </span>
@@ -128,7 +128,7 @@ export default function StepPetService({
       </div>
 
       <div className="bg-white rounded-2xl border border-orange-100 p-4 sm:p-7">
-        <h2 className="text-lg font-semibold text-stone-900 mb-4">제공 서비스를 선택해주세요</h2>
+        <h2 className="text-lg font-semibold text-brown-900 mb-4">제공 서비스를 선택해주세요</h2>
         {errors.selectedService && (
           <p className="mb-2 text-red-500 text-xs">{errors.selectedService.message}</p>
         )}
@@ -154,7 +154,7 @@ export default function StepPetService({
               >
                 <span className="text-2xl shrink-0">{svc.emoji}</span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-stone-900 text-sm font-semibold">{svc.label}</p>
+                  <p className="text-brown-900 text-sm font-semibold">{svc.label}</p>
                   <p className="text-gray-500 text-xs">{svc.desc}</p>
                 </div>
                 {selected && <Check size={18} className="text-orange-500 shrink-0" />}

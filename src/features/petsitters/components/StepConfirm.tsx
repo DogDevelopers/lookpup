@@ -59,7 +59,7 @@ export default function StepConfirm({
         <Check size={36} className="text-white" strokeWidth={3} />
       </div>
 
-      <h1 className="text-stone-900 text-2xl sm:text-3xl font-bold mb-3 text-center">
+      <h1 className="text-brown-900 text-2xl sm:text-3xl font-bold mb-3 text-center">
         예약 요청이 전송되었습니다!
       </h1>
       <p className="text-gray-500 text-sm sm:text-base text-center leading-6 mb-8">
@@ -69,7 +69,7 @@ export default function StepConfirm({
       </p>
 
       <div className="w-full max-w-sm sm:max-w-[384px] bg-white rounded-2xl border border-orange-100 p-4 sm:p-5 mb-8">
-        <p className="text-stone-900 text-base font-semibold mb-4">예약 정보</p>
+        <p className="text-brown-900 text-base font-semibold mb-4">예약 정보</p>
         <div className="flex items-start gap-3 pb-3 border-b border-orange-100 mb-3">
           {sitter.profileImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -86,20 +86,20 @@ export default function StepConfirm({
             </div>
           )}
           <div>
-            <p className="text-stone-900 text-base font-medium">{sitter.name} 펫시터</p>
+            <p className="text-brown-900 text-base font-medium">{sitter.name} 펫시터</p>
             <p className="text-gray-500 text-sm">{serviceLabel}</p>
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-sm gap-2">
             <span className="text-gray-500 shrink-0">날짜</span>
-            <span className="text-stone-900 font-medium text-right">
+            <span className="text-brown-900 font-medium text-right">
               {formatDateRange(dateRange)}
             </span>
           </div>
           <div className="flex justify-between text-sm gap-2">
             <span className="text-gray-500 shrink-0">반려동물</span>
-            <span className="text-stone-900 font-medium text-right">
+            <span className="text-brown-900 font-medium text-right">
               {selectedPetNames.length > 0 ? selectedPetNames.join(", ") : "-"}
             </span>
           </div>

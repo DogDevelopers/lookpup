@@ -78,7 +78,7 @@ export default function SitterReviewTab({
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-stone-900 truncate">
+                  <p className="text-sm font-semibold text-brown-900 truncate">
                     {rv.owner?.full_name ?? "보호자"}
                   </p>
                   <div className="flex items-center gap-1 mt-0.5">

@@ -156,11 +156,11 @@ export default function BookingClient({
               <button
                 type="button"
                 onClick={handleBack}
-                className="w-10 h-10 rounded-xl border border-orange-100 flex items-center justify-center text-stone-900 hover:bg-orange-50 transition-colors"
+                className="w-10 h-10 rounded-xl border border-orange-100 flex items-center justify-center text-brown-900 hover:bg-orange-50 transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <h1 className="text-2xl font-bold text-stone-900">
+              <h1 className="text-2xl font-bold text-brown-900">
                 {step === 4 ? "예약 완료" : "펫시터 예약"}
               </h1>
             </div>
@@ -192,7 +192,7 @@ export default function BookingClient({
                       <span
                         className={`text-[10px] sm:text-xs text-center leading-tight ${
                           isActive
-                            ? "font-bold text-stone-900"
+                            ? "font-bold text-brown-900"
                             : "font-normal text-gray-500"
                         }`}
                       >

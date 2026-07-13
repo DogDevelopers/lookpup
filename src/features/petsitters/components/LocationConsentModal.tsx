@@ -16,7 +16,7 @@ export default function LocationConsentModal({
           <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
             <LocateFixed size={20} className="text-orange-500" />
           </div>
-          <h2 className="text-stone-900 text-lg font-semibold">현재 위치 사용</h2>
+          <h2 className="text-brown-900 text-lg font-semibold">현재 위치 사용</h2>
         </div>
         <p className="text-gray-500 text-sm mb-5 leading-relaxed">
           현재 위치를 사용하면 가까운 펫시터를 찾을 수 있어요!

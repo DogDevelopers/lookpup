@@ -140,7 +140,7 @@ export default function SitterDetailClient({
                   aria-label={isFromChat ? "채팅으로 돌아가기" : "펫시터 목록으로 돌아가기"}
                   className="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm"
                 >
-                  <ChevronLeft size={20} className="text-stone-900" aria-hidden="true" />
+                  <ChevronLeft size={20} className="text-brown-900" aria-hidden="true" />
                 </Link>
                 <div
                   className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/30 to-transparent"
@@ -175,7 +175,7 @@ export default function SitterDetailClient({
                 )}
 
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-stone-900 text-2xl font-bold">{name}</span>
+                  <span className="text-brown-900 text-2xl font-bold">{name}</span>
                   {sitter?.is_verified && (
                     <span className="px-2 py-1 bg-orange-500 rounded-md text-white text-xs font-medium">
                       인증
@@ -190,7 +190,7 @@ export default function SitterDetailClient({
 
                 <div className="flex items-center justify-center gap-1 mb-4">
                   <StarRow size={18} count={Math.round(rating)} />
-                  <span className="text-stone-900 text-lg font-bold ml-1">
+                  <span className="text-brown-900 text-lg font-bold ml-1">
                     {rating.toFixed(1)}
                   </span>
                   <span className="text-gray-500 text-sm">({reviewCount})</span>
@@ -223,7 +223,7 @@ export default function SitterDetailClient({
               <div className="md:hidden bg-white">
                 <div className="px-5 py-3 flex items-center gap-1.5">
                   <StarRow size={13} count={Math.round(rating)} />
-                  <span className="text-sm font-bold text-stone-900">
+                  <span className="text-sm font-bold text-brown-900">
                     {rating.toFixed(1)}
                   </span>
                   <span className="text-xs text-gray-400">({reviewCount})</span>
@@ -245,7 +245,7 @@ export default function SitterDetailClient({
                       className={`pb-3 text-sm md:text-lg font-semibold transition-colors relative ${
                         activeTab === tab
                           ? "text-orange-500"
-                          : "text-gray-400 md:hover:text-stone-900"
+                          : "text-gray-400 md:hover:text-brown-900"
                       }`}
                     >
                       {tab}
