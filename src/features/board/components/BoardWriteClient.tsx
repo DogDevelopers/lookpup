@@ -235,11 +235,11 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.back()}
-                className="w-10 h-10 rounded-xl border border-orange-100 flex items-center justify-center text-stone-900 hover:bg-orange-50 transition-colors"
+                className="w-10 h-10 rounded-xl border border-orange-100 flex items-center justify-center text-brown-900 hover:bg-orange-50 transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              <h1 className="text-2xl font-bold text-stone-900">
+              <h1 className="text-2xl font-bold text-brown-900">
                 돌봄 요청 게시글 작성
               </h1>
             </div>
@@ -255,7 +255,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
               )}
               <button
                 onClick={handleSaveDraft}
-                className="h-10 px-5 rounded-xl border border-[var(--color-orange-500)]/40 text-stone-900 text-[15px] font-medium flex items-center gap-1.5 hover:bg-orange-50 active:scale-95 transition-all"
+                className="h-10 px-5 rounded-xl border border-[var(--color-orange-500)]/40 text-brown-900 text-[15px] font-medium flex items-center gap-1.5 hover:bg-orange-50 active:scale-95 transition-all"
               >
                 <Save className="w-3.75 h-3.75" />
                 임시저장
@@ -275,7 +275,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
 
           <div className="flex flex-col gap-6 pt-8">
             <div className="bg-white rounded-2xl border border-orange-100 p-7">
-              <h2 className="text-lg font-semibold text-stone-900">
+              <h2 className="text-lg font-semibold text-brown-900">
                 어떤 돌봄이 필요하신가요?
               </h2>
 
@@ -296,10 +296,10 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                       }`}
                     >
                       <Icon
-                        className={`w-5.5 h-5.5 ${selected ? "text-[var(--color-orange-500)]" : "text-stone-900"}`}
+                        className={`w-5.5 h-5.5 ${selected ? "text-[var(--color-orange-500)]" : "text-brown-900"}`}
                       />
                       <span
-                        className={`text-sm font-medium ${selected ? "text-[var(--color-orange-500)]" : "text-stone-900"}`}
+                        className={`text-sm font-medium ${selected ? "text-[var(--color-orange-500)]" : "text-brown-900"}`}
                       >
                         {label}
                       </span>
@@ -309,7 +309,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
               </div>
 
               <div className="border-t border-orange-100 mt-6 pt-6">
-                <h3 className="text-lg font-semibold text-stone-900">
+                <h3 className="text-lg font-semibold text-brown-900">
                   예산을 입력해주세요
                 </h3>
                 <div className="flex items-center gap-3 mt-4">
@@ -328,7 +328,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                       className="w-full text-lg text-gray-500 placeholder:text-gray-500 outline-none bg-transparent"
                     />
                   </div>
-                  <span className="text-[15px] font-medium text-stone-900">
+                  <span className="text-[15px] font-medium text-brown-900">
                     원
                   </span>
                 </div>
@@ -346,7 +346,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                       className={`h-8.5 px-4 rounded-full border text-sm transition-colors ${
                         form.budget === String(amount)
                           ? "bg-[var(--color-orange-500)] text-white border-[var(--color-orange-500)]"
-                          : "bg-orange-50 text-stone-900 border-orange-100 hover:border-[var(--color-orange-500)]/50"
+                          : "bg-orange-50 text-brown-900 border-orange-100 hover:border-[var(--color-orange-500)]/50"
                       }`}
                     >
                       {amount.toLocaleString()}원
@@ -358,7 +358,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                     className={`h-8.5 px-4 rounded-full border text-sm transition-colors ${
                       form.budget === ""
                         ? "bg-[var(--color-orange-500)] text-white border-[var(--color-orange-500)]"
-                        : "bg-orange-50 text-stone-900 border-orange-100 hover:border-[var(--color-orange-500)]/50"
+                        : "bg-orange-50 text-brown-900 border-orange-100 hover:border-[var(--color-orange-500)]/50"
                     }`}
                   >
                     협의 가능
@@ -368,7 +368,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
             </div>
 
             <div className="bg-white rounded-2xl border border-orange-100 p-4 sm:p-7">
-              <h2 className="text-lg font-semibold text-stone-900">
+              <h2 className="text-lg font-semibold text-brown-900">
                 날짜 · 시간
               </h2>
 
@@ -389,7 +389,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5">
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-sm font-medium text-stone-900">
+                  <span className="text-sm font-medium text-brown-900">
                     시작 시간
                   </span>
                   <SimpleTimePicker
@@ -401,7 +401,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <span className="text-sm font-medium text-stone-900">
+                  <span className="text-sm font-medium text-brown-900">
                     종료 시간
                   </span>
                   <SimpleTimePicker
@@ -416,7 +416,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
             </div>
 
             <div className="bg-white rounded-2xl border border-orange-100 p-7">
-              <h2 className="text-lg font-semibold text-stone-900">
+              <h2 className="text-lg font-semibold text-brown-900">
                 돌봄 장소
               </h2>
 
@@ -461,7 +461,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                     }
                   }}
                   placeholder="도로명 주소를 입력하면 추천이 떠요"
-                  className="w-full h-12 pl-9 pr-20 bg-white border border-orange-100 rounded-xl text-stone-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition"
+                  className="w-full h-12 pl-9 pr-20 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition"
                 />
                 <button
                   type="button"
@@ -484,7 +484,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                           }}
                           className="w-full text-left px-4 py-2.5 hover:bg-orange-50 transition-colors"
                         >
-                          <div className="text-sm text-stone-900">
+                          <div className="text-sm text-brown-900">
                             {s.roadAddress ?? s.addressName}
                           </div>
                           {s.jibunAddress &&
@@ -536,7 +536,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                       <div className="w-9 h-9 bg-[var(--color-orange-500)] rounded-full flex items-center justify-center shadow-md">
                         <MapPin className="w-5 h-5 text-white" />
                       </div>
-                      <span className="px-3 py-1 bg-white rounded-full text-xs text-stone-900 shadow-sm">
+                      <span className="px-3 py-1 bg-white rounded-full text-xs text-brown-900 shadow-sm">
                         위치를 검색해주세요
                       </span>
                     </div>
@@ -567,7 +567,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
             </div>
 
             <div className="bg-white rounded-2xl border border-orange-100 p-7">
-              <h2 className="text-xl font-bold text-stone-900 mb-1">
+              <h2 className="text-xl font-bold text-brown-900 mb-1">
                 함께할 반려동물을 선택해주세요
               </h2>
               <p className="text-gray-400 text-sm mb-5">
@@ -609,7 +609,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                         )}
                       </div>
                       <div className="py-3 text-center">
-                        <div className="text-stone-900 text-base font-bold">
+                        <div className="text-brown-900 text-base font-bold">
                           {pet.name}
                         </div>
                         <div className="text-gray-400 text-xs mt-0.5">
@@ -635,7 +635,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
             <div className="bg-white rounded-2xl border border-orange-100 p-7">
               <div className="flex flex-col gap-2 mb-6">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold text-stone-900">
+                  <label className="text-sm font-bold text-brown-900">
                     게시글 제목
                   </label>
                   <span className="text-xs text-gray-400">
@@ -653,13 +653,13 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                       }));
                   }}
                   placeholder="예: 이번 주말 강아지 산책 펫시터 구해요"
-                  className="w-full h-12 px-4 bg-white border border-orange-100 rounded-xl text-stone-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition"
+                  className="w-full h-12 px-4 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold text-stone-900">
+                  <label className="text-sm font-bold text-brown-900">
                     상세 내용
                   </label>
                   <span className="text-xs text-gray-400">
@@ -700,7 +700,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                   }}
                   placeholder="펫시터에게 전달하고 싶은 내용을 입력해주세요"
                   rows={7}
-                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-stone-900 placeholder:text-gray-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
+                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
                 />
               </div>
             </div>
@@ -708,7 +708,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
             <div className="bg-white rounded-2xl border border-orange-100 p-7">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-sm font-bold text-stone-900 flex items-center gap-2">
+                  <label className="text-sm font-bold text-brown-900 flex items-center gap-2">
                     펫시터 조건
                     <span className="px-2 py-0.5 bg-orange-50 rounded-full text-xs font-medium text-[var(--color-orange-500)]">
                       선택
@@ -745,7 +745,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                   }}
                   placeholder="예: - 책임감 있고 성실하신 분"
                   rows={6}
-                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-stone-900 placeholder:text-gray-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
+                  className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
                 />
               </div>
             </div>

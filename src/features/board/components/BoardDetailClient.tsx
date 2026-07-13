@@ -235,7 +235,7 @@ export default function BoardDetailClient({
                     </div>
                   </div>
 
-                  <h1 className="text-2xl md:text-3xl font-bold text-stone-900">
+                  <h1 className="text-2xl md:text-3xl font-bold text-brown-900">
                     {post.title}
                   </h1>
 
@@ -244,7 +244,7 @@ export default function BoardDetailClient({
                       <MapPin className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
                         <p className="text-gray-500 text-xs">위치</p>
-                        <p className="text-stone-900 text-base font-medium">
+                        <p className="text-brown-900 text-base font-medium">
                           {post.location}
                         </p>
                       </div>
@@ -253,7 +253,7 @@ export default function BoardDetailClient({
                       <Calendar className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
                         <p className="text-gray-500 text-xs">기간</p>
-                        <p className="text-stone-900 text-base font-medium">
+                        <p className="text-brown-900 text-base font-medium">
                           {formatPeriod(post.start_datetime, post.end_datetime)}
                         </p>
                       </div>
@@ -262,7 +262,7 @@ export default function BoardDetailClient({
                       <Clock className="w-5 h-5 text-orange-500 mt-0.5 shrink-0" />
                       <div>
                         <p className="text-gray-500 text-xs">시간</p>
-                        <p className="text-stone-900 text-base font-medium">
+                        <p className="text-brown-900 text-base font-medium">
                           {formatTimeRange(
                             post.start_datetime,
                             post.end_datetime,
@@ -302,18 +302,18 @@ export default function BoardDetailClient({
               </SectionCard>
 
               <SectionCard>
-                <h2 className="text-stone-900 text-xl font-bold">상세 내용</h2>
-                <p className="text-stone-900 text-base leading-7 whitespace-pre-line">
+                <h2 className="text-brown-900 text-xl font-bold">상세 내용</h2>
+                <p className="text-brown-900 text-base leading-7 whitespace-pre-line">
                   {parsed.content}
                 </p>
               </SectionCard>
 
               {conditionsText && (
                 <SectionCard>
-                  <h2 className="text-stone-900 text-xl font-bold">
+                  <h2 className="text-brown-900 text-xl font-bold">
                     펫시터 조건
                   </h2>
-                  <p className="text-stone-900 text-base leading-7 whitespace-pre-line">
+                  <p className="text-brown-900 text-base leading-7 whitespace-pre-line">
                     {conditionsText}
                   </p>
                 </SectionCard>
@@ -321,10 +321,10 @@ export default function BoardDetailClient({
 
               {post.pets && (
                 <SectionCard>
-                  <h2 className="text-stone-900 text-xl font-bold">반려동물</h2>
+                  <h2 className="text-brown-900 text-xl font-bold">반려동물</h2>
                   <div className="flex flex-wrap gap-3">
                     <div className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 rounded-lg">
-                      <span className="text-sm font-semibold text-stone-900">
+                      <span className="text-sm font-semibold text-brown-900">
                         {post.pets.name}
                       </span>
                       <span className="text-xs text-gray-500">
@@ -337,7 +337,7 @@ export default function BoardDetailClient({
 
               {post && (
                 <SectionCard>
-                  <h2 className="text-stone-900 text-xl font-bold">
+                  <h2 className="text-brown-900 text-xl font-bold">
                     지원자 {post.applications.length}명
                   </h2>
                   {post.applications.length === 0 ? (
@@ -359,7 +359,7 @@ export default function BoardDetailClient({
                           />
                           <div className="flex-1">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-stone-900 text-sm font-semibold">
+                              <span className="text-brown-900 text-sm font-semibold">
                                 {app.sitters?.users?.full_name ?? "알 수 없음"}
                               </span>
                               {app.proposed_price != null && (
@@ -369,7 +369,7 @@ export default function BoardDetailClient({
                               )}
                             </div>
                             {app.message && (
-                              <p className="text-stone-900 text-sm leading-5">
+                              <p className="text-brown-900 text-sm leading-5">
                                 {app.message}
                               </p>
                             )}
@@ -384,7 +384,7 @@ export default function BoardDetailClient({
 
             <div className="w-full lg:w-96 shrink-0 flex flex-col gap-6 lg:sticky lg:top-20">
               <SectionCard>
-                <h3 className="text-stone-900 text-lg font-bold">
+                <h3 className="text-brown-900 text-lg font-bold">
                   작성자 정보
                 </h3>
                 <div className="flex items-center gap-3">
@@ -396,7 +396,7 @@ export default function BoardDetailClient({
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-stone-900 text-base font-semibold">
+                      <span className="text-brown-900 text-base font-semibold">
                         {post.users?.full_name ?? "알 수 없음"}
                       </span>
                       {post.users?.is_verified && (
@@ -419,7 +419,7 @@ export default function BoardDetailClient({
 
               <SectionCard>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-stone-900 text-lg font-bold">
+                  <h3 className="text-brown-900 text-lg font-bold">
                     {post.users?.full_name ?? "작성자"}님의 다른 게시물
                   </h3>
                   <Link
@@ -454,7 +454,7 @@ export default function BoardDetailClient({
                         <Link key={p.id} href={`/board/${p.id}`}>
                           <div className="p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors cursor-pointer">
                             <div className="flex items-start justify-between mb-1">
-                              <p className="text-stone-900 text-sm font-medium flex-1 truncate pr-2">
+                              <p className="text-brown-900 text-sm font-medium flex-1 truncate pr-2">
                                 {p.title}
                               </p>
                               <span

@@ -31,7 +31,7 @@ function PostCard({ post, index = 0 }: { post: PostListItem; index?: number }) {
         <div className="flex-1 flex flex-col gap-2 min-w-0 pr-6">
           <div className="flex items-center gap-3">
             <Pill className="shrink-0">{post.category}</Pill>
-            <span className="text-stone-900 text-lg font-semibold truncate">
+            <span className="text-brown-900 text-lg font-semibold truncate">
               {post.title}
             </span>
           </div>
@@ -143,7 +143,7 @@ export default function BoardListClient({
           <div className="animate-list-fade-in max-w-[1280px] mx-auto px-4 sm:px-10 py-8 md:py-12">
             <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-8">
               <div>
-                <h1 className="text-3xl font-bold text-stone-900">
+                <h1 className="text-3xl font-bold text-brown-900">
                   구인게시판
                 </h1>
                 <p className="text-gray-500 text-base mt-2">
