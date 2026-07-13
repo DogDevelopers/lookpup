@@ -119,7 +119,7 @@ function ChatSidebarImpl({
         className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors ${
           activeTab === tab
             ? "border-orange-500 text-orange-500"
-            : "border-transparent text-gray-400"
+            : "border-transparent text-stone-400"
         }`}
       >
         {tab === "one_on_one"
@@ -199,7 +199,7 @@ function ChatSidebarImpl({
         <div
           className={`flex items-center gap-2 px-4 ${searchPy} bg-orange-50 rounded-xl`}
         >
-          <Search size={16} className="text-gray-400 shrink-0" />
+          <Search size={16} className="text-stone-400 shrink-0" />
           <input
             type="text"
             value={searchQuery}
