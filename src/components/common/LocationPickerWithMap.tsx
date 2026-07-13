@@ -186,7 +186,7 @@ export default function LocationPickerWithMap({
             }}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             placeholder="도로명 또는 지번 주소 검색"
-            className="w-full h-12 pl-9 pr-10 bg-white border border-[#ffe9d6] rounded-xl text-[15px] text-stone-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition-colors"
+            className="w-full h-12 pl-9 pr-10 bg-white border border-orange-100 rounded-xl text-[15px] text-stone-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition-colors"
           />
           {query && (
             <button
@@ -200,13 +200,13 @@ export default function LocationPickerWithMap({
         </div>
 
         {showSuggestions && suggestions.length > 0 && (
-          <ul className="absolute z-50 top-full mt-1 w-full bg-white border border-[#ffe9d6] rounded-xl shadow-lg overflow-hidden">
+          <ul className="absolute z-50 top-full mt-1 w-full bg-white border border-orange-100 rounded-xl shadow-lg overflow-hidden">
             {suggestions.map((s, i) => (
               <li key={i}>
                 <button
                   type="button"
                   onClick={() => selectSuggestion(s)}
-                  className="w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors border-b border-[#fff0e5] last:border-0"
+                  className="w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors border-b border-orange-50 last:border-0"
                 >
                   <div className="flex items-start gap-2">
                     <MapPin
@@ -233,7 +233,7 @@ export default function LocationPickerWithMap({
 
       <div>
         <p className="text-sm font-medium text-stone-900 mb-2">지도 미리보기</p>
-        <div className="relative rounded-xl overflow-hidden border border-[#ffe9d6] h-56">
+        <div className="relative rounded-xl overflow-hidden border border-orange-100 h-56">
           <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
           {!value && (
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-orange-100 flex flex-col items-center justify-center gap-2 pointer-events-none">

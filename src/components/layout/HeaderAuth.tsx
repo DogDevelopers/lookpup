@@ -29,7 +29,7 @@ function relativeTime(iso: string) {
 }
 
 const HOVER_CARD_CLS =
-  "bg-white border border-[#ffe9d6] rounded-xl ring-0 shadow-[0px_4px_20px_0px_rgba(232,116,42,0.15)]";
+  "bg-white border border-orange-100 rounded-xl ring-0 shadow-[0px_4px_20px_0px_rgba(232,116,42,0.15)]";
 
 interface HeaderAuthProps {
   user: HeaderUser | null;
@@ -101,7 +101,7 @@ export default function HeaderAuth({
           sideOffset={8}
           className={`w-80 p-0 overflow-hidden ${HOVER_CARD_CLS}`}
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#ffe9d6]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
             <span className="text-stone-900 text-sm font-semibold">알림</span>
             {unreadCount > 0 && (
               <button
@@ -125,7 +125,7 @@ export default function HeaderAuth({
                   key={notif.id}
                   type="button"
                   onClick={() => onNotificationClick?.(notif)}
-                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-orange-50/50 transition-colors ${i < notifications.length - 1 ? "border-b border-[#ffe9d6]" : ""} ${notif.isRead ? "opacity-70" : ""}`}
+                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-orange-50/50 transition-colors ${i < notifications.length - 1 ? "border-b border-orange-100" : ""} ${notif.isRead ? "opacity-70" : ""}`}
                 >
                   <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
                     <Bell size={14} className="text-orange-500" />
@@ -150,7 +150,7 @@ export default function HeaderAuth({
               ))
             )}
           </div>
-          <div className="border-t border-[#ffe9d6]">
+          <div className="border-t border-orange-100">
             <Link
               href="/notifications"
               className="flex items-center justify-center gap-1 py-3 text-xs text-orange-500 font-medium hover:bg-orange-50 transition-colors"
@@ -210,7 +210,7 @@ export default function HeaderAuth({
               관리자 페이지
             </Link>
           )}
-          <div className="mx-2 my-1 h-px bg-[#ffe9d6]" />
+          <div className="mx-2 my-1 h-px bg-orange-100" />
           <button
             type="button"
             onClick={() => onLogout?.()}
