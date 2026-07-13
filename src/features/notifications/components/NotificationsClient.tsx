@@ -66,7 +66,7 @@ export default function NotificationsClient({
             </Link>
             <div>
               <h1 className="text-stone-900 text-2xl font-bold leading-8">알림</h1>
-              <p className="text-gray-500 text-sm mt-1">새로운 소식을 확인하세요</p>
+              <p className="text-stone-500 text-sm mt-1">새로운 소식을 확인하세요</p>
             </div>
           </div>
           {hasUnread && (
@@ -88,7 +88,7 @@ export default function NotificationsClient({
 
         {!isLoading && notifications.length === 0 && (
           <div className="bg-white rounded-2xl border border-orange-100 overflow-hidden">
-            <div className="py-10 flex flex-col items-center gap-2 text-gray-400">
+            <div className="py-10 flex flex-col items-center gap-2 text-stone-400">
               <Bell size={28} strokeWidth={1.5} />
               <p className="text-sm">아직 알림이 없어요</p>
             </div>
@@ -97,7 +97,7 @@ export default function NotificationsClient({
 
         {!isLoading && todayList.length > 0 && (
           <div className="mb-6">
-            <p className="px-1 text-gray-500 text-xs uppercase tracking-tight mb-3">오늘</p>
+            <p className="px-1 text-stone-500 text-xs uppercase tracking-tight mb-3">오늘</p>
             <div className="bg-white rounded-2xl border border-orange-100 overflow-hidden">
               {todayList.map((n, i) => (
                 <NotificationItem
@@ -119,7 +119,7 @@ export default function NotificationsClient({
 
         {!isLoading && prevList.length > 0 && (
           <div>
-            <p className="px-1 text-gray-500 text-xs uppercase tracking-tight mb-3">이전 알림</p>
+            <p className="px-1 text-stone-500 text-xs uppercase tracking-tight mb-3">이전 알림</p>
             <div className="bg-white rounded-2xl border border-orange-100 overflow-hidden">
               {prevList.map((n, i) => (
                 <NotificationItem
