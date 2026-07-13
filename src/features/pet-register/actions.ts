@@ -1,0 +1,141 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase/server";
+import { petRegisterSchema, petUpdateSchema, type PetUpdateInput } from "@/features/pet-register/schema";
+import type { PetRegisterFormValues } from "@/features/pet-register/types";
+
+type ActionResult = { ok: true } | { ok: false; error: string };
+
+const MAX_PETS_PER_OWNER = 10;
+
+export async function createPet(input: PetRegisterFormValues): Promise<ActionResult> {
+  const parsed = petRegisterSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: "입력값을 확인해주세요." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "로그인이 필요합니다." };
+  }
+
+  const { count } = await supabase
+    .from("pets")
+    .select("id", { count: "exact", head: true })
+    .eq("owner_id", user.id)
+    .is("deleted_at", null);
+
+  if ((count ?? 0) >= MAX_PETS_PER_OWNER) {
+    return { ok: false, error: `반려동물은 최대 ${MAX_PETS_PER_OWNER}마리까지 등록할 수 있습니다.` };
+  }
+
+  const { petType, name, breed, age, weight, gender, neutered, notes } = parsed.data;
+
+  const { error } = await supabase.from("pets").insert({
+    owner_id: user.id,
+    name,
+    animal_type: petType,
+    breed: breed || null,
+    age: age ? Number(age) : null,
+    gender,
+    weight: weight ? Number(weight) : null,
+    neutered,
+    caution: notes || null,
+  });
+
+  if (error) {
+    return { ok: false, error: "반려동물 등록에 실패했습니다." };
+  }
+
+  revalidatePath("/myprofile/mypets");
+  return { ok: true };
+}
+
+export async function updatePet(id: string, input: PetUpdateInput): Promise<ActionResult> {
+  const parsed = petUpdateSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: "입력값을 확인해주세요." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "로그인이 필요합니다." };
+  }
+
+  const { data: pet } = await supabase
+    .from("pets")
+    .select("owner_id")
+    .eq("id", id)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (!pet || pet.owner_id !== user.id) {
+    return { ok: false, error: "반려동물 정보를 찾을 수 없습니다." };
+  }
+
+  const { name, breed, age, weight, gender, neutered, caution } = parsed.data;
+
+  const { error } = await supabase
+    .from("pets")
+    .update({
+      name,
+      breed: breed || null,
+      age: age ? Number(age) : null,
+      weight: weight ? Number(weight) : null,
+      gender,
+      neutered,
+      caution: caution || null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    return { ok: false, error: "반려동물 정보를 수정하지 못했습니다." };
+  }
+
+  revalidatePath("/myprofile/mypets");
+  return { ok: true };
+}
+
+export async function deletePet(id: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "로그인이 필요합니다." };
+  }
+
+  const { data: pet } = await supabase
+    .from("pets")
+    .select("owner_id")
+    .eq("id", id)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (!pet || pet.owner_id !== user.id) {
+    return { ok: false, error: "반려동물 정보를 찾을 수 없습니다." };
+  }
+
+  // TODO: 예약 백엔드 이식 후, 진행 중인 예약에 연결된 반려동물이면 삭제를 차단하는 체크 추가.
+  const { error } = await supabase
+    .from("pets")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) {
+    return { ok: false, error: "반려동물 삭제에 실패했습니다." };
+  }
+
+  revalidatePath("/myprofile/mypets");
+  return { ok: true };
+}

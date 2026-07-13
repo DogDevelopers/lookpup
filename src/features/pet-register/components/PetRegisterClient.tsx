@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Camera, X } from "lucide-react";
 import { DesktopBackButton } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
+import { createPet } from "../actions";
 import { usePetRegisterForm } from "../hooks/usePetRegisterForm";
 import { COMMON_NOTES } from "../schema";
 import type { PetRegisterFormValues } from "../types";
@@ -13,8 +14,6 @@ const inputCls =
   "w-full h-12 px-4 py-3 bg-white rounded-xl border border-orange-100 text-base font-normal text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-[var(--color-orange-500)] transition-all";
 const numberInputCls = `${inputCls} [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`;
 
-// TODO: 페이지 서버 컴포넌트에서 로그인 여부를 확인해 리다이렉트 처리
-// (features/auth 이식 후). 지금은 항상 폼을 렌더링한다.
 export default function PetRegisterClient() {
   const router = useRouter();
   const { register, watch, setValue, handleSubmit } = usePetRegisterForm();
@@ -57,11 +56,16 @@ export default function PetRegisterClient() {
     setValue("notes", next);
   };
 
-  const onSubmit = handleSubmit((_values: PetRegisterFormValues) => {
+  const onSubmit = handleSubmit(async (values: PetRegisterFormValues) => {
     setIsSubmitting(true);
     setSubmitError(null);
-    // TODO: features/pet-register/actions.ts의 createPet으로 교체 (사진 업로드 포함).
+    // TODO: 사진 업로드(Cloudinary) 연동 후 photoFile을 image_url로 변환해 전달.
+    const result = await createPet(values);
     setIsSubmitting(false);
+    if (!result.ok) {
+      setSubmitError(result.error);
+      return;
+    }
     setShowSuccessModal(true);
   });
 

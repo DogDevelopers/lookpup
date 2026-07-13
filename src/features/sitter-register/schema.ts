@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const locationSchema = z.object({
+export const locationSchema = z.object({
   address: z.string(),
   lat: z.number(),
   lng: z.number(),
@@ -49,3 +49,33 @@ export const STEP_FIELDS: Record<1 | 2 | 3, string[]> = {
   2: ["selectedServices"],
   3: ["selectedAnimals", "certificateFiles", "activityPhotoFiles"],
 };
+
+export const createSitterSchema = z.object({
+  introduction: z.string().min(20).max(500),
+  career: z.string().min(1),
+  location: locationSchema,
+  selectedServices: z.array(z.enum(["visit", "foster", "walk", "pickup"])).min(1),
+  selectedAnimals: z.array(z.enum(["small_dog", "medium_dog", "large_dog", "cat"])).min(1),
+});
+export type CreateSitterInput = z.infer<typeof createSitterSchema>;
+
+const serviceInputSchema = z.object({
+  id: z.string().optional(),
+  title: z.string().min(1),
+  price: z.number().min(1000, "서비스 가격은 1,000원 이상이어야 합니다."),
+  description: z.string().max(300).optional().default(""),
+});
+
+export const updateSitterProfileSchema = z.object({
+  introduction: z.string().min(20).max(500),
+  career: z.string().min(1),
+  availableArea: z.string().min(1),
+  displayArea: z.string().nullable().optional(),
+  latitude: z.number().nullable().optional(),
+  longitude: z.number().nullable().optional(),
+  availableAnimals: z.array(z.enum(["small_dog", "medium_dog", "large_dog", "cat"])).min(1),
+  activityPhotoUrls: z.array(z.string()),
+  services: z.array(serviceInputSchema),
+  deletedServiceIds: z.array(z.string()),
+});
+export type UpdateSitterProfileInput = z.infer<typeof updateSitterProfileSchema>;
