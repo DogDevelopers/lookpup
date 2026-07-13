@@ -163,7 +163,7 @@ export default function AdminReportsClient({
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-stone-900 mb-2">신고 관리</h1>
-      <p className="text-sm text-gray-500 mb-8">
+      <p className="text-sm text-stone-500 mb-8">
         총 {reports.length}건의 신고가 접수되었습니다.
       </p>
 
@@ -184,7 +184,7 @@ export default function AdminReportsClient({
             >
               {label}
               <span
-                className={`ml-1.5 text-xs ${active ? "text-orange-100" : "text-gray-400"}`}
+                className={`ml-1.5 text-xs ${active ? "text-orange-100" : "text-stone-400"}`}
               >
                 {counts[s] ?? 0}
               </span>
@@ -194,7 +194,7 @@ export default function AdminReportsClient({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-400 text-sm">
+        <div className="text-center py-20 text-stone-400 text-sm">
           해당 상태의 신고가 없습니다.
         </div>
       ) : (
@@ -232,7 +232,7 @@ export default function AdminReportsClient({
                       <p className="text-sm font-semibold text-stone-900 truncate">
                         {reporter?.full_name ?? "알 수 없음"}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-xs text-stone-400 truncate">
                         {reporter?.email ?? ""}
                       </p>
                     </div>
@@ -246,7 +246,7 @@ export default function AdminReportsClient({
                     {report.reason}
                   </span>
 
-                  <span className="hidden md:block text-xs text-gray-400 shrink-0">
+                  <span className="hidden md:block text-xs text-stone-400 shrink-0">
                     {report.created_at
                       ? format(new Date(report.created_at), "MM.dd HH:mm", { locale: ko })
                       : "-"}
@@ -260,9 +260,9 @@ export default function AdminReportsClient({
                   </span>
 
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" />
+                    <ChevronUp className="w-4 h-4 text-stone-400 shrink-0" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-stone-400 shrink-0" />
                   )}
                 </button>
 
@@ -278,7 +278,7 @@ export default function AdminReportsClient({
                         <InfoRow label="대상 ID" value={report.target_id} mono />
                         {report.content && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-400 mb-1">상세 내용</p>
+                            <p className="text-xs font-semibold text-stone-400 mb-1">상세 내용</p>
                             <p className="text-sm text-stone-700 leading-relaxed whitespace-pre-wrap bg-stone-50 rounded-xl px-4 py-3">
                               {report.content}
                             </p>
@@ -286,7 +286,7 @@ export default function AdminReportsClient({
                         )}
                         {report.image_urls && report.image_urls.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-400 mb-2">증거 사진</p>
+                            <p className="text-xs font-semibold text-stone-400 mb-2">증거 사진</p>
                             <div className="flex flex-wrap gap-2">
                               {report.image_urls.map((url, i) => (
                                 <a key={`${url}-${i}`} href={url} target="_blank" rel="noopener noreferrer">
@@ -307,7 +307,7 @@ export default function AdminReportsClient({
                         {isEditing ? (
                           <>
                             <div>
-                              <p className="text-xs font-semibold text-gray-400 mb-2">처리 상태 변경</p>
+                              <p className="text-xs font-semibold text-stone-400 mb-2">처리 상태 변경</p>
                               <div className="grid grid-cols-2 gap-2">
                                 {(["pending", "processing", "completed", "rejected"] as ReportStatus[]).map((s) => (
                                   <button
@@ -328,15 +328,15 @@ export default function AdminReportsClient({
                             </div>
 
                             <div>
-                              <p className="text-xs font-semibold text-gray-400 mb-2">관리자 메모</p>
+                              <p className="text-xs font-semibold text-stone-400 mb-2">관리자 메모</p>
                               <textarea
                                 value={editMemo}
                                 onChange={(e) => setEditMemo(e.target.value.slice(0, 500))}
                                 placeholder="처리 내용을 입력하세요"
-                                className="w-full h-28 border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 placeholder:text-gray-400 resize-none focus:outline-none focus:border-orange-400 bg-white"
+                                className="w-full h-28 border border-stone-200 rounded-xl px-3 py-2.5 text-sm text-stone-900 placeholder:text-stone-400 resize-none focus:outline-none focus:border-orange-400 bg-white"
                               />
                               <div className="flex justify-end mt-0.5">
-                                <span className="text-xs text-gray-400">{editMemo.length} / 500</span>
+                                <span className="text-xs text-stone-400">{editMemo.length} / 500</span>
                               </div>
                             </div>
 
@@ -347,7 +347,7 @@ export default function AdminReportsClient({
                                 type="button"
                                 onClick={cancelEdit}
                                 disabled={saving}
-                                className="flex-1 h-9 border border-stone-200 rounded-xl text-sm text-gray-500 hover:bg-stone-50 transition-colors disabled:opacity-50"
+                                className="flex-1 h-9 border border-stone-200 rounded-xl text-sm text-stone-500 hover:bg-stone-50 transition-colors disabled:opacity-50"
                               >
                                 취소
                               </button>
@@ -373,7 +373,7 @@ export default function AdminReportsClient({
                             )}
                             {report.admin_memo && (
                               <div>
-                                <p className="text-xs font-semibold text-gray-400 mb-1">관리자 메모</p>
+                                <p className="text-xs font-semibold text-stone-400 mb-1">관리자 메모</p>
                                 <p className="text-sm text-stone-700 bg-stone-50 rounded-xl px-4 py-3 whitespace-pre-wrap">
                                   {report.admin_memo}
                                 </p>
@@ -484,7 +484,7 @@ function AdminActions({
                   onChange={(e) => setSuspendDays(e.target.value)}
                   className="w-16 border border-red-200 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:border-red-400"
                 />
-                <span className="text-sm text-gray-500">일</span>
+                <span className="text-sm text-stone-500">일</span>
                 <button
                   type="button"
                   onClick={handleSuspend}
@@ -591,9 +591,9 @@ function ActionButton({
         {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (icon ?? null)}
         {label}
       </button>
-      <span className="text-xs text-gray-400">{description}</span>
+      <span className="text-xs text-stone-400">{description}</span>
       {result && (
-        <span className={`text-xs font-medium ${isDone ? "text-green-600" : isError ? "text-red-500" : "text-gray-500"}`}>
+        <span className={`text-xs font-medium ${isDone ? "text-green-600" : isError ? "text-red-500" : "text-stone-500"}`}>
           {result}
         </span>
       )}
@@ -604,7 +604,7 @@ function ActionButton({
 function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-xs font-semibold text-gray-400 shrink-0 mt-0.5 w-20">{label}</span>
+      <span className="text-xs font-semibold text-stone-400 shrink-0 mt-0.5 w-20">{label}</span>
       <span className={`text-sm text-stone-700 break-all ${mono ? "font-mono text-xs" : ""}`}>
         {value}
       </span>

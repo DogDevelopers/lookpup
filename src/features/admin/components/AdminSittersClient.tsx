@@ -105,7 +105,7 @@ export default function AdminSittersClient({
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-stone-900 mb-2">펫시터 승인 관리</h1>
-      <p className="text-sm text-gray-500 mb-8">총 {sitters.length}건의 펫시터 신청이 있습니다.</p>
+      <p className="text-sm text-stone-500 mb-8">총 {sitters.length}건의 펫시터 신청이 있습니다.</p>
 
       <div className="flex gap-2 flex-wrap mb-6">
         {STATUS_FILTERS.map((s) => {
@@ -123,7 +123,7 @@ export default function AdminSittersClient({
               }`}
             >
               {label}
-              <span className={`ml-1.5 text-xs ${active ? "text-orange-100" : "text-gray-400"}`}>
+              <span className={`ml-1.5 text-xs ${active ? "text-orange-100" : "text-stone-400"}`}>
                 {counts[s] ?? 0}
               </span>
             </button>
@@ -132,7 +132,7 @@ export default function AdminSittersClient({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-400 text-sm">해당 상태의 펫시터가 없습니다.</div>
+        <div className="text-center py-20 text-stone-400 text-sm">해당 상태의 펫시터가 없습니다.</div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((sitter) => {
@@ -167,7 +167,7 @@ export default function AdminSittersClient({
                       <p className="text-sm font-semibold text-stone-900 truncate">
                         {user?.full_name ?? "알 수 없음"}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{user?.email ?? ""}</p>
+                      <p className="text-xs text-stone-400 truncate">{user?.email ?? ""}</p>
                     </div>
                   </div>
 
@@ -175,7 +175,7 @@ export default function AdminSittersClient({
                     {sitter.title ?? "-"}
                   </span>
 
-                  <span className="hidden md:block text-xs text-gray-400 shrink-0">
+                  <span className="hidden md:block text-xs text-stone-400 shrink-0">
                     {sitter.created_at
                       ? format(new Date(sitter.created_at), "MM.dd HH:mm", { locale: ko })
                       : "-"}
@@ -189,9 +189,9 @@ export default function AdminSittersClient({
                   </span>
 
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" />
+                    <ChevronUp className="w-4 h-4 text-stone-400 shrink-0" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-stone-400 shrink-0" />
                   )}
                 </button>
 
@@ -229,7 +229,7 @@ export default function AdminSittersClient({
                         />
                         {sitter.introduction && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-400 mb-1">소개</p>
+                            <p className="text-xs font-semibold text-stone-400 mb-1">소개</p>
                             <p className="text-sm text-stone-700 bg-stone-50 rounded-xl px-4 py-3 whitespace-pre-wrap">
                               {sitter.introduction}
                             </p>
@@ -240,7 +240,7 @@ export default function AdminSittersClient({
                       <div className="flex flex-col gap-4">
                         {sitter.certificate_urls.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-400 mb-2">자격증</p>
+                            <p className="text-xs font-semibold text-stone-400 mb-2">자격증</p>
                             <div className="flex flex-wrap gap-2">
                               {sitter.certificate_urls.map((url, i) => (
                                 <a key={`${url}-${i}`} href={url} target="_blank" rel="noopener noreferrer">
@@ -258,7 +258,7 @@ export default function AdminSittersClient({
 
                         {sitter.activity_photo_urls.length > 0 && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-400 mb-2">활동 사진</p>
+                            <p className="text-xs font-semibold text-stone-400 mb-2">활동 사진</p>
                             <div className="flex flex-wrap gap-2">
                               {sitter.activity_photo_urls.map((url, i) => (
                                 <a key={`${url}-${i}`} href={url} target="_blank" rel="noopener noreferrer">
@@ -275,7 +275,7 @@ export default function AdminSittersClient({
                         )}
 
                         <div>
-                          <p className="text-xs font-semibold text-gray-400 mb-2">현재 상태</p>
+                          <p className="text-xs font-semibold text-stone-400 mb-2">현재 상태</p>
                           <span
                             className={`inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium border rounded-full ${statusMeta?.color ?? ""}`}
                           >
@@ -285,7 +285,7 @@ export default function AdminSittersClient({
                         </div>
 
                         <div>
-                          <p className="text-xs font-semibold text-gray-400 mb-2">상태 변경</p>
+                          <p className="text-xs font-semibold text-stone-400 mb-2">상태 변경</p>
                           <div className="grid grid-cols-3 gap-2">
                             {ALL_STATUSES.map((s) => {
                               const meta = STATUS_META[s];
@@ -339,7 +339,7 @@ export default function AdminSittersClient({
 function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-xs font-semibold text-gray-400 shrink-0 mt-0.5 w-20">{label}</span>
+      <span className="text-xs font-semibold text-stone-400 shrink-0 mt-0.5 w-20">{label}</span>
       <span className={`text-sm text-stone-700 break-all ${mono ? "font-mono text-xs" : ""}`}>
         {value}
       </span>

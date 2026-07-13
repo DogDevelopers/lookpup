@@ -135,7 +135,7 @@ export default function AdminStateClient({
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
       <h1 className="text-2xl font-bold text-stone-900 mb-2">예약 상태 관리</h1>
-      <p className="text-sm text-gray-500 mb-8">총 {reservations.length}건의 예약이 있습니다.</p>
+      <p className="text-sm text-stone-500 mb-8">총 {reservations.length}건의 예약이 있습니다.</p>
 
       <div className="flex gap-2 flex-wrap mb-6">
         {STATUS_FILTERS.map((s) => {
@@ -153,7 +153,7 @@ export default function AdminStateClient({
               }`}
             >
               {label}
-              <span className={`ml-1.5 text-xs ${active ? "text-orange-100" : "text-gray-400"}`}>
+              <span className={`ml-1.5 text-xs ${active ? "text-orange-100" : "text-stone-400"}`}>
                 {counts[s] ?? 0}
               </span>
             </button>
@@ -162,7 +162,7 @@ export default function AdminStateClient({
       </div>
 
       {filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-400 text-sm">해당 상태의 예약이 없습니다.</div>
+        <div className="text-center py-20 text-stone-400 text-sm">해당 상태의 예약이 없습니다.</div>
       ) : (
         <div className="flex flex-col gap-3">
           {filtered.map((reservation) => {
@@ -198,7 +198,7 @@ export default function AdminStateClient({
                       <p className="text-sm font-semibold text-stone-900 truncate">
                         {owner?.full_name ?? "알 수 없음"}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{owner?.email ?? ""}</p>
+                      <p className="text-xs text-stone-400 truncate">{owner?.email ?? ""}</p>
                     </div>
                   </div>
 
@@ -206,7 +206,7 @@ export default function AdminStateClient({
                     {reservation.total_price.toLocaleString()}원
                   </span>
 
-                  <span className="hidden md:block text-xs text-gray-400 shrink-0">
+                  <span className="hidden md:block text-xs text-stone-400 shrink-0">
                     {reservation.start_datetime
                       ? format(new Date(reservation.start_datetime), "MM.dd HH:mm", { locale: ko })
                       : "-"}
@@ -220,9 +220,9 @@ export default function AdminStateClient({
                   </span>
 
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-gray-400 shrink-0" />
+                    <ChevronUp className="w-4 h-4 text-stone-400 shrink-0" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-400 shrink-0" />
+                    <ChevronDown className="w-4 h-4 text-stone-400 shrink-0" />
                   )}
                 </button>
 
@@ -250,7 +250,7 @@ export default function AdminStateClient({
                         />
                         {reservation.memo && (
                           <div>
-                            <p className="text-xs font-semibold text-gray-400 mb-1">메모</p>
+                            <p className="text-xs font-semibold text-stone-400 mb-1">메모</p>
                             <p className="text-sm text-stone-700 bg-stone-50 rounded-xl px-4 py-3 whitespace-pre-wrap">
                               {reservation.memo}
                             </p>
@@ -266,7 +266,7 @@ export default function AdminStateClient({
                         )}
 
                         <div className="mt-1">
-                          <p className="text-xs font-semibold text-gray-400 mb-2">타임라인</p>
+                          <p className="text-xs font-semibold text-stone-400 mb-2">타임라인</p>
                           <div className="flex flex-col gap-1">
                             {[
                               { label: "생성", value: reservation.created_at },
@@ -279,7 +279,7 @@ export default function AdminStateClient({
                               .filter((t) => t.value)
                               .map((t) => (
                                 <div key={t.label} className="flex items-center gap-2 text-xs">
-                                  <span className="w-8 text-gray-400 font-medium shrink-0">{t.label}</span>
+                                  <span className="w-8 text-stone-400 font-medium shrink-0">{t.label}</span>
                                   <span className="text-stone-600">
                                     {format(new Date(t.value!), "yyyy.MM.dd HH:mm", { locale: ko })}
                                   </span>
@@ -291,7 +291,7 @@ export default function AdminStateClient({
 
                       <div className="flex flex-col gap-4">
                         <div>
-                          <p className="text-xs font-semibold text-gray-400 mb-2">현재 상태</p>
+                          <p className="text-xs font-semibold text-stone-400 mb-2">현재 상태</p>
                           <span
                             className={`inline-flex items-center gap-1.5 px-3 py-1 text-sm font-medium border rounded-full ${statusMeta?.color ?? ""}`}
                           >
@@ -301,10 +301,10 @@ export default function AdminStateClient({
                         </div>
 
                         <div>
-                          <p className="text-xs font-semibold text-gray-400 mb-2">상태 변경</p>
+                          <p className="text-xs font-semibold text-stone-400 mb-2">상태 변경</p>
 
                           <div className="mb-3">
-                            <label className="text-xs text-gray-400 mb-1 block">
+                            <label className="text-xs text-stone-400 mb-1 block">
                               취소 사유 (취소 선택 시)
                             </label>
                             <input
@@ -371,7 +371,7 @@ export default function AdminStateClient({
 function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-start gap-2">
-      <span className="text-xs font-semibold text-gray-400 shrink-0 mt-0.5 w-20">{label}</span>
+      <span className="text-xs font-semibold text-stone-400 shrink-0 mt-0.5 w-20">{label}</span>
       <span className={`text-sm text-stone-700 break-all ${mono ? "font-mono text-xs" : ""}`}>
         {value}
       </span>
