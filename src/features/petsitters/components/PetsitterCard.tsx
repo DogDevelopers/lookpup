@@ -54,11 +54,11 @@ export default function PetsitterCard({
               )}
             </div>
             <div className="flex items-center gap-1 mt-1">
-              <MapPin size={14} className="text-gray-400" />
-              <span className="text-gray-500 text-sm">
+              <MapPin size={14} className="text-stone-400" />
+              <span className="text-stone-500 text-sm">
                 {[sitter.district, sitter.neighborhood].filter(Boolean).join(" ")}
               </span>
-              <span className="text-gray-400 text-xs">· {formatDistance(distance)}</span>
+              <span className="text-stone-400 text-xs">· {formatDistance(distance)}</span>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@ export default function PetsitterCard({
           <div className="flex items-center gap-1">
             <Star size={14} className="fill-amber-400 text-amber-400" />
             <span className="text-brown-900 text-base font-bold">{sitter.rating.toFixed(1)}</span>
-            <span className="text-gray-500 text-sm">({sitter.reviewCount})</span>
+            <span className="text-stone-500 text-sm">({sitter.reviewCount})</span>
           </div>
           {sitter.price != null && (
             <span className="text-orange-500 text-base font-semibold">

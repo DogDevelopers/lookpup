@@ -77,7 +77,7 @@ export default function StepPetService({
       <div className="bg-white rounded-2xl border border-orange-100 p-4 sm:p-7">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-brown-900">반려동물을 선택하세요</h2>
-          <span className="text-xs text-gray-400">중복 선택 가능</span>
+          <span className="text-xs text-stone-400">중복 선택 가능</span>
         </div>
         {errors.petIds && (
           <p className="mb-2 text-red-500 text-xs">{errors.petIds.message}</p>
@@ -100,7 +100,7 @@ export default function StepPetService({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={pet.image_url} alt={pet.name} className="w-12 h-12 sm:w-16 sm:h-16 rounded-full shrink-0 object-cover" />
                 ) : (
-                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-br from-gray-100 to-gray-200 rounded-full shrink-0" />
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-br from-stone-100 to-stone-200 rounded-full shrink-0" />
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -109,7 +109,7 @@ export default function StepPetService({
                       {pet.type}
                     </span>
                   </div>
-                  <p className="text-gray-500 text-xs sm:text-sm">
+                  <p className="text-stone-500 text-xs sm:text-sm">
                     {pet.breed} · {pet.age}살 · {pet.weight}kg
                   </p>
                 </div>
@@ -120,7 +120,7 @@ export default function StepPetService({
 
           <Link
             href="/pet-register"
-            className="w-full min-h-11 h-14 rounded-2xl border-2 border-dashed border-orange-100 text-gray-400 text-sm font-medium hover:border-orange-500/50 hover:text-orange-500 transition-colors flex items-center justify-center"
+            className="w-full min-h-11 h-14 rounded-2xl border-2 border-dashed border-orange-100 text-stone-400 text-sm font-medium hover:border-orange-500/50 hover:text-orange-500 transition-colors flex items-center justify-center"
           >
             + 반려동물 추가
           </Link>
@@ -146,7 +146,7 @@ export default function StepPetService({
                 disabled={!available}
                 className={`w-full p-4 rounded-2xl border text-left flex items-center gap-3 transition-colors ${
                   !available
-                    ? "bg-gray-50 border-gray-100 opacity-50 cursor-not-allowed"
+                    ? "bg-stone-50 border-stone-100 opacity-50 cursor-not-allowed"
                     : selected
                     ? "bg-orange-50 border-orange-500"
                     : "bg-white border-orange-100 hover:border-orange-500/50"
@@ -155,7 +155,7 @@ export default function StepPetService({
                 <span className="text-2xl shrink-0">{svc.emoji}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-brown-900 text-sm font-semibold">{svc.label}</p>
-                  <p className="text-gray-500 text-xs">{svc.desc}</p>
+                  <p className="text-stone-500 text-xs">{svc.desc}</p>
                 </div>
                 {selected && <Check size={18} className="text-orange-500 shrink-0" />}
               </button>

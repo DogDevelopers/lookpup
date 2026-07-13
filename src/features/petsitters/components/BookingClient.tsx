@@ -129,7 +129,7 @@ export default function BookingClient({
     return (
       <>
         <main className="flex-1 bg-orange-50 min-h-screen flex items-center justify-center">
-          <p className="text-gray-400 text-sm">불러오는 중...</p>
+          <p className="text-stone-400 text-sm">불러오는 중...</p>
         </main>
         <Footer />
       </>
@@ -140,7 +140,7 @@ export default function BookingClient({
     return (
       <>
         <main className="flex-1 bg-orange-50 min-h-screen flex items-center justify-center">
-          <p className="text-gray-400 text-sm">시터 정보를 불러올 수 없습니다.</p>
+          <p className="text-stone-400 text-sm">시터 정보를 불러올 수 없습니다.</p>
         </main>
         <Footer />
       </>
@@ -165,7 +165,7 @@ export default function BookingClient({
               </h1>
             </div>
             {step < 4 && (
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-stone-500">
                 {step} / {TOTAL_STEPS}
               </span>
             )}
@@ -184,7 +184,7 @@ export default function BookingClient({
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors ${
                           isActive || isDone
                             ? "bg-orange-500 text-white"
-                            : "border-2 border-orange-100 text-gray-500"
+                            : "border-2 border-orange-100 text-stone-500"
                         }`}
                       >
                         {isDone ? <Check className="size-3.5" /> : num}
@@ -193,7 +193,7 @@ export default function BookingClient({
                         className={`text-[10px] sm:text-xs text-center leading-tight ${
                           isActive
                             ? "font-bold text-brown-900"
-                            : "font-normal text-gray-500"
+                            : "font-normal text-stone-500"
                         }`}
                       >
                         {label}
@@ -244,13 +244,13 @@ export default function BookingClient({
             <button
               type="button"
               onClick={handleBack}
-              className="h-11 px-6 rounded-xl border border-orange-100 flex items-center gap-1.5 text-gray-500 text-[15px] font-medium hover:bg-orange-50 transition-colors"
+              className="h-11 px-6 rounded-xl border border-orange-100 flex items-center gap-1.5 text-stone-500 text-[15px] font-medium hover:bg-orange-50 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               이전
             </button>
 
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-stone-500">
               {step} / {TOTAL_STEPS}
             </span>
 
@@ -261,7 +261,7 @@ export default function BookingClient({
                 className={`h-11 px-6 rounded-xl flex items-center gap-1.5 text-[15px] font-semibold transition-colors ${
                   canProceed()
                     ? "bg-orange-500 text-white hover:opacity-90"
-                    : "bg-orange-100 text-gray-500 cursor-default"
+                    : "bg-orange-100 text-stone-500 cursor-default"
                 }`}
               >
                 다음 단계

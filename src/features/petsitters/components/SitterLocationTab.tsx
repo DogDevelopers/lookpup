@@ -30,7 +30,7 @@ export default function SitterLocationTab({
           level={5}
         />
       </div>
-      <p className="mt-4 text-gray-500 text-sm flex items-center gap-1">
+      <p className="mt-4 text-stone-500 text-sm flex items-center gap-1">
         <MapPin size={14} className="text-orange-500 shrink-0" />
         {areaText}
       </p>

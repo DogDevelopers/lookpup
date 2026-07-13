@@ -62,7 +62,7 @@ export default function StepConfirm({
       <h1 className="text-brown-900 text-2xl sm:text-3xl font-bold mb-3 text-center">
         예약 요청이 전송되었습니다!
       </h1>
-      <p className="text-gray-500 text-sm sm:text-base text-center leading-6 mb-8">
+      <p className="text-stone-500 text-sm sm:text-base text-center leading-6 mb-8">
         펫시터가 요청을 확인 후 수락하면 예약이 확정됩니다.
         <br />
         채팅에서 진행 상황을 확인하세요.
@@ -87,18 +87,18 @@ export default function StepConfirm({
           )}
           <div>
             <p className="text-brown-900 text-base font-medium">{sitter.name} 펫시터</p>
-            <p className="text-gray-500 text-sm">{serviceLabel}</p>
+            <p className="text-stone-500 text-sm">{serviceLabel}</p>
           </div>
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex justify-between text-sm gap-2">
-            <span className="text-gray-500 shrink-0">날짜</span>
+            <span className="text-stone-500 shrink-0">날짜</span>
             <span className="text-brown-900 font-medium text-right">
               {formatDateRange(dateRange)}
             </span>
           </div>
           <div className="flex justify-between text-sm gap-2">
-            <span className="text-gray-500 shrink-0">반려동물</span>
+            <span className="text-stone-500 shrink-0">반려동물</span>
             <span className="text-brown-900 font-medium text-right">
               {selectedPetNames.length > 0 ? selectedPetNames.join(", ") : "-"}
             </span>

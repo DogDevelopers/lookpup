@@ -25,7 +25,7 @@ export default function SitterServiceTab({
     <div className="bg-white rounded-2xl shadow-[0px_2px_12px_rgba(232,116,42,0.10)] border border-orange-100 p-6">
       <h3 className="font-bold text-brown-900 mb-4">제공 서비스 및 가격</h3>
       {services.length === 0 ? (
-        <p className="text-gray-400 text-sm">등록된 서비스가 없습니다.</p>
+        <p className="text-stone-400 text-sm">등록된 서비스가 없습니다.</p>
       ) : (
         <div className="flex flex-col gap-3">
           {services.map((sv, idx) => {
@@ -41,7 +41,7 @@ export default function SitterServiceTab({
                     {sv.title ?? `${label} (${unit})`}
                   </span>
                   {sv.description && (
-                    <p className="text-xs text-gray-500 mt-1">{sv.description}</p>
+                    <p className="text-xs text-stone-500 mt-1">{sv.description}</p>
                   )}
                 </div>
                 <span className="text-base font-bold text-orange-500 shrink-0">

@@ -61,7 +61,7 @@ export default function PetsitterListPanel({
             </div>
           ))}
           {sitters.length === 0 && (
-            <div className="flex flex-col items-center gap-2 py-16 text-gray-400">
+            <div className="flex flex-col items-center gap-2 py-16 text-stone-400">
               <MapPin size={32} className="text-orange-200" />
               <p className="text-sm">
                 {hasAreaFilter

@@ -73,9 +73,9 @@ export default function StepNotes({
             onChange={(e) => handleNoteChange(e.target.value)}
             placeholder={`펫시터에게 전달할 특이사항을 입력해주세요\n예) 낯선 사람 경계함, 약 복용 필요 등`}
             rows={7}
-            className="w-full px-4 py-3 pb-8 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-gray-400 outline-none resize-none focus:border-orange-500 transition-colors"
+            className="w-full px-4 py-3 pb-8 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none resize-none focus:border-orange-500 transition-colors"
           />
-          <span className="absolute bottom-3 right-4 text-gray-400 text-xs">
+          <span className="absolute bottom-3 right-4 text-stone-400 text-xs">
             {noteValue.length}/{MAX}
           </span>
         </div>
@@ -91,7 +91,7 @@ export default function StepNotes({
                 key={q}
                 type="button"
                 onClick={() => appendQuickNote(q)}
-                className="min-h-9 px-4 py-1 border border-orange-100 text-gray-500 text-xs font-medium rounded-full hover:border-orange-500/50 hover:text-orange-500 transition-colors"
+                className="min-h-9 px-4 py-1 border border-orange-100 text-stone-500 text-xs font-medium rounded-full hover:border-orange-500/50 hover:text-orange-500 transition-colors"
               >
                 {q}
               </button>

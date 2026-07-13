@@ -51,7 +51,7 @@ export default function PetsitterSearchBar({
               <button
                 onClick={onClearAreaFilter}
                 aria-label="지역 검색 초기화"
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-stone-400 hover:text-stone-600 transition-colors"
               >
                 <X size={15} />
               </button>
@@ -70,7 +70,7 @@ export default function PetsitterSearchBar({
                     <MapPin size={14} className="text-orange-400 shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-brown-900 font-medium truncate">{s.label}</p>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-xs text-stone-400 truncate">
                         {s.type === "area" ? s.city : s.address}
                       </p>
                     </div>

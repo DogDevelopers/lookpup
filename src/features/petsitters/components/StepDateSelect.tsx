@@ -78,7 +78,7 @@ export default function StepDateSelect({
               )}
             </div>
             {(startTime || endTime) && (
-              <div className="flex items-center gap-1.5 pl-6 text-sm text-gray-500">
+              <div className="flex items-center gap-1.5 pl-6 text-sm text-stone-500">
                 <span>시간</span>
                 <span className="text-brown-900 font-medium">
                   {startTime ? formatTime12h(startTime) : "--:--"}
