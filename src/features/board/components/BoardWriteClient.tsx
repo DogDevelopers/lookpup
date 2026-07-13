@@ -31,7 +31,19 @@ import {
   BUDGET_PRESETS,
   SITTER_CONDITIONS,
 } from "../constants";
+import { createRequest } from "../actions";
 import type { Pet } from "../types";
+
+function toDateTime(date: Date, time: string): string {
+  const d = new Date(date);
+  if (time) {
+    const [h, m] = time.split(":").map(Number);
+    d.setHours(h, m, 0, 0);
+  } else {
+    d.setSeconds(30, 0);
+  }
+  return d.toISOString();
+}
 
 const LOCATION_TABS = ["우리 집", "펫시터 집", "직접 입력"];
 
@@ -219,10 +231,25 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
     if (!form.startDate || !canSubmit()) return;
     setIsSubmitting(true);
 
-    // TODO: features/board/actions.ts의 createRequest로 교체.
-    void mergeConditions(form.content, form.conditions);
+    const result = await createRequest({
+      title: form.title,
+      content: mergeConditions(form.content, form.conditions),
+      request_type: form.service_type,
+      budget: form.budget ? Number(form.budget) : null,
+      start_datetime: toDateTime(form.startDate, form.start_time),
+      end_datetime: toDateTime(form.endDate ?? form.startDate, form.end_time),
+      location: form.location,
+      latitude: form.latitude,
+      longitude: form.longitude,
+      pet_id: form.selected_pets[0] ?? null,
+      sitter_conditions: [],
+    });
 
     setIsSubmitting(false);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
     if (draftKey) localStorage.removeItem(draftKey);
     router.push("/board");
   };

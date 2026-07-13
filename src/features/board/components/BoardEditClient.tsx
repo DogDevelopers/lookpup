@@ -28,9 +28,21 @@ import {
   BUDGET_PRESETS,
   SITTER_CONDITIONS,
 } from "../constants";
+import { updateRequest } from "../actions";
 import type { Pet, PostData } from "../types";
 
 export type { PostData };
+
+function toDateTime(date: Date, time: string): string {
+  const d = new Date(date);
+  if (time) {
+    const [h, m] = time.split(":").map(Number);
+    d.setHours(h, m, 0, 0);
+  } else {
+    d.setSeconds(30, 0);
+  }
+  return d.toISOString();
+}
 
 type FormState = {
   service_type: string;
@@ -144,10 +156,25 @@ export default function BoardEditClient({
     if (!form.startDate) return;
     setIsSubmitting(true);
 
-    // TODO: features/board/actions.ts의 updateRequest로 교체.
-    void mergeConditions(form.content, form.conditions);
+    const result = await updateRequest(id, {
+      title: form.title,
+      content: mergeConditions(form.content, form.conditions),
+      request_type: form.service_type,
+      budget: form.budget ? Number(form.budget) : null,
+      start_datetime: toDateTime(form.startDate, form.start_time),
+      end_datetime: toDateTime(form.endDate ?? form.startDate, form.end_time),
+      location: form.location,
+      latitude: form.latitude,
+      longitude: form.longitude,
+      pet_id: form.selected_pets[0] ?? null,
+      sitter_conditions: [],
+    });
 
     setIsSubmitting(false);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
     router.push(`/board/${id}`);
   };
 

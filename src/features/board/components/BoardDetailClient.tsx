@@ -19,6 +19,7 @@ import { CustomModal } from "@/components/common/CustomModal";
 import BackButton from "@/components/common/BackButton";
 import KakaoMap from "@/components/common/KakaoMap";
 import { splitConditions } from "../utils";
+import { createApplication, closeRequest, deleteRequest } from "../actions";
 import type { OtherPost, RequestDetail } from "../types";
 
 export type { OtherPost, RequestDetail };
@@ -109,8 +110,17 @@ export default function BoardDetailClient({
     setApplying(true);
     setApplyError(null);
 
-    // TODO: features/board/actions.ts의 createApplication으로 교체.
+    const result = await createApplication({
+      request_id: post.id,
+      message: null,
+      proposed_price: null,
+    });
+
     setApplying(false);
+    if (!result.ok) {
+      setApplyError(result.error);
+      return;
+    }
     setShowApplyModal(false);
     router.push("/chat?tab=applicants");
   };
@@ -151,14 +161,22 @@ export default function BoardDetailClient({
   };
 
   const handleClose = async () => {
-    // TODO: features/board/actions.ts의 updateRequest(status: "matched")로 교체.
+    const result = await closeRequest(post.id);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
     setPost((prev) => (prev ? { ...prev, status: "matched" } : prev));
   };
 
   const confirmDelete = async () => {
     if (!deleteTargetId) return;
-    // TODO: features/board/actions.ts의 deleteRequest로 교체.
+    const result = await deleteRequest(deleteTargetId);
     setDeleteTargetId(null);
+    if (!result.ok) {
+      setErrorMessage(result.error);
+      return;
+    }
     router.push("/board");
   };
 
