@@ -52,7 +52,7 @@ export default function StepDateSelect({
   return (
     <div className="flex flex-col gap-4">
       <div className="bg-white rounded-2xl border border-orange-100 p-4 sm:p-7">
-        <h2 className="text-lg font-semibold text-stone-900 mb-5">
+        <h2 className="text-lg font-semibold text-brown-900 mb-5">
           날짜를 선택해주세요
         </h2>
 
@@ -78,13 +78,13 @@ export default function StepDateSelect({
               )}
             </div>
             {(startTime || endTime) && (
-              <div className="flex items-center gap-1.5 pl-6 text-sm text-gray-500">
+              <div className="flex items-center gap-1.5 pl-6 text-sm text-stone-500">
                 <span>시간</span>
-                <span className="text-stone-900 font-medium">
+                <span className="text-brown-900 font-medium">
                   {startTime ? formatTime12h(startTime) : "--:--"}
                 </span>
                 <span>~</span>
-                <span className="text-stone-900 font-medium">
+                <span className="text-brown-900 font-medium">
                   {endTime ? formatTime12h(endTime) : "--:--"}
                 </span>
               </div>
@@ -94,7 +94,7 @@ export default function StepDateSelect({
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stone-900">시작 시간</label>
+            <label className="text-sm font-medium text-brown-900">시작 시간</label>
             <SimpleTimePicker
               value={startTime}
               onChange={(v) => setValue("startTime", v, { shouldValidate: true })}
@@ -104,7 +104,7 @@ export default function StepDateSelect({
             )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-stone-900">종료 시간</label>
+            <label className="text-sm font-medium text-brown-900">종료 시간</label>
             <SimpleTimePicker
               value={endTime}
               onChange={(v) => setValue("endTime", v, { shouldValidate: true })}

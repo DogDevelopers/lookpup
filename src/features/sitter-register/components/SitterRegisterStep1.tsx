@@ -30,11 +30,11 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
   const introduction = watch("introduction");
 
   return (
-    <div className="bg-white rounded-2xl border border-[#ffe9d6] p-7">
-      <h2 className="text-lg font-semibold text-[#281a0e]">
+    <div className="bg-white rounded-2xl border border-orange-100 p-7">
+      <h2 className="text-lg font-semibold text-stone-900">
         기본 정보를 입력해주세요
       </h2>
-      <p className="text-gray-400 text-sm mt-1">
+      <p className="text-stone-400 text-sm mt-1">
         펫시터로 활동하기 위한 정보를 입력합니다
       </p>
 
@@ -44,7 +44,7 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
           control={control}
           name="profilePhotoFile"
           render={({ field }) => (
-            <label className="mt-3 w-24 h-24 bg-[#fff8f3] rounded-full border border-[#ffe9d6] flex items-center justify-center hover:bg-orange-100 transition-colors cursor-pointer overflow-hidden">
+            <label className="mt-3 w-24 h-24 bg-orange-50 rounded-full border border-orange-100 flex items-center justify-center hover:bg-orange-100 transition-colors cursor-pointer overflow-hidden">
               {preview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -57,7 +57,7 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
                   }}
                 />
               ) : (
-                <Camera className="w-7 h-7 text-gray-500" strokeWidth={2} />
+                <Camera className="w-7 h-7 text-stone-500" strokeWidth={2} />
               )}
               <input
                 type="file"
@@ -112,13 +112,13 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
               onChange={(e) => field.onChange(e.target.value.slice(0, 500))}
               placeholder="펫시터 경력, 반려동물 돌봄 경험 등을 작성해주세요"
               rows={6}
-              className="w-full px-4 py-3 bg-white rounded-xl border border-[#ffe9d6] text-base font-normal text-stone-900 placeholder:text-stone-900/50 leading-6 resize-none focus:outline-none focus:border-[var(--color-orange-500)] transition-all"
+              className="w-full px-4 py-3 bg-white rounded-xl border border-orange-100 text-base font-normal text-stone-900 placeholder:text-stone-900/50 leading-6 resize-none focus:outline-none focus:border-[var(--color-orange-500)] transition-all"
             />
           )}
         />
         <div className="flex justify-between pt-1">
           <span className="text-red-500 text-xs">{errors.introduction?.message}</span>
-          <span className="text-gray-400 text-xs font-normal leading-4">
+          <span className="text-stone-400 text-xs font-normal leading-4">
             {introduction.length}/500
           </span>
         </div>
@@ -133,7 +133,7 @@ export default function SitterRegisterStep1({ form }: SitterRegisterStep1Props) 
             <select
               value={field.value}
               onChange={(e) => field.onChange(e.target.value)}
-              className="w-full h-11 px-4 bg-white rounded-xl border border-[#ffe9d6] text-base font-normal text-stone-900 focus:outline-none focus:border-[var(--color-orange-500)] transition-all appearance-none cursor-pointer"
+              className="w-full h-11 px-4 bg-white rounded-xl border border-orange-100 text-base font-normal text-stone-900 focus:outline-none focus:border-[var(--color-orange-500)] transition-all appearance-none cursor-pointer"
             >
               <option value="">펫시터 경력 선택</option>
               {CAREER_OPTIONS.map((o) => (

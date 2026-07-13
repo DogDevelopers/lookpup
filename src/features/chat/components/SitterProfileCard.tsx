@@ -59,9 +59,9 @@ export default function SitterProfileCard({
               ) : null}
             </div>
             <div className="flex items-center gap-1 mb-1">
-              <MapPin size={12} className="text-gray-400" />
+              <MapPin size={12} className="text-stone-400" />
               <span
-                className={`text-xs ${p.location ? "text-gray-500" : "text-gray-300"}`}
+                className={`text-xs ${p.location ? "text-stone-500" : "text-stone-300"}`}
               >
                 {p.location || "위치 미등록"}
               </span>
@@ -72,7 +72,7 @@ export default function SitterProfileCard({
                 <span className="text-sm font-bold text-stone-900">
                   {p.rating ?? "-"}
                 </span>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-stone-400">
                   ({p.reviewCount ?? 0}개 리뷰)
                 </span>
               </div>

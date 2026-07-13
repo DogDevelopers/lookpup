@@ -97,9 +97,9 @@ const TYPE_CONFIG: Record<ModalType, TypeConfig> = {
     confirmHover: 'hover:bg-orange-600',
   },
   disabled: {
-    iconBg: 'bg-gray-100',
+    iconBg: 'bg-stone-100',
     Icon: Lock,
-    iconColor: 'text-gray-500',
+    iconColor: 'text-stone-500',
     confirmBg: 'bg-orange-500',
     confirmHover: 'hover:bg-orange-600',
   },
@@ -125,9 +125,9 @@ const TYPE_CONFIG: Record<ModalType, TypeConfig> = {
     confirmHover: 'hover:bg-orange-600',
   },
   empty: {
-    iconBg: 'bg-gray-100',
+    iconBg: 'bg-stone-100',
     Icon: Inbox,
-    iconColor: 'text-gray-500',
+    iconColor: 'text-stone-500',
     confirmBg: 'bg-orange-500',
     confirmHover: 'hover:bg-orange-600',
   },
@@ -214,7 +214,7 @@ export function CustomModal({
             type="button"
             aria-label="닫기"
             onClick={onClose}
-            className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+            className="absolute top-4 right-4 flex items-center justify-center w-8 h-8 rounded-full text-stone-400 hover:bg-stone-100 hover:text-stone-600 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -229,7 +229,7 @@ export function CustomModal({
               {title}
             </p>
             {description && (
-              <p id={descId} className="text-gray-500 text-sm leading-6 whitespace-pre-line">
+              <p id={descId} className="text-stone-500 text-sm leading-6 whitespace-pre-line">
                 {description}
               </p>
             )}

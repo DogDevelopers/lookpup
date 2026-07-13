@@ -15,14 +15,14 @@ export default function SitterRegisterStep2({ form }: SitterRegisterStep2Props) 
   } = form;
 
   return (
-    <div className="bg-white rounded-2xl border border-[#ffe9d6] p-7">
+    <div className="bg-white rounded-2xl border border-orange-100 p-7">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-[#281a0e]">
+        <h2 className="text-lg font-semibold text-stone-900">
           제공 서비스를 선택해주세요
         </h2>
-        <span className="text-xs text-gray-500">중복 선택 가능</span>
+        <span className="text-xs text-stone-500">중복 선택 가능</span>
       </div>
-      <p className="text-gray-400 text-sm mt-1">
+      <p className="text-stone-400 text-sm mt-1">
         제공 가능한 서비스를 모두 선택하세요
       </p>
 
@@ -46,8 +46,8 @@ export default function SitterRegisterStep2({ form }: SitterRegisterStep2Props) 
                   }
                   className={`p-4 bg-white rounded-xl border-2 text-left transition-all ${
                     isSelected
-                      ? "border-[var(--color-orange-500)] bg-[#fff8f3]"
-                      : "border-[#ffe9d6] hover:border-[var(--color-orange-500)]/50"
+                      ? "border-[var(--color-orange-500)] bg-orange-50"
+                      : "border-orange-100 hover:border-[var(--color-orange-500)]/50"
                   }`}
                 >
                   <div className="flex items-center gap-4">
@@ -62,7 +62,7 @@ export default function SitterRegisterStep2({ form }: SitterRegisterStep2Props) 
                       >
                         {service.title}
                       </p>
-                      <p className="text-gray-500 text-sm font-normal leading-5 pt-1">
+                      <p className="text-stone-500 text-sm font-normal leading-5 pt-1">
                         {service.desc}
                       </p>
                     </div>

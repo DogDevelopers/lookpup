@@ -42,7 +42,7 @@ export default function PetsitterListPanel({
   return (
     <ScrollArea className="flex-1 min-h-0">
       <div className="p-4 md:p-6">
-        <p className="text-stone-900 text-lg font-semibold mb-4">{listHeading}</p>
+        <p className="text-brown-900 text-lg font-semibold mb-4">{listHeading}</p>
         <div className="flex flex-col gap-4">
           {sitters.map((sitter, i) => (
             <div
@@ -61,7 +61,7 @@ export default function PetsitterListPanel({
             </div>
           ))}
           {sitters.length === 0 && (
-            <div className="flex flex-col items-center gap-2 py-16 text-gray-400">
+            <div className="flex flex-col items-center gap-2 py-16 text-stone-400">
               <MapPin size={32} className="text-orange-200" />
               <p className="text-sm">
                 {hasAreaFilter

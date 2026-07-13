@@ -16,7 +16,7 @@ export default function Footer() {
                 className="object-contain h-auto brightness-0 invert"
               />
             </Link>
-            <p className="text-gray-500 text-sm">
+            <p className="text-stone-500 text-sm">
               믿을 수 있는 반려동물 돌봄 플랫폼
             </p>
           </div>
@@ -27,19 +27,19 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 <Link
                   href="/petsitters"
-                  className="text-gray-500 text-sm hover:text-white transition-colors"
+                  className="text-stone-500 text-sm hover:text-white transition-colors"
                 >
                   펫시터 찾기
                 </Link>
                 <Link
                   href="/board"
-                  className="text-gray-500 text-sm hover:text-white transition-colors"
+                  className="text-stone-500 text-sm hover:text-white transition-colors"
                 >
                   구인게시판
                 </Link>
                 <Link
                   href="/about"
-                  className="text-gray-500 text-sm hover:text-white transition-colors"
+                  className="text-stone-500 text-sm hover:text-white transition-colors"
                 >
                   서비스 소개
                 </Link>
@@ -50,13 +50,13 @@ export default function Footer() {
               <div className="flex flex-col gap-2">
                 <Link
                   href="/terms"
-                  className="text-gray-500 text-sm hover:text-white transition-colors"
+                  className="text-stone-500 text-sm hover:text-white transition-colors"
                 >
                   이용약관
                 </Link>
                 <Link
                   href="/privacy"
-                  className="text-gray-500 text-sm hover:text-white transition-colors"
+                  className="text-stone-500 text-sm hover:text-white transition-colors"
                 >
                   개인정보처리방침
                 </Link>
@@ -68,7 +68,7 @@ export default function Footer() {
 
       <div className="border-t border-slate-800">
         <div className="max-w-[1280px] mx-auto px-10 py-4">
-          <p className="text-center text-gray-500 text-xs">
+          <p className="text-center text-stone-500 text-xs">
             © 2026 봐주개. All rights reserved.
           </p>
         </div>

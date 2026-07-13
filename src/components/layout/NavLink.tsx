@@ -13,7 +13,7 @@ export default function NavLink({ href, label }: { href: string; label: string }
       className={`h-7 flex items-start text-base font-medium leading-6 transition-colors border-b-2 ${
         isActive
           ? "text-orange-500 border-orange-500"
-          : "text-gray-500 border-transparent hover:text-orange-500"
+          : "text-stone-500 border-transparent hover:text-orange-500"
       }`}
     >
       {label}

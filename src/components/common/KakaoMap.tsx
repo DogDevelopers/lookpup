@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Script from "next/script";
 import { clientEnv } from "@/lib/env";
 import { formatDistance } from "@/lib/distance";
+import { ORANGE_MARKER_SIZE, ORANGE_MARKER_URL } from "@/lib/map-marker";
 
 export interface MapMarker {
   lat: number;
@@ -30,27 +31,21 @@ interface KakaoMapProps {
   onMarkerDragEnd?: (lat: number, lng: number) => void;
 }
 
+const SELECTED_MARKER_SVG = encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" fill="#FF6900" stroke="white" stroke-width="2.5"/>
+    <circle cx="12" cy="12" r="4" fill="white"/>
+  </svg>`,
+);
+const SELECTED_MARKER_URL = `data:image/svg+xml,${SELECTED_MARKER_SVG}`;
+const SELECTED_MARKER_SIZE = { width: 24, height: 24, offsetX: 12, offsetY: 12 };
+
 function markerImageUrl(selected = false): string {
-  const svg = selected
-    ? encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" fill="#f97316" stroke="white" stroke-width="2.5"/>
-          <circle cx="12" cy="12" r="4" fill="white"/>
-        </svg>`,
-      )
-    : encodeURIComponent(
-        `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42">
-          <path d="M16 0C7.163 0 0 7.163 0 16c0 10.667 16 26 16 26S32 26.667 32 16C32 7.163 24.837 0 16 0z" fill="#f97316" stroke="white" stroke-width="1.5"/>
-          <circle cx="16" cy="16" r="6" fill="white"/>
-        </svg>`,
-      );
-  return `data:image/svg+xml,${svg}`;
+  return selected ? SELECTED_MARKER_URL : ORANGE_MARKER_URL;
 }
 
 function getMarkerSize(selected = false) {
-  return selected
-    ? { width: 24, height: 24, offsetX: 12, offsetY: 12 }
-    : { width: 32, height: 42, offsetX: 16, offsetY: 42 };
+  return selected ? SELECTED_MARKER_SIZE : ORANGE_MARKER_SIZE;
 }
 
 export default function KakaoMap({
@@ -322,7 +317,7 @@ export default function KakaoMap({
         map,
         path: [new window.kakao.maps.LatLng(base.lat, base.lng), position],
         strokeWeight: 2,
-        strokeColor: "#f97316",
+        strokeColor: "#FF6900",
         strokeOpacity: 0.6,
         strokeStyle: "dashed",
       });
@@ -333,10 +328,10 @@ export default function KakaoMap({
     inner.style.cssText = `
       padding: 8px 10px;
       background: white;
-      border: 1px solid #FFE9D6;
+      border: 1px solid var(--color-orange-100);
       border-radius: 12px;
       box-shadow: 0 2px 12px rgba(232,116,42,0.16);
-      color: #281A0E;
+      color: var(--color-stone-900);
       font-size: 13px;
       white-space: nowrap;
       margin-bottom: 8px;
@@ -347,14 +342,14 @@ export default function KakaoMap({
     inner.appendChild(nameEl);
 
     const areaEl = document.createElement("div");
-    areaEl.style.cssText = "color:#6B7280; font-size:12px; margin-top:2px;";
+    areaEl.style.cssText = "color:var(--color-stone-500); font-size:12px; margin-top:2px;";
     areaEl.textContent = [district, neighborhood].filter(Boolean).join(" ");
     inner.appendChild(areaEl);
 
     if (distanceKm !== undefined) {
       const distanceEl = document.createElement("div");
       distanceEl.style.cssText =
-        "color:#f97316; font-size:11px; margin-top:3px;";
+        "color:var(--color-orange-500); font-size:11px; margin-top:3px;";
       distanceEl.textContent = `약 ${formatDistance(distanceKm)}`;
       inner.appendChild(distanceEl);
     }

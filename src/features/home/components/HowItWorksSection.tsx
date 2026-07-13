@@ -27,7 +27,7 @@ export default function HowItWorksSection() {
                 </div>
                 <div className="lg:mt-6">
                   <h3 className="text-stone-900 text-lg font-semibold">{title}</h3>
-                  <p className="text-gray-500 text-base mt-2">{desc}</p>
+                  <p className="text-stone-500 text-base mt-2">{desc}</p>
                 </div>
               </div>
             </ScrollReveal>

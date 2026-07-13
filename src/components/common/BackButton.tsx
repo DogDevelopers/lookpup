@@ -18,7 +18,7 @@ export default function BackButton({
   return (
     <Link
       href={href}
-      className={`flex items-center gap-2 text-gray-500 hover:text-orange-500 transition-colors w-fit ${className}`}
+      className={`flex items-center gap-2 text-stone-500 hover:text-orange-500 transition-colors w-fit ${className}`}
     >
       <ChevronLeft className="w-5 h-5" />
       <span className="text-base">{label}</span>

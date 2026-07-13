@@ -14,7 +14,7 @@ export default function LoadingPage({
       } ${className}`}
     >
       <div className="w-10 h-10 rounded-full border-4 border-orange-200 border-t-orange-500 animate-spin" />
-      {label && <p className="text-gray-400 text-sm">{label}</p>}
+      {label && <p className="text-stone-400 text-sm">{label}</p>}
     </div>
   );
 }

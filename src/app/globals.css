@@ -6,6 +6,23 @@
 
 @theme {
   --breakpoint-xs: 390px;
+
+  /* Brand orange — anchored to #FF6900 at 500 */
+  --color-orange-50: oklch(0.9725 0.0152 70.52);
+  --color-orange-100: oklch(0.9468 0.036 72);
+  --color-orange-200: oklch(0.8942 0.0721 67.53);
+  --color-orange-300: oklch(0.8305 0.1214 63.13);
+  --color-orange-400: oklch(0.7442 0.1736 52.77);
+  --color-orange-500: oklch(0.6996 0.202 44.44);
+  --color-orange-600: oklch(0.6411 0.2105 37.95);
+  --color-orange-700: oklch(0.5487 0.1849 35.24);
+  --color-orange-800: oklch(0.4664 0.1489 34.14);
+  --color-orange-900: oklch(0.4048 0.1167 35.01);
+  --color-orange-950: oklch(0.264 0.0749 33.1);
+
+  /* Brand brown — headings/strong text, anchored to #37210E / #724121 */
+  --color-brown-900: oklch(0.2714 0.0456 59.85); /* #37210E */
+  --color-brown-600: oklch(0.4279 0.0819 51.96); /* #724121 */
 }
 
 @theme inline {

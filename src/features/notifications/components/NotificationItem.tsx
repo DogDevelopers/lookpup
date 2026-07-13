@@ -67,11 +67,11 @@ export function NotificationItem({ id, type, title, content, time, isRead, linkU
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm leading-5 ${isRead ? "text-gray-500" : "text-stone-900 font-medium"}`}>
+        <p className={`text-sm leading-5 ${isRead ? "text-stone-500" : "text-stone-900 font-medium"}`}>
           {title}
         </p>
-        <p className="text-xs text-gray-500 leading-4 mt-0.5 truncate">{content}</p>
-        <p className="text-xs text-gray-400 leading-4 mt-1">{time}</p>
+        <p className="text-xs text-stone-500 leading-4 mt-0.5 truncate">{content}</p>
+        <p className="text-xs text-stone-400 leading-4 mt-1">{time}</p>
       </div>
     </div>
   );

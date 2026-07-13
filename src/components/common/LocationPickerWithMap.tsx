@@ -173,7 +173,7 @@ export default function LocationPickerWithMap({
         <div className="relative">
           <Search
             size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none"
           />
           <input
             value={query}
@@ -186,13 +186,13 @@ export default function LocationPickerWithMap({
             }}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
             placeholder="도로명 또는 지번 주소 검색"
-            className="w-full h-12 pl-9 pr-10 bg-white border border-[#ffe9d6] rounded-xl text-[15px] text-stone-900 placeholder:text-gray-400 outline-none focus:border-[var(--color-orange-500)] transition-colors"
+            className="w-full h-12 pl-9 pr-10 bg-white border border-orange-100 rounded-xl text-[15px] text-stone-900 placeholder:text-stone-400 outline-none focus:border-[var(--color-orange-500)] transition-colors"
           />
           {query && (
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
             >
               <X size={16} />
             </button>
@@ -200,13 +200,13 @@ export default function LocationPickerWithMap({
         </div>
 
         {showSuggestions && suggestions.length > 0 && (
-          <ul className="absolute z-50 top-full mt-1 w-full bg-white border border-[#ffe9d6] rounded-xl shadow-lg overflow-hidden">
+          <ul className="absolute z-50 top-full mt-1 w-full bg-white border border-orange-100 rounded-xl shadow-lg overflow-hidden">
             {suggestions.map((s, i) => (
               <li key={i}>
                 <button
                   type="button"
                   onClick={() => selectSuggestion(s)}
-                  className="w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors border-b border-[#fff0e5] last:border-0"
+                  className="w-full text-left px-4 py-3 hover:bg-orange-50 transition-colors border-b border-orange-50 last:border-0"
                 >
                   <div className="flex items-start gap-2">
                     <MapPin
@@ -218,7 +218,7 @@ export default function LocationPickerWithMap({
                         {s.roadAddress ?? s.addressName}
                       </p>
                       {s.jibunAddress && s.jibunAddress !== s.roadAddress && (
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-xs text-stone-400 mt-0.5">
                           {s.jibunAddress}
                         </p>
                       )}
@@ -233,24 +233,24 @@ export default function LocationPickerWithMap({
 
       <div>
         <p className="text-sm font-medium text-stone-900 mb-2">지도 미리보기</p>
-        <div className="relative rounded-xl overflow-hidden border border-[#ffe9d6] h-56">
+        <div className="relative rounded-xl overflow-hidden border border-orange-100 h-56">
           <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
           {!value && (
             <div className="absolute inset-0 bg-gradient-to-br from-orange-50 to-orange-100 flex flex-col items-center justify-center gap-2 pointer-events-none">
               <MapPin size={28} className="text-orange-300" />
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-stone-400">
                 주소를 검색하면 지도가 표시됩니다
               </span>
             </div>
           )}
         </div>
         {value && (
-          <p className="mt-2 text-xs text-gray-500 flex items-center gap-1">
+          <p className="mt-2 text-xs text-stone-500 flex items-center gap-1">
             <MapPin size={12} className="text-orange-400 shrink-0" />
             {value.displayArea}
           </p>
         )}
-        <p className="mt-2 text-xs text-gray-400">
+        <p className="mt-2 text-xs text-stone-400">
           지도 핀을 드래그해 위치를 조정할 수 있어요. 개인정보 보호를 위해
           좌표는 약 100m 오차 내로 저장되어, 핀 위치가 입력한 주소와 약간
           다르게 보일 수 있어요.

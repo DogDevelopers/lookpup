@@ -80,7 +80,7 @@ export default function SitterDetailClient({
     if (isError || !sitter) {
       return (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <p className="text-gray-400 text-sm">펫시터 정보를 찾을 수 없습니다.</p>
+          <p className="text-stone-400 text-sm">펫시터 정보를 찾을 수 없습니다.</p>
           <Link href={backHref} className="text-orange-500 text-sm underline underline-offset-2">
             {isFromChat ? "채팅으로 돌아가기" : "목록으로 돌아가기"}
           </Link>
@@ -124,7 +124,7 @@ export default function SitterDetailClient({
           <div className="md:flex md:gap-8 md:items-start">
             <div className="md:w-85.25 md:shrink-0">
               <div
-                className="md:hidden relative w-full h-44 bg-linear-to-br from-gray-100 to-gray-200"
+                className="md:hidden relative w-full h-44 bg-linear-to-br from-stone-100 to-stone-200"
                 style={
                   sitter?.profile_image
                     ? {
@@ -140,7 +140,7 @@ export default function SitterDetailClient({
                   aria-label={isFromChat ? "채팅으로 돌아가기" : "펫시터 목록으로 돌아가기"}
                   className="absolute top-4 left-4 w-9 h-9 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm"
                 >
-                  <ChevronLeft size={20} className="text-stone-900" aria-hidden="true" />
+                  <ChevronLeft size={20} className="text-brown-900" aria-hidden="true" />
                 </Link>
                 <div
                   className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/30 to-transparent"
@@ -171,11 +171,11 @@ export default function SitterDetailClient({
                     className="w-full aspect-square rounded-xl object-cover mb-4"
                   />
                 ) : (
-                  <div className="w-full aspect-square rounded-xl bg-linear-to-br from-gray-100 to-gray-200 mb-4" />
+                  <div className="w-full aspect-square rounded-xl bg-linear-to-br from-stone-100 to-stone-200 mb-4" />
                 )}
 
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <span className="text-stone-900 text-2xl font-bold">{name}</span>
+                  <span className="text-brown-900 text-2xl font-bold">{name}</span>
                   {sitter?.is_verified && (
                     <span className="px-2 py-1 bg-orange-500 rounded-md text-white text-xs font-medium">
                       인증
@@ -183,17 +183,17 @@ export default function SitterDetailClient({
                   )}
                 </div>
 
-                <div className="flex items-center justify-center gap-1 text-gray-500 mb-3">
+                <div className="flex items-center justify-center gap-1 text-stone-500 mb-3">
                   <MapPin size={14} />
                   <span className="text-sm">{areaText}</span>
                 </div>
 
                 <div className="flex items-center justify-center gap-1 mb-4">
                   <StarRow size={18} count={Math.round(rating)} />
-                  <span className="text-stone-900 text-lg font-bold ml-1">
+                  <span className="text-brown-900 text-lg font-bold ml-1">
                     {rating.toFixed(1)}
                   </span>
-                  <span className="text-gray-500 text-sm">({reviewCount})</span>
+                  <span className="text-stone-500 text-sm">({reviewCount})</span>
                 </div>
 
                 <div className="flex gap-2 flex-wrap justify-center mb-6">
@@ -205,7 +205,7 @@ export default function SitterDetailClient({
                 <StatGrid stats={stats} className="w-full mb-6" />
 
                 {isSelf ? (
-                  <div className="w-full h-13 bg-gray-200 text-gray-400 text-base font-semibold rounded-[10px] flex items-center justify-center cursor-not-allowed">
+                  <div className="w-full h-13 bg-stone-200 text-stone-400 text-base font-semibold rounded-[10px] flex items-center justify-center cursor-not-allowed">
                     본인 프로필입니다
                   </div>
                 ) : (
@@ -223,10 +223,10 @@ export default function SitterDetailClient({
               <div className="md:hidden bg-white">
                 <div className="px-5 py-3 flex items-center gap-1.5">
                   <StarRow size={13} count={Math.round(rating)} />
-                  <span className="text-sm font-bold text-stone-900">
+                  <span className="text-sm font-bold text-brown-900">
                     {rating.toFixed(1)}
                   </span>
-                  <span className="text-xs text-gray-400">({reviewCount})</span>
+                  <span className="text-xs text-stone-400">({reviewCount})</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5 px-5 pb-3">
                   {serviceLabels.map((s) => (
@@ -245,7 +245,7 @@ export default function SitterDetailClient({
                       className={`pb-3 text-sm md:text-lg font-semibold transition-colors relative ${
                         activeTab === tab
                           ? "text-orange-500"
-                          : "text-gray-400 md:hover:text-stone-900"
+                          : "text-stone-400 md:hover:text-brown-900"
                       }`}
                     >
                       {tab}
@@ -267,7 +267,7 @@ export default function SitterDetailClient({
 
       <div className="fixed bottom-0 left-0 right-0 md:hidden z-40 bg-white border-t border-orange-100 px-5 py-3">
         {isSelf ? (
-          <div className="block w-full py-3.5 bg-gray-200 text-gray-400 font-semibold rounded-xl text-sm text-center cursor-not-allowed">
+          <div className="block w-full py-3.5 bg-stone-200 text-stone-400 font-semibold rounded-xl text-sm text-center cursor-not-allowed">
             본인 프로필입니다
           </div>
         ) : (

@@ -18,7 +18,7 @@ export default function ServicesSection() {
           <h2 className="text-2xl md:text-3xl font-semibold text-stone-900">
             어떤 돌봄이 필요하신가요?
           </h2>
-          <p className="text-gray-500 text-base mt-3">
+          <p className="text-stone-500 text-base mt-3">
             다양한 돌봄 서비스를 제공합니다
           </p>
         </ScrollReveal>
@@ -34,7 +34,7 @@ export default function ServicesSection() {
                   <Icon className="w-7 h-7 text-orange-500" strokeWidth={2} />
                 </div>
                 <span className="text-stone-900 text-base font-semibold">{label}</span>
-                <span className="text-gray-500 text-sm mt-2 text-center">{desc}</span>
+                <span className="text-stone-500 text-sm mt-2 text-center">{desc}</span>
               </Link>
             </ScrollReveal>
           ))}

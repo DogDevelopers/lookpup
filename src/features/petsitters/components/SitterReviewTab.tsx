@@ -29,13 +29,13 @@ export default function SitterReviewTab({
             <div className="flex items-center gap-0.5 justify-center mb-1">
               <StarRow size={14} count={Math.round(rating)} />
             </div>
-            <p className="text-xs text-gray-400">{reviewCount}개 리뷰</p>
+            <p className="text-xs text-stone-400">{reviewCount}개 리뷰</p>
           </div>
           <div className="flex-1 flex flex-col gap-2">
             {ratingCounts.map(({ r, count }) => (
               <div key={r} className="flex items-center gap-3">
-                <span className="text-xs text-gray-500 w-6">{r}점</span>
-                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                <span className="text-xs text-stone-500 w-6">{r}점</span>
+                <div className="flex-1 h-2 bg-stone-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-amber-400 rounded-full"
                     style={{
@@ -46,7 +46,7 @@ export default function SitterReviewTab({
                     }}
                   />
                 </div>
-                <span className="text-xs text-gray-400 w-4 text-right">{count}</span>
+                <span className="text-xs text-stone-400 w-4 text-right">{count}</span>
               </div>
             ))}
           </div>
@@ -54,7 +54,7 @@ export default function SitterReviewTab({
       </div>
 
       {reviews.length === 0 ? (
-        <div className="flex items-center justify-center py-10 text-gray-400 text-sm">
+        <div className="flex items-center justify-center py-10 text-stone-400 text-sm">
           아직 후기가 없습니다.
         </div>
       ) : (
@@ -73,23 +73,23 @@ export default function SitterReviewTab({
                     className="w-9 h-9 rounded-full object-cover shrink-0"
                   />
                 ) : (
-                  <div className="w-9 h-9 rounded-full bg-gray-200 shrink-0 flex items-center justify-center text-gray-500 text-sm font-bold">
+                  <div className="w-9 h-9 rounded-full bg-stone-200 shrink-0 flex items-center justify-center text-stone-500 text-sm font-bold">
                     {(rv.owner?.full_name ?? "?").charAt(0)}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-stone-900 truncate">
+                  <p className="text-sm font-semibold text-brown-900 truncate">
                     {rv.owner?.full_name ?? "보호자"}
                   </p>
                   <div className="flex items-center gap-1 mt-0.5">
                     <StarRow size={11} count={rv.rating} />
-                    <span className="text-xs text-gray-400 ml-1">
+                    <span className="text-xs text-stone-400 ml-1">
                       {new Date(rv.created_at).toLocaleDateString("ko-KR")}
                     </span>
                   </div>
                 </div>
               </div>
-              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+              <p className="text-sm text-stone-600 leading-relaxed whitespace-pre-line">
                 {rv.content}
               </p>
               {rv.image_urls && rv.image_urls.length > 0 && (

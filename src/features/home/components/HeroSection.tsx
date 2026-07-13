@@ -39,7 +39,7 @@ export default function HeroSection() {
           </h1>
 
           <p
-            className="animate-hero-text text-gray-500 text-base sm:text-lg leading-7 mb-8"
+            className="animate-hero-text text-stone-500 text-base sm:text-lg leading-7 mb-8"
             style={{ animationDelay: "0.2s" }}
           >
             지역 기반 검색으로 가까운 펫시터를 찾고,
@@ -57,17 +57,17 @@ export default function HeroSection() {
           >
             <div className="text-center lg:text-left">
               <p className="text-orange-500 text-2xl font-bold">5,200+</p>
-              <p className="text-gray-500 text-sm">펫시터</p>
+              <p className="text-stone-500 text-sm">펫시터</p>
             </div>
             <div className="text-center lg:text-left">
               <p className="text-orange-500 text-2xl font-bold">98%</p>
-              <p className="text-gray-500 text-sm">만족도</p>
+              <p className="text-stone-500 text-sm">만족도</p>
             </div>
             <div className="text-center lg:text-left">
               <p className="text-stone-900 text-sm font-bold">
                 안전 에스크로 결제
               </p>
-              <p className="text-gray-500 text-xs">보장된 거래</p>
+              <p className="text-stone-500 text-xs">보장된 거래</p>
             </div>
           </div>
         </div>
@@ -90,8 +90,8 @@ export default function HeroSection() {
                     </span>
                   </div>
                   <div className="flex items-center gap-1 mb-2">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-gray-500 text-sm">서울 마포구</span>
+                    <MapPin className="w-3.5 h-3.5 text-stone-400" />
+                    <span className="text-stone-500 text-sm">서울 마포구</span>
                   </div>
                   <div className="flex gap-2 mb-3">
                     <span className="px-3 py-1 bg-orange-50 rounded-full text-orange-500 text-[10px] font-medium">
@@ -107,7 +107,7 @@ export default function HeroSection() {
                       <span className="text-stone-900 text-sm font-bold">
                         4.9
                       </span>
-                      <span className="text-gray-500 text-xs">(47)</span>
+                      <span className="text-stone-500 text-xs">(47)</span>
                     </div>
                     <span className="text-orange-500 text-sm font-semibold">
                       30,000원~
@@ -140,8 +140,8 @@ export default function HeroSection() {
                     박서현 펫시터
                   </p>
                   <div className="flex items-center gap-1 mt-1">
-                    <MapPin className="w-3.5 h-3.5 text-gray-400" />
-                    <span className="text-gray-500 text-sm">서울 강남구</span>
+                    <MapPin className="w-3.5 h-3.5 text-stone-400" />
+                    <span className="text-stone-500 text-sm">서울 강남구</span>
                   </div>
                 </div>
               </div>
@@ -159,7 +159,7 @@ export default function HeroSection() {
             className="animate-hero-card absolute top-48 left-0 px-4 py-3 bg-white rounded-2xl shadow-lg z-20"
             style={{ animationDelay: "0.45s" }}
           >
-            <span className="text-gray-500 text-xs">인증 펫시터</span>
+            <span className="text-stone-500 text-xs">인증 펫시터</span>
           </div>
           <div
             className="animate-hero-card absolute bottom-8 right-8 px-4 py-2.5 bg-orange-500 rounded-2xl shadow-lg z-20"

@@ -54,7 +54,7 @@ export function ReportModalContent({
         onChange={(e) => onAdditionalTextChange(e.target.value)}
         placeholder="추가 내용을 직접 입력해 주세요. (선택)"
         rows={4}
-        className="w-full px-4 py-3 bg-orange-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-orange-100 text-sm text-stone-900 placeholder:text-gray-400 leading-5 resize-none focus:outline-orange-300 transition-colors"
+        className="w-full px-4 py-3 bg-orange-50 rounded-xl outline outline-1 outline-offset-[-1px] outline-orange-100 text-sm text-stone-900 placeholder:text-stone-400 leading-5 resize-none focus:outline-orange-300 transition-colors"
       />
     </div>
   );

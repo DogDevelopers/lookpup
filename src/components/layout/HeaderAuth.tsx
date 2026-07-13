@@ -29,7 +29,7 @@ function relativeTime(iso: string) {
 }
 
 const HOVER_CARD_CLS =
-  "bg-white border border-[#ffe9d6] rounded-xl ring-0 shadow-[0px_4px_20px_0px_rgba(232,116,42,0.15)]";
+  "bg-white border border-orange-100 rounded-xl ring-0 shadow-[0px_4px_20px_0px_rgba(232,116,42,0.15)]";
 
 interface HeaderAuthProps {
   user: HeaderUser | null;
@@ -87,7 +87,7 @@ export default function HeaderAuth({
               aria-label="알림 보기"
               className="relative p-2 rounded-full hover:bg-orange-50 transition-colors"
             >
-              <Bell size={20} className="text-gray-500" strokeWidth={1.8} />
+              <Bell size={20} className="text-stone-500" strokeWidth={1.8} />
               {unreadCount > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 size-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold leading-4">
                   {unreadCount}
@@ -101,7 +101,7 @@ export default function HeaderAuth({
           sideOffset={8}
           className={`w-80 p-0 overflow-hidden ${HOVER_CARD_CLS}`}
         >
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#ffe9d6]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-orange-100">
             <span className="text-stone-900 text-sm font-semibold">알림</span>
             {unreadCount > 0 && (
               <button
@@ -115,7 +115,7 @@ export default function HeaderAuth({
           </div>
           <div className="max-h-72 overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="py-8 flex flex-col items-center gap-2 text-gray-400">
+              <div className="py-8 flex flex-col items-center gap-2 text-stone-400">
                 <Bell size={24} strokeWidth={1.5} />
                 <p className="text-xs">새로운 알림이 없습니다</p>
               </div>
@@ -125,21 +125,21 @@ export default function HeaderAuth({
                   key={notif.id}
                   type="button"
                   onClick={() => onNotificationClick?.(notif)}
-                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-orange-50/50 transition-colors ${i < notifications.length - 1 ? "border-b border-[#ffe9d6]" : ""} ${notif.isRead ? "opacity-70" : ""}`}
+                  className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-orange-50/50 transition-colors ${i < notifications.length - 1 ? "border-b border-orange-100" : ""} ${notif.isRead ? "opacity-70" : ""}`}
                 >
                   <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
                     <Bell size={14} className="text-orange-500" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-xs leading-4 truncate ${notif.isRead ? "text-gray-500" : "text-stone-900 font-medium"}`}
+                      className={`text-xs leading-4 truncate ${notif.isRead ? "text-stone-500" : "text-stone-900 font-medium"}`}
                     >
                       {notif.title}
                     </p>
-                    <p className="text-xs text-gray-400 leading-4 mt-0.5 truncate">
+                    <p className="text-xs text-stone-400 leading-4 mt-0.5 truncate">
                       {notif.content}
                     </p>
-                    <p className="text-[10px] text-gray-300 mt-1">
+                    <p className="text-[10px] text-stone-300 mt-1">
                       {relativeTime(notif.createdAt)}
                     </p>
                   </div>
@@ -150,7 +150,7 @@ export default function HeaderAuth({
               ))
             )}
           </div>
-          <div className="border-t border-[#ffe9d6]">
+          <div className="border-t border-orange-100">
             <Link
               href="/notifications"
               className="flex items-center justify-center gap-1 py-3 text-xs text-orange-500 font-medium hover:bg-orange-50 transition-colors"
@@ -210,13 +210,13 @@ export default function HeaderAuth({
               관리자 페이지
             </Link>
           )}
-          <div className="mx-2 my-1 h-px bg-[#ffe9d6]" />
+          <div className="mx-2 my-1 h-px bg-orange-100" />
           <button
             type="button"
             onClick={() => onLogout?.()}
-            className="w-full px-3 py-2.5 flex items-center gap-3 text-sm text-gray-500 rounded-lg hover:bg-orange-50 transition-colors"
+            className="w-full px-3 py-2.5 flex items-center gap-3 text-sm text-stone-500 rounded-lg hover:bg-orange-50 transition-colors"
           >
-            <LogOut size={16} className="text-gray-400 shrink-0" strokeWidth={1.8} />
+            <LogOut size={16} className="text-stone-400 shrink-0" strokeWidth={1.8} />
             로그아웃
           </button>
         </HoverCardContent>

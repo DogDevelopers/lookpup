@@ -436,7 +436,7 @@ function ChatWindowImpl({
             <p className="font-semibold text-sm text-stone-900 truncate">
               {roomName}
             </p>
-            <p className="text-xs text-gray-400 truncate">{headerSub}</p>
+            <p className="text-xs text-stone-400 truncate">{headerSub}</p>
           </div>
           <span
             className={`text-xs px-2.5 py-1 rounded-full font-medium shrink-0 ${headerBadge.className}`}
@@ -448,7 +448,7 @@ function ChatWindowImpl({
               onClick={() => setMobileMenuOpen((v) => !v)}
               className="p-1"
             >
-              <MoreVertical size={20} className="text-gray-500" />
+              <MoreVertical size={20} className="text-stone-500" />
             </button>
             {mobileMenuOpen && (
               <>
@@ -519,7 +519,7 @@ function ChatWindowImpl({
               <button
                 onClick={onRejectApplicant}
                 disabled={!!actioningId}
-                className="flex-1 py-2 text-sm text-gray-500 border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors disabled:opacity-50"
+                className="flex-1 py-2 text-sm text-stone-500 border border-stone-200 rounded-xl hover:bg-stone-50 transition-colors disabled:opacity-50"
               >
                 거절
               </button>
@@ -558,7 +558,7 @@ function ChatWindowImpl({
               >
                 <Plus
                   size={22}
-                  className={`text-gray-500 transition-transform duration-200 ${plusMenuOpen ? "rotate-45" : ""}`}
+                  className={`text-stone-500 transition-transform duration-200 ${plusMenuOpen ? "rotate-45" : ""}`}
                 />
               </button>
               <input

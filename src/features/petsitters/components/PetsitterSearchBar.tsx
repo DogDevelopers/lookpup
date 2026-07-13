@@ -45,13 +45,13 @@ export default function PetsitterSearchBar({
               placeholder="지역 또는 펫시터 이름 검색"
               value={areaQuery}
               onChange={(e) => onAreaQueryChange(e.target.value)}
-              className="flex-1 min-w-0 bg-transparent text-sm md:text-base text-stone-900 placeholder:text-stone-900/50 outline-none"
+              className="flex-1 min-w-0 bg-transparent text-sm md:text-base text-brown-900 placeholder:text-brown-900/50 outline-none"
             />
             {areaQuery && (
               <button
                 onClick={onClearAreaFilter}
                 aria-label="지역 검색 초기화"
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-stone-400 hover:text-stone-600 transition-colors"
               >
                 <X size={15} />
               </button>
@@ -69,8 +69,8 @@ export default function PetsitterSearchBar({
                   >
                     <MapPin size={14} className="text-orange-400 shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-stone-900 font-medium truncate">{s.label}</p>
-                      <p className="text-xs text-gray-400 truncate">
+                      <p className="text-sm text-brown-900 font-medium truncate">{s.label}</p>
+                      <p className="text-xs text-stone-400 truncate">
                         {s.type === "area" ? s.city : s.address}
                       </p>
                     </div>
@@ -83,7 +83,7 @@ export default function PetsitterSearchBar({
 
         <button
           onClick={onRequestLocation}
-          className="shrink-0 flex items-center gap-1.5 px-3 py-3 rounded-xl bg-orange-50 text-stone-900 hover:bg-orange-100 transition-colors"
+          className="shrink-0 flex items-center gap-1.5 px-3 py-3 rounded-xl bg-orange-50 text-brown-900 hover:bg-orange-100 transition-colors"
           title="내 위치로 지도 이동"
         >
           <LocateFixed className="w-4 h-4 md:w-5 md:h-5 text-orange-500" />

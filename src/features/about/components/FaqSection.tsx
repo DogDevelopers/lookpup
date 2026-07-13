@@ -31,7 +31,7 @@ export default function FaqSection() {
           <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-center mb-4">
             자주 묻는 질문
           </h2>
-          <p className="text-gray-500 text-center mb-10 md:mb-14">
+          <p className="text-stone-500 text-center mb-10 md:mb-14">
             궁금한 점을 미리 확인하세요
           </p>
         </ScrollReveal>
@@ -51,7 +51,7 @@ export default function FaqSection() {
                   <h3 className="text-stone-900 text-lg font-semibold mb-2">
                     {q}
                   </h3>
-                  <p className="text-gray-500 text-base leading-6">{a}</p>
+                  <p className="text-stone-500 text-base leading-6">{a}</p>
                 </div>
               </div>
             </ScrollReveal>

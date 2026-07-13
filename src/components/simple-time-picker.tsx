@@ -270,7 +270,7 @@ export function SimpleTimePicker({
             role="combobox"
             aria-expanded={open}
             className={cn(
-              "flex h-9 px-3 items-center justify-between cursor-pointer font-normal border border-[#ffe9d6] rounded-md text-sm text-gray-500 bg-white hover:border-[var(--color-orange-500)]/50 transition-colors",
+              "flex h-9 px-3 items-center justify-between cursor-pointer font-normal border border-orange-100 rounded-md text-sm text-stone-500 bg-white hover:border-[var(--color-orange-500)]/50 transition-colors",
               disabled && "opacity-50 cursor-not-allowed",
             )}
             tabIndex={0}
@@ -282,7 +282,7 @@ export function SimpleTimePicker({
         }
       />
       <PopoverContent
-        className="p-0 bg-white border border-[#ffe9d6] shadow-md"
+        className="p-0 bg-white border border-orange-100 shadow-md"
         side="bottom"
         align="start"
       >

@@ -37,7 +37,7 @@ export default function FeaturesSection() {
           <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-center mb-4">
             주요 기능
           </h2>
-          <p className="text-gray-500 text-center mb-10 md:mb-14">
+          <p className="text-stone-500 text-center mb-10 md:mb-14">
             봐주개가 제공하는 핵심 기능을 확인하세요
           </p>
         </ScrollReveal>
@@ -53,7 +53,7 @@ export default function FeaturesSection() {
                   <Icon className="w-7 h-7 text-orange-500" />
                 </div>
                 <h3 className="text-stone-900 text-lg font-semibold">{title}</h3>
-                <p className="text-gray-500 text-base leading-6">{desc}</p>
+                <p className="text-stone-500 text-base leading-6">{desc}</p>
               </div>
             </ScrollReveal>
           ))}

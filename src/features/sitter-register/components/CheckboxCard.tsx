@@ -17,13 +17,13 @@ export default function CheckboxCard({
     <button
       type="button"
       onClick={onToggle}
-      className="p-3 bg-white rounded-lg border border-[#ffe9d6] flex items-center gap-3 hover:border-[var(--color-orange-500)]/50 transition-all text-left"
+      className="p-3 bg-white rounded-lg border border-orange-100 flex items-center gap-3 hover:border-[var(--color-orange-500)]/50 transition-all text-left"
     >
       <div
         className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
           checked
             ? "bg-[var(--color-orange-500)] border-[var(--color-orange-500)]"
-            : "border-gray-300"
+            : "border-stone-300"
         }`}
       >
         {checked && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}

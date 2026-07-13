@@ -54,7 +54,7 @@ export default function SearchFilterBar({
       {(!hideSearch || !hideSort) && <div className="flex gap-2 md:gap-3">
         {!hideSearch && (
           <div className="flex-1 flex items-center gap-2 px-3 md:px-4 py-3 bg-orange-50 rounded-xl min-w-0">
-            <Search className="w-4 h-4 md:w-5 md:h-5 text-gray-400 shrink-0" />
+            <Search className="w-4 h-4 md:w-5 md:h-5 text-stone-400 shrink-0" />
             <input
               type="text"
               placeholder={placeholder}
@@ -115,7 +115,7 @@ export default function SearchFilterBar({
               className={`shrink-0 h-9 px-4 rounded-full text-sm font-medium transition-colors whitespace-nowrap ${
                 activeFilter === f
                   ? "bg-orange-500 text-white"
-                  : "bg-orange-50 text-gray-500 hover:bg-orange-100"
+                  : "bg-orange-50 text-stone-500 hover:bg-orange-100"
               }`}
             >
               {f}

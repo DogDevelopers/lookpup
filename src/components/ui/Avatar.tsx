@@ -28,10 +28,10 @@ const SIZE_PX: Record<NonNullable<AvatarProps["size"]>, number> = {
 };
 
 const VARIANT: Record<NonNullable<AvatarProps["variant"]>, { container: string; text: string }> = {
-  default: { container: "bg-[#FFF0E8] border-2 border-[#FFE9D6]", text: "text-[var(--color-orange-500)]" },
+  default: { container: "bg-orange-100 border-2 border-orange-100", text: "text-[var(--color-orange-500)]" },
   dark: { container: "bg-orange-100", text: "text-[var(--color-orange-500)]" },
   orange: { container: "bg-orange-50 border border-orange-100", text: "text-orange-500" },
-  blue: { container: "bg-[#aed6f1]", text: "text-white" },
+  blue: { container: "bg-sky-200", text: "text-white" },
 };
 
 interface AvatarMobileProps {

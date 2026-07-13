@@ -124,22 +124,22 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
   const weeks = buildWeeks(month);
 
   return (
-    <div className="select-none bg-white rounded-2xl border border-[#ffe9d6] p-4 sm:p-6">
+    <div className="select-none bg-white rounded-2xl border border-orange-100 p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => setMonth((m) => subMonths(m, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#ffe9d6] hover:bg-[#fff8f3] transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 hover:bg-orange-50 transition-colors"
         >
-          <ChevronLeft size={16} className="text-gray-500" />
+          <ChevronLeft size={16} className="text-stone-500" />
         </button>
-        <span className="text-[#281a0e] text-base font-semibold">
+        <span className="text-stone-900 text-base font-semibold">
           {format(month, "yyyy년 M월", { locale: ko })}
         </span>
         <button
           onClick={() => setMonth((m) => addMonths(m, 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#ffe9d6] hover:bg-[#fff8f3] transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 hover:bg-orange-50 transition-colors"
         >
-          <ChevronRight size={16} className="text-gray-500" />
+          <ChevronRight size={16} className="text-stone-500" />
         </button>
       </div>
 
@@ -147,7 +147,7 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
         {DAY_LABELS.map((d) => (
           <div
             key={d}
-            className="text-center text-xs font-medium text-gray-400 py-1"
+            className="text-center text-xs font-medium text-stone-400 py-1"
           >
             {d}
           </div>
@@ -169,19 +169,19 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
               let barClass = "";
               if (kind === "start")
                 barClass =
-                  "bg-[#ffe9d6]/70 rounded-r-none rounded-l-full left-1/2 right-0";
+                  "bg-orange-100/70 rounded-r-none rounded-l-full left-1/2 right-0";
               else if (kind === "end")
                 barClass =
-                  "bg-[#ffe9d6]/70 rounded-l-none rounded-r-full left-0 right-1/2";
+                  "bg-orange-100/70 rounded-l-none rounded-r-full left-0 right-1/2";
               else if (kind === "middle")
-                barClass = "bg-[#ffe9d6]/70 left-0 right-0";
+                barClass = "bg-orange-100/70 left-0 right-0";
 
               const isWeekStart = di === 0;
               const isWeekEnd = di === 6;
               if (kind === "middle" && isWeekStart)
-                barClass = "bg-[#ffe9d6]/70 rounded-l-full left-0 right-0";
+                barClass = "bg-orange-100/70 rounded-l-full left-0 right-0";
               if (kind === "middle" && isWeekEnd)
-                barClass = "bg-[#ffe9d6]/70 rounded-r-full left-0 right-0";
+                barClass = "bg-orange-100/70 rounded-r-full left-0 right-0";
 
               return (
                 <div
@@ -197,16 +197,16 @@ export default function RangePicker({ value, onChange, bookedRanges = [] }: Prop
                     disabled={disabled}
                     className={[
                       "relative z-10 w-9 h-9 rounded-full text-sm font-medium transition-colors",
-                      past ? "text-gray-300 cursor-not-allowed" : "",
-                      booked ? "text-gray-300 cursor-not-allowed line-through" : "",
+                      past ? "text-stone-300 cursor-not-allowed" : "",
+                      booked ? "text-stone-300 cursor-not-allowed line-through" : "",
                       !disabled && (kind === "start" || kind === "end" || kind === "single")
                         ? "bg-[var(--color-orange-500)] text-white"
                         : !disabled && kind === "middle"
-                          ? "text-[#281a0e] hover:bg-[#fff8f3]"
+                          ? "text-stone-900 hover:bg-orange-50"
                           : !disabled && isToday
-                            ? "text-[var(--color-orange-500)] font-bold hover:bg-[#fff8f3]"
+                            ? "text-[var(--color-orange-500)] font-bold hover:bg-orange-50"
                             : !disabled
-                              ? "text-[#281a0e] hover:bg-[#fff8f3]"
+                              ? "text-stone-900 hover:bg-orange-50"
                               : "",
                     ].join(" ")}
                   >

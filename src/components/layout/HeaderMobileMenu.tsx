@@ -79,7 +79,7 @@ export default function HeaderMobileMenu({
                 aria-label="알림 보기"
                 className="relative p-2 rounded-full hover:bg-orange-50 transition-colors"
               >
-                <Bell size={20} className="text-gray-500" strokeWidth={1.8} />
+                <Bell size={20} className="text-stone-500" strokeWidth={1.8} />
                 {unreadCount > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 size-4 bg-red-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold leading-4">
                     {unreadCount}
@@ -141,7 +141,7 @@ export default function HeaderMobileMenu({
                     </span>
                   )}
                 </div>
-                <p className="mt-0.5 text-gray-400 text-xs font-normal leading-4 truncate">{user?.email || ""}</p>
+                <p className="mt-0.5 text-stone-400 text-xs font-normal leading-4 truncate">{user?.email || ""}</p>
               </div>
             </div>
           )}
@@ -163,7 +163,7 @@ export default function HeaderMobileMenu({
                     {label}
                   </span>
                   {isLoggedIn && (
-                    <ChevronRight size={16} className={active ? "text-orange-500" : "text-gray-300"} strokeWidth={2} />
+                    <ChevronRight size={16} className={active ? "text-orange-500" : "text-stone-300"} strokeWidth={2} />
                   )}
                 </Link>
               );
@@ -183,7 +183,7 @@ export default function HeaderMobileMenu({
                       </span>
                       <span className="text-stone-900 text-base font-medium leading-6">마이페이지</span>
                     </span>
-                    <ChevronRight size={16} className="text-gray-300" strokeWidth={2} />
+                    <ChevronRight size={16} className="text-stone-300" strokeWidth={2} />
                   </Link>
 
                   <Link href="/chat" onClick={() => setOpen(false)} className="px-4 py-3 rounded-xl inline-flex items-center justify-between hover:bg-orange-50 transition-colors">
@@ -193,7 +193,7 @@ export default function HeaderMobileMenu({
                       </span>
                       <span className="text-stone-900 text-base font-medium leading-6">채팅</span>
                     </span>
-                    <ChevronRight size={16} className="text-gray-300" strokeWidth={2} />
+                    <ChevronRight size={16} className="text-stone-300" strokeWidth={2} />
                   </Link>
 
                   {user?.role === "admin" && (
@@ -204,7 +204,7 @@ export default function HeaderMobileMenu({
                         </span>
                         <span className="text-stone-900 text-base font-medium leading-6">관리자 페이지</span>
                       </span>
-                      <ChevronRight size={16} className="text-gray-300" strokeWidth={2} />
+                      <ChevronRight size={16} className="text-stone-300" strokeWidth={2} />
                     </Link>
                   )}
                 </div>
@@ -215,9 +215,9 @@ export default function HeaderMobileMenu({
                   <button
                     type="button"
                     onClick={() => onLogout?.()}
-                    className="w-full h-12 rounded-xl border border-orange-100 bg-white flex items-center justify-center gap-2 text-gray-500 text-sm font-normal leading-6 hover:bg-orange-50 transition-colors"
+                    className="w-full h-12 rounded-xl border border-orange-100 bg-white flex items-center justify-center gap-2 text-stone-500 text-sm font-normal leading-6 hover:bg-orange-50 transition-colors"
                   >
-                    <LogOut size={16} className="text-gray-500" strokeWidth={1.8} />
+                    <LogOut size={16} className="text-stone-500" strokeWidth={1.8} />
                     로그아웃
                   </button>
                 </div>
