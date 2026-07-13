@@ -1,8 +1,29 @@
-// TODO: 로그인 여부 + role="admin" 확인 후 리다이렉트 (features/auth 이식 후).
-export default function AdminLayout({
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile?.role !== "admin") {
+    redirect("/");
+  }
+
   return <>{children}</>;
 }

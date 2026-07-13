@@ -1,6 +1,36 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import SitterRegisterClient from "@/features/sitter-register/components/SitterRegisterClient";
 
-// TODO: 로그인/본인인증/기존 시터 여부 확인 후 리다이렉트 (features/auth 이식 후).
-export default function PetsitterRegisterPage() {
+export default async function PetsitterRegisterPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login?next=/sitter-register");
+  }
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("is_verified")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile?.is_verified) {
+    redirect("/auth/verification?next=/sitter-register");
+  }
+
+  const { data: existingSitter } = await supabase
+    .from("sitters")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existingSitter) {
+    redirect("/myprofile/sitter-profile");
+  }
+
   return <SitterRegisterClient />;
 }

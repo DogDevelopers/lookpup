@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { useBookingStore } from "@/stores/booking-store";
 import Footer from "@/components/layout/Footer";
+import { createReservation } from "../actions";
 import {
   step1Schema,
   step2Schema,
@@ -100,12 +102,42 @@ export default function BookingClient({
 
   async function handleSubmit() {
     const ok = await step3Form.trigger();
-    if (!ok || isSubmitting || !sitter) return;
+    if (!ok || isSubmitting || !sitter || !dateRange?.from) return;
 
     setIsSubmitting(true);
 
-    // TODO: features/petsitters/actions.ts의 createPetsitterReservationRequest로 교체.
+    const start = new Date(dateRange.from);
+    if (startTime) {
+      const [h, m] = startTime.split(":").map(Number);
+      start.setHours(h, m, 0, 0);
+    } else {
+      start.setHours(0, 0, 0, 0);
+    }
+
+    const end = new Date(dateRange.to ?? dateRange.from);
+    if (endTime) {
+      const [h, m] = endTime.split(":").map(Number);
+      end.setHours(h, m, 0, 0);
+    } else {
+      end.setHours(23, 59, 0, 0);
+    }
+
+    const result = await createReservation({
+      sitterId,
+      petIds,
+      selectedService: selectedService ?? "",
+      startDatetime: start.toISOString(),
+      endDatetime: end.toISOString(),
+      memo: step3Form.getValues("note"),
+    });
+
     setIsSubmitting(false);
+
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+
     setStep(4);
     setChatRoomId(null);
   }

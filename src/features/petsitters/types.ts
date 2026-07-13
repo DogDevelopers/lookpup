@@ -52,6 +52,7 @@ export interface SitterDetail {
   rating: number;
   review_count: number;
   activity_photo_urls: string[];
+  available_animals: string[];
   services: ServiceRow[];
 }
 
