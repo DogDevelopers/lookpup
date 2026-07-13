@@ -83,15 +83,15 @@ export default function TermsPage() {
       heading="봐주개 이용약관"
       intro={
         <>
-          <p className="text-sm text-gray-500 leading-relaxed">
+          <p className="text-sm text-stone-500 leading-relaxed">
             안녕하십니까. 우리 아이를 믿고 맡길 수 있는 반려동물 돌봄 플랫폼
             봐주개의 서비스를 이용해주셔서 감사합니다.
           </p>
-          <p className="text-sm text-gray-500 leading-relaxed mt-2">
+          <p className="text-sm text-stone-500 leading-relaxed mt-2">
             본 약관은 봐주개가 제공하는 펫시팅 서비스의 이용과 관련하여 봐주개와
             이용자 간의 권리, 의무 및 책임사항을 정하고 있습니다.
           </p>
-          <p className="text-sm text-gray-500 leading-relaxed mt-2">
+          <p className="text-sm text-stone-500 leading-relaxed mt-2">
             본 약관에 동의하여 봐주개가 제공하는 다양한 서비스를 이용해주시길
             바랍니다.
           </p>
