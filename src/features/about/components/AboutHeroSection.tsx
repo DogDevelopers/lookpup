@@ -21,7 +21,7 @@ export default function AboutHeroSection() {
         </div>
         <br></br>
 
-        <p className="text-gray-500 text-sm md:text-lg leading-6 md:leading-7 w-[300px] md:w-auto">
+        <p className="text-stone-500 text-sm md:text-lg leading-6 md:leading-7 w-[300px] md:w-auto">
           <strong className="text-stone-700">
             봐주<span className="text-orange-500">개</span>
           </strong>

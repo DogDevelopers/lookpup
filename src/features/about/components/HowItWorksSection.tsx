@@ -36,7 +36,7 @@ export default function HowItWorksSection() {
           <h2 className="text-2xl md:text-3xl font-bold text-stone-900 text-center mb-2">
             이용 방법
           </h2>
-          <p className="text-gray-500 text-center mb-10 md:mb-14">
+          <p className="text-stone-500 text-center mb-10 md:mb-14">
             간단한 단계로 시작할 수 있습니다
           </p>
         </ScrollReveal>
@@ -57,7 +57,7 @@ export default function HowItWorksSection() {
                 <h3 className="text-stone-900 text-base font-semibold mb-1">
                   {title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-5">{desc}</p>
+                <p className="text-stone-500 text-sm leading-5">{desc}</p>
               </div>
             </ScrollReveal>
           ))}
@@ -79,7 +79,7 @@ export default function HowItWorksSection() {
                 <h3 className="text-stone-900 text-base font-semibold mb-1">
                   {title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-5">{desc}</p>
+                <p className="text-stone-500 text-sm leading-5">{desc}</p>
               </div>
             </ScrollReveal>
           ))}
