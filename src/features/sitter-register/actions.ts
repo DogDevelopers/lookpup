@@ -51,7 +51,16 @@ export async function createSitter(input: CreateSitterInput): Promise<ActionResu
     return { ok: false, error: "이미 펫시터 프로필이 존재합니다." };
   }
 
-  const { introduction, career, location, selectedServices, selectedAnimals } = parsed.data;
+  const {
+    introduction,
+    career,
+    location,
+    selectedServices,
+    selectedAnimals,
+    profilePhotoUrl,
+    certificateUrls,
+    activityPhotoUrls,
+  } = parsed.data;
 
   const { data: sitter, error: sitterError } = await supabase
     .from("sitters")
@@ -66,12 +75,18 @@ export async function createSitter(input: CreateSitterInput): Promise<ActionResu
       base_price: 0,
       request_type: selectedServices,
       available_animals: selectedAnimals,
+      certificate_urls: certificateUrls,
+      activity_photo_urls: activityPhotoUrls,
     })
     .select("id")
     .single();
 
   if (sitterError || !sitter) {
     return { ok: false, error: "펫시터 등록에 실패했습니다." };
+  }
+
+  if (profilePhotoUrl) {
+    await supabase.from("users").update({ profile_image: profilePhotoUrl }).eq("id", user.id);
   }
 
   const servicesToInsert = selectedServices.map((serviceId) => {
@@ -214,10 +229,15 @@ export async function updateSitterProfile(
     latitude,
     longitude,
     availableAnimals,
+    profilePhotoUrl,
     activityPhotoUrls,
     services,
     deletedServiceIds,
   } = parsed.data;
+
+  if (profilePhotoUrl) {
+    await supabase.from("users").update({ profile_image: profilePhotoUrl }).eq("id", user.id);
+  }
 
   const { error: updateError } = await supabase
     .from("sitters")

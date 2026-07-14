@@ -9,3 +9,11 @@ export const bankAccountSchema = z.object({
   accountHolder: z.string().min(1, "예금주명을 입력해주세요."),
 });
 export type BankAccountInput = z.infer<typeof bankAccountSchema>;
+
+export const ownerLocationSchema = z.object({
+  address: z.string().min(1),
+  lat: z.number(),
+  lng: z.number(),
+  dong: z.string().min(1),
+});
+export type OwnerLocationInput = z.infer<typeof ownerLocationSchema>;

@@ -14,15 +14,29 @@ export const APPLICATION_STATUS = {
   CANCELED: "canceled",
 } as const;
 
-export const WITHDRAW_REASONS = [
-  { value: "not_useful", label: "서비스를 잘 이용하지 않아요" },
-  { value: "hard_to_use", label: "사용 방법이 어려워요" },
-  { value: "found_alternative", label: "다른 서비스를 이용하고 있어요" },
-  { value: "privacy_concern", label: "개인정보 이용이 걱정돼요" },
-  { value: "other", label: "기타" },
+export const WITHDRAW_REASON_VALUES = [
+  "low_usage",
+  "no_service",
+  "inconvenient",
+  "privacy",
+  "other",
 ] as const;
 
-export const WITHDRAW_REASON_VALUES = WITHDRAW_REASONS.map((r) => r.value) as [
-  string,
-  ...string[],
+export type WithdrawReason = (typeof WITHDRAW_REASON_VALUES)[number];
+
+export const WITHDRAW_REASONS: { value: WithdrawReason; label: string }[] = [
+  { value: "low_usage", label: "이용 빈도가 낮음" },
+  { value: "no_service", label: "원하는 서비스가 없음" },
+  { value: "inconvenient", label: "이용이 불편함" },
+  { value: "privacy", label: "개인정보 보호 우려" },
+  { value: "other", label: "기타" },
 ];
+
+export const SITTER_STATUS_VALUES = [
+  "pending",
+  "approved",
+  "rejected",
+  "suspended",
+] as const;
+
+export type SitterStatus = (typeof SITTER_STATUS_VALUES)[number];

@@ -1,4 +1,4 @@
-export type ReportStatus = "pending" | "processing" | "completed" | "rejected";
+export type ReportStatus = "pending" | "in_review" | "resolved" | "rejected";
 export type SitterStatus = "pending" | "approved" | "rejected";
 export type ReservationStatus =
   | "pending"

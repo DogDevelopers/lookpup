@@ -1,13 +1,25 @@
 "use client";
 
-import { useState, useTransition, type ReactNode } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
-import { Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  Plus,
+  PawPrint,
+  AlertTriangle,
+  CheckCircle2,
+  X,
+  Camera,
+  Pencil,
+  Trash2,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
+import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
-import SectionCard from "@/components/common/SectionCard";
 import { updatePet, deletePet } from "@/features/pet-register/actions";
-import type { PetUpdateInput } from "@/features/pet-register/schema";
+
+type AnimalType = "dog" | "cat" | "other";
 
 export interface MyPet {
   id: string;
@@ -21,274 +33,827 @@ export interface MyPet {
   caution: string | null;
 }
 
-const inputCls =
-  "w-full h-11 px-3 rounded-xl border border-orange-100 text-sm outline-none focus:border-orange-300";
+function normalizeAnimalType(type: string): AnimalType {
+  return type === "dog" || type === "cat" ? type : "other";
+}
 
-function Field({
-  label,
-  children,
-  className = "",
+const ANIMAL_TYPE_LABEL: Record<AnimalType, string> = {
+  dog: "강아지",
+  cat: "고양이",
+  other: "기타",
+};
+
+const ANIMAL_VISUAL: Record<AnimalType, { emoji: string; bgFrom: string; bgTo: string }> = {
+  dog: { emoji: "🐶", bgFrom: "#FDE8C4", bgTo: "#FAD7A0" },
+  cat: { emoji: "🐱", bgFrom: "#D6EAF8", bgTo: "#AED6F1" },
+  other: { emoji: "🐾", bgFrom: "#D5F5E3", bgTo: "#A9DFBF" },
+};
+
+function genderLabel(pet: MyPet): string {
+  const base = pet.gender === "male" ? "수컷" : "암컷";
+  return pet.neutered ? `${base}(중성화)` : base;
+}
+
+function Backdrop({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/35 backdrop-blur-sm" />
+      <div className="relative z-10 w-full flex justify-center">{children}</div>
+    </div>
+  );
+}
+
+function DeleteModal({
+  pet,
+  onClose,
+  onConfirm,
 }: {
-  label: string;
-  children: ReactNode;
-  className?: string;
+  pet: MyPet;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  const visual = ANIMAL_VISUAL[normalizeAnimalType(pet.animalType)];
+  return (
+    <Backdrop>
+      <div className="bg-white rounded-[20px] w-[460px] max-w-[calc(100vw-32px)] p-8 shadow-[0_12px_16px_rgba(0,0,0,0.12)]">
+        <div className="flex flex-col items-center text-center">
+          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+            <AlertTriangle size={28} className="text-[var(--color-orange-500)]" />
+          </div>
+          <h3 className="text-xl font-bold text-stone-900 mb-2">등록된 정보를 삭제하시겠어요?</h3>
+          <p className="text-sm text-gray-500 mb-6">삭제된 정보는 복구할 수 없습니다.</p>
+
+          <div className="w-full flex items-center gap-3 p-4 bg-orange-50 rounded-xl mb-6">
+            <div
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+              style={{ background: `linear-gradient(135deg, ${visual.bgFrom}, ${visual.bgTo})` }}
+            >
+              {visual.emoji}
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-stone-900">{pet.name}</p>
+              <p className="text-sm text-gray-500">{pet.breed ?? "품종 미입력"}</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 w-full">
+            <button
+              onClick={onClose}
+              className="flex-1 h-12 rounded-xl border border-orange-100 text-gray-500 font-medium hover:border-[var(--color-orange-500)]/50 transition-colors"
+            >
+              취소
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 h-12 rounded-xl bg-[var(--color-orange-500)] text-white font-semibold hover:bg-orange-600 transition-colors"
+            >
+              삭제하기
+            </button>
+          </div>
+        </div>
+      </div>
+    </Backdrop>
+  );
+}
+
+function BulkDeleteModal({
+  count,
+  onClose,
+  onConfirm,
+}: {
+  count: number;
+  onClose: () => void;
+  onConfirm: () => void;
 }) {
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
-      <span className="text-xs text-gray-400">{label}</span>
+    <Backdrop>
+      <div className="bg-white rounded-[20px] w-[460px] max-w-[calc(100vw-32px)] p-8 shadow-[0_12px_16px_rgba(0,0,0,0.12)]">
+        <div className="flex flex-col items-center text-center">
+          <div className="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+            <AlertTriangle size={28} className="text-[var(--color-orange-500)]" />
+          </div>
+          <h3 className="text-xl font-bold text-stone-900 mb-2">등록된 정보를 삭제하시겠어요?</h3>
+          <p className="text-sm text-gray-500 mb-6">
+            선택한 반려동물 {count}마리를 삭제합니다.
+            <br />
+            삭제된 정보는 복구할 수 없습니다.
+          </p>
+
+          <div className="w-full flex items-center gap-3 p-4 bg-orange-50 rounded-xl mb-6">
+            <div className="w-12 h-12 rounded-xl bg-[#FDE8C4] flex items-center justify-center text-2xl shrink-0">
+              🐾
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-stone-900">{count}마리 선택됨</p>
+              <p className="text-sm text-gray-500">선택된 반려동물이 모두 삭제됩니다</p>
+            </div>
+          </div>
+
+          <div className="flex gap-3 w-full">
+            <button
+              onClick={onClose}
+              className="flex-1 h-12 rounded-xl border border-orange-100 text-gray-500 font-medium hover:border-[var(--color-orange-500)]/50 transition-colors"
+            >
+              취소
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 h-12 rounded-xl bg-[var(--color-orange-500)] text-white font-semibold hover:bg-orange-600 transition-colors"
+            >
+              삭제하기
+            </button>
+          </div>
+        </div>
+      </div>
+    </Backdrop>
+  );
+}
+
+function SuccessModal({ petName, onClose }: { petName: string; onClose: () => void }) {
+  return (
+    <Backdrop>
+      <div className="bg-white rounded-[20px] w-[480px] max-w-[calc(100vw-32px)] p-8 shadow-[0_12px_16px_rgba(0,0,0,0.12)]">
+        <div className="flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+            <CheckCircle2 size={36} className="text-[var(--color-orange-500)]" />
+          </div>
+          <h3 className="text-xl font-bold text-stone-900 mb-2">수정이 완료되었어요</h3>
+          <p className="text-sm text-gray-500 mb-6">반려동물 정보가 저장되었습니다.</p>
+
+          <div className="w-full flex items-center gap-3 p-4 bg-orange-50 rounded-xl mb-6">
+            <div className="w-12 h-12 rounded-xl bg-[#FDE8C4] flex items-center justify-center text-2xl shrink-0">
+              🐾
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-stone-900">{petName}</p>
+              <p className="text-sm text-gray-500">방금 수정됨</p>
+            </div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-full h-12 rounded-xl bg-[var(--color-orange-500)] text-white font-semibold hover:bg-orange-600 transition-colors"
+          >
+            확인
+          </button>
+        </div>
+      </div>
+    </Backdrop>
+  );
+}
+
+function FormField({
+  label,
+  helper,
+  children,
+}: {
+  label: string;
+  helper?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-stone-900 mb-1.5">{label}</label>
+      {helper && <p className="text-xs text-gray-500 mb-1.5">{helper}</p>}
       {children}
     </div>
   );
 }
 
-export default function MyPetsClient({ pets: initialPets }: { pets: MyPet[] }) {
-  const [pets, setPets] = useState(initialPets);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [form, setForm] = useState<PetUpdateInput | null>(null);
-  const [isPending, startTransition] = useTransition();
+function EditModal({
+  pet,
+  onClose,
+  onSave,
+}: {
+  pet: MyPet;
+  onClose: () => void;
+  onSave: (updated: MyPet) => void;
+}) {
+  const [name, setName] = useState(pet.name);
+  const [breed, setBreed] = useState(pet.breed ?? "");
+  const [age, setAge] = useState(pet.age != null ? String(pet.age) : "");
+  const [weight, setWeight] = useState(pet.weight != null ? String(pet.weight) : "");
+  const [sex, setSex] = useState<"male" | "female">(pet.gender);
+  const [neutered, setNeutered] = useState(pet.neutered);
+  const [caution, setCaution] = useState(pet.caution ?? "");
+  const [saving, setSaving] = useState(false);
+  const [editErrorMessage, setEditErrorMessage] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const visual = ANIMAL_VISUAL[normalizeAnimalType(pet.animalType)];
 
-  const startEdit = (pet: MyPet) => {
-    setEditingId(pet.id);
-    setForm({
-      name: pet.name,
-      breed: pet.breed ?? "",
-      age: pet.age != null ? String(pet.age) : "",
-      weight: pet.weight != null ? String(pet.weight) : "",
-      gender: pet.gender,
-      neutered: pet.neutered,
-      caution: pet.caution ?? "",
+  const handleSave = async () => {
+    setSaving(true);
+    const result = await updatePet(pet.id, {
+      name: name.trim(),
+      breed: breed.trim(),
+      age,
+      weight,
+      gender: sex,
+      neutered,
+      caution: caution.trim(),
+    });
+    setSaving(false);
+
+    if (!result.ok) {
+      setEditErrorMessage(result.error);
+      return;
+    }
+
+    onSave({
+      ...pet,
+      name: name.trim(),
+      breed: breed.trim() || null,
+      age: age ? parseInt(age) : null,
+      weight: weight ? parseFloat(weight) : null,
+      gender: sex,
+      neutered,
+      caution: caution.trim() || null,
     });
   };
-
-  const closeEdit = () => {
-    setEditingId(null);
-    setForm(null);
-  };
-
-  const handleSave = () => {
-    if (!editingId || !form) return;
-    startTransition(async () => {
-      const result = await updatePet(editingId, form);
-      if (!result.ok) {
-        toast.error(result.error);
-        return;
-      }
-      setPets((prev) =>
-        prev.map((p) =>
-          p.id === editingId
-            ? {
-                ...p,
-                name: form.name,
-                breed: form.breed || null,
-                age: form.age ? Number(form.age) : null,
-                weight: form.weight ? Number(form.weight) : null,
-                gender: form.gender,
-                neutered: form.neutered,
-                caution: form.caution || null,
-              }
-            : p,
-        ),
-      );
-      closeEdit();
-      toast.success("반려동물 정보가 수정되었습니다.");
-    });
-  };
-
-  const handleDelete = () => {
-    if (!deletingId) return;
-    startTransition(async () => {
-      const result = await deletePet(deletingId);
-      if (!result.ok) {
-        toast.error(result.error);
-        setDeletingId(null);
-        return;
-      }
-      setPets((prev) => prev.filter((p) => p.id !== deletingId));
-      setDeletingId(null);
-      toast.success("반려동물이 삭제되었습니다.");
-    });
-  };
-
-  if (pets.length === 0) {
-    return (
-      <div className="w-full max-w-[720px] mx-auto px-5 py-8">
-        <h1 className="text-xl font-bold text-stone-900 mb-5">반려동물 관리</h1>
-        <SectionCard className="items-center text-center py-12 gap-3">
-          <p className="text-sm text-gray-500">등록된 반려동물이 없어요</p>
-          <Link
-            href="/pet-register"
-            className="h-11 px-5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium flex items-center transition-colors"
-          >
-            반려동물 등록하기
-          </Link>
-        </SectionCard>
-      </div>
-    );
-  }
 
   return (
-    <div className="w-full max-w-[720px] mx-auto px-5 py-8 flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-stone-900">반려동물 관리</h1>
-        <Link
-          href="/pet-register"
-          className="h-9 px-4 rounded-xl border border-orange-500 text-orange-500 text-sm font-medium flex items-center hover:bg-orange-50 transition-colors"
-        >
-          추가하기
-        </Link>
-      </div>
+    <>
+      <Backdrop>
+        <div className="bg-white rounded-[20px] w-180 max-w-full shadow-[0_12px_32px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col max-h-[90vh]">
+          <div className="px-8 pt-7 pb-5 border-b border-orange-100 flex items-center justify-between shrink-0">
+            <h3 className="text-xl font-bold text-stone-900">반려동물 정보 수정</h3>
+            <button onClick={onClose} className="p-1 hover:bg-orange-50 rounded-lg transition-colors">
+              <X size={20} className="text-gray-500" />
+            </button>
+          </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {pets.map((pet) => (
-          <SectionCard key={pet.id} className="gap-3">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <span className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl shrink-0">
-                  {pet.animalType === "dog" ? "🐕" : pet.animalType === "cat" ? "🐈" : "🐾"}
-                </span>
-                <div>
-                  <p className="text-stone-900 font-semibold">{pet.name}</p>
-                  <p className="text-xs text-gray-400">
-                    {pet.breed || "품종 미상"} · {pet.gender === "male" ? "남아" : "여아"}
-                    {pet.neutered && " · 중성화"}
-                  </p>
+          <div className="overflow-y-auto flex-1 px-8 py-6">
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" />
+
+            <div className="flex flex-col items-center mb-6">
+              <div className="relative">
+                <div
+                  className="w-25 h-25 rounded-full flex items-center justify-center text-5xl"
+                  style={{ background: `linear-gradient(135deg, ${visual.bgFrom}, ${visual.bgTo})` }}
+                >
+                  {visual.emoji}
                 </div>
-              </div>
-              <div className="flex gap-1 shrink-0">
                 <button
-                  type="button"
-                  onClick={() => startEdit(pet)}
-                  aria-label="수정"
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-orange-50 hover:text-orange-500 transition-colors"
+                  onClick={() => toast.error("사진 업로드는 아직 준비 중이에요.")}
+                  className="absolute -bottom-1 -right-1 w-8 h-8 bg-[var(--color-orange-500)] rounded-full flex items-center justify-center shadow"
                 >
-                  <Pencil size={14} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDeletingId(pet.id)}
-                  aria-label="삭제"
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-                >
-                  <Trash2 size={14} />
+                  <Camera size={15} className="text-white" />
                 </button>
               </div>
+              <button
+                onClick={() => toast.error("사진 업로드는 아직 준비 중이에요.")}
+                className="mt-3 text-sm text-[var(--color-orange-500)] font-medium hover:underline"
+              >
+                사진 변경
+              </button>
             </div>
-            {(pet.age != null || pet.weight != null) && (
-              <div className="flex gap-4 text-xs text-gray-400">
-                {pet.age != null && <span>나이 {pet.age}살</span>}
-                {pet.weight != null && <span>체중 {pet.weight}kg</span>}
+
+            <div className="flex flex-col gap-5">
+              <FormField label="이름">
+                <input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full h-11 px-4 border border-orange-100 rounded-xl text-stone-900 focus:outline-none focus:border-[var(--color-orange-500)] transition-colors"
+                />
+              </FormField>
+
+              <FormField label="품종" helper="예: 말티즈, 푸들, 코리안 숏헤어">
+                <input
+                  value={breed}
+                  onChange={(e) => setBreed(e.target.value)}
+                  placeholder="품종을 직접 입력해주세요"
+                  className="w-full h-11 px-4 border border-orange-100 rounded-xl text-stone-900 placeholder-gray-500 focus:outline-none focus:border-[var(--color-orange-500)] transition-colors"
+                />
+              </FormField>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField label="나이">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={age}
+                      onChange={(e) => setAge(e.target.value)}
+                      className="flex-1 min-w-0 h-11 px-4 border border-orange-100 rounded-xl text-stone-900 focus:outline-none focus:border-[var(--color-orange-500)] transition-colors"
+                    />
+                    <span className="shrink-0 text-sm text-gray-500">살</span>
+                  </div>
+                </FormField>
+                <FormField label="몸무게">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      step="0.1"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      className="flex-1 min-w-0 h-11 px-4 border border-orange-100 rounded-xl text-stone-900 focus:outline-none focus:border-[var(--color-orange-500)] transition-colors"
+                    />
+                    <span className="shrink-0 text-sm text-gray-500">kg</span>
+                  </div>
+                </FormField>
               </div>
-            )}
-            {pet.caution && (
-              <p className="text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2 whitespace-pre-line">
-                {pet.caution}
-              </p>
-            )}
-          </SectionCard>
-        ))}
-      </div>
 
-      <CustomModal
-        open={deletingId !== null}
-        type="danger"
-        size="medium"
-        title="반려동물을 삭제하시겠습니까?"
-        description="삭제한 반려동물 정보는 복구할 수 없습니다."
-        cancelText="취소"
-        confirmText="삭제하기"
-        onClose={() => setDeletingId(null)}
-        onConfirm={handleDelete}
-      />
-
-      <CustomModal
-        open={editingId !== null}
-        type="confirm"
-        size="medium"
-        title="반려동물 정보 수정"
-        cancelText="취소"
-        confirmText={isPending ? "저장 중..." : "저장"}
-        onClose={closeEdit}
-        onConfirm={handleSave}
-      >
-        {form && (
-          <div className="flex flex-col gap-3">
-            <Field label="이름">
-              <input
-                value={form.name}
-                onChange={(e) => setForm((f) => (f ? { ...f, name: e.target.value } : f))}
-                className={inputCls}
-              />
-            </Field>
-            <Field label="품종">
-              <input
-                value={form.breed}
-                onChange={(e) => setForm((f) => (f ? { ...f, breed: e.target.value } : f))}
-                className={inputCls}
-              />
-            </Field>
-            <div className="flex gap-3">
-              <Field label="나이" className="flex-1">
-                <input
-                  value={form.age}
-                  onChange={(e) =>
-                    setForm((f) => (f ? { ...f, age: e.target.value.replace(/[^0-9]/g, "") } : f))
-                  }
-                  className={inputCls}
-                />
-              </Field>
-              <Field label="체중(kg)" className="flex-1">
-                <input
-                  value={form.weight}
-                  onChange={(e) =>
-                    setForm((f) =>
-                      f ? { ...f, weight: e.target.value.replace(/[^0-9.]/g, "") } : f,
-                    )
-                  }
-                  className={inputCls}
-                />
-              </Field>
-            </div>
-            <Field label="성별">
-              <div className="flex gap-2">
-                {(["male", "female"] as const).map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => setForm((f) => (f ? { ...f, gender: g } : f))}
-                    className={`flex-1 h-11 rounded-xl border-2 text-sm font-medium transition-colors ${
-                      form.gender === g
-                        ? "bg-orange-50 border-orange-500 text-orange-500"
-                        : "bg-white border-orange-100 text-stone-900"
+              <FormField label="성별">
+                <div className="flex gap-3">
+                  {(["male", "female"] as const).map((g) => (
+                    <button
+                      key={g}
+                      onClick={() => setSex(g)}
+                      className={`flex-1 h-11 rounded-xl border-2 text-sm font-medium transition-all ${
+                        sex === g
+                          ? "border-[var(--color-orange-500)] bg-orange-50 text-[var(--color-orange-500)]"
+                          : "border-orange-100 text-gray-500"
+                      }`}
+                    >
+                      {g === "male" ? "수컷" : "암컷"}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setNeutered((prev) => !prev)}
+                  className="mt-2 flex items-center gap-2 text-sm text-gray-500"
+                >
+                  <span
+                    className={`size-4 rounded-sm border flex items-center justify-center ${
+                      neutered
+                        ? "bg-[var(--color-orange-500)] border-[var(--color-orange-500)]"
+                        : "border-gray-300"
                     }`}
                   >
-                    {g === "male" ? "남아" : "여아"}
-                  </button>
-                ))}
-              </div>
-            </Field>
+                    {neutered && <Check size={11} className="text-white" />}
+                  </span>
+                  중성화 했어요
+                </button>
+              </FormField>
+
+              <FormField label="주의사항">
+                <textarea
+                  value={caution}
+                  onChange={(e) => setCaution(e.target.value)}
+                  placeholder="돌봄 시 주의사항을 자유롭게 작성해주세요"
+                  className="w-full px-4 py-3 border border-orange-100 rounded-xl text-stone-900 placeholder-gray-500 focus:outline-none focus:border-[var(--color-orange-500)] transition-colors resize-none"
+                  style={{ minHeight: 100 }}
+                />
+              </FormField>
+            </div>
+          </div>
+
+          <div className="px-8 pb-7 pt-5 border-t border-orange-100 flex gap-3 shrink-0">
             <button
-              type="button"
-              onClick={() => setForm((f) => (f ? { ...f, neutered: !f.neutered } : f))}
-              className={`h-11 px-4 rounded-xl border-2 flex items-center gap-2 text-sm font-medium transition-colors ${
-                form.neutered
-                  ? "bg-orange-50 border-orange-500 text-orange-500"
-                  : "bg-white border-orange-100 text-stone-900"
-              }`}
+              onClick={onClose}
+              className="flex-1 h-12 rounded-xl border border-orange-100 text-gray-500 font-medium hover:border-[var(--color-orange-500)]/50 transition-colors"
             >
-              중성화 수술 완료
+              취소
             </button>
-            <Field label="특이사항">
-              <textarea
-                value={form.caution}
-                onChange={(e) => setForm((f) => (f ? { ...f, caution: e.target.value } : f))}
-                maxLength={500}
-                className="w-full h-20 px-3 py-2 rounded-xl border border-orange-100 text-sm outline-none focus:border-orange-300 resize-none"
-              />
-            </Field>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-2 h-12 rounded-xl bg-[var(--color-orange-500)] text-white font-semibold hover:bg-orange-600 disabled:opacity-60 transition-colors"
+            >
+              {saving ? "저장 중..." : "저장하기"}
+            </button>
+          </div>
+        </div>
+      </Backdrop>
+      <CustomModal
+        open={!!editErrorMessage}
+        type="error"
+        title="오류가 발생했습니다."
+        description={editErrorMessage ?? undefined}
+        confirmText="확인"
+        onConfirm={() => setEditErrorMessage(null)}
+        onClose={() => setEditErrorMessage(null)}
+        showCloseButton={false}
+      />
+    </>
+  );
+}
+
+function PetCard({
+  pet,
+  onEdit,
+  onDelete,
+  isSelectionMode = false,
+  isSelected = false,
+  onSelect,
+}: {
+  pet: MyPet;
+  onEdit: () => void;
+  onDelete: () => void;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
+}) {
+  const animalType = normalizeAnimalType(pet.animalType);
+  return (
+    <div
+      onClick={isSelectionMode ? onSelect : undefined}
+      className={`group bg-white border rounded-2xl overflow-hidden transition-all ${
+        isSelectionMode
+          ? `cursor-pointer ${
+              isSelected
+                ? "border-[var(--color-orange-500)] shadow-[0_0_0_3px_rgba(232,116,42,0.15)]"
+                : "border-orange-100 hover:border-[var(--color-orange-500)]/40"
+            }`
+          : "border-orange-100 hover:border-[var(--color-orange-500)] hover:shadow-[0_2px_12px_rgba(232,116,42,0.10)] cursor-default"
+      }`}
+    >
+      <div
+        className="relative h-45 flex items-center justify-center"
+        style={{ background: `linear-gradient(135deg, ${ANIMAL_VISUAL[animalType].bgFrom}, ${ANIMAL_VISUAL[animalType].bgTo})` }}
+      >
+        <span className="text-6xl leading-none">{ANIMAL_VISUAL[animalType].emoji}</span>
+        <div className="absolute top-3 left-3 bg-white/90 px-2.5 py-1 rounded-full border border-orange-100">
+          <span className="text-xs font-semibold text-[var(--color-orange-500)]">
+            {ANIMAL_TYPE_LABEL[animalType]}
+          </span>
+        </div>
+        {isSelectionMode && (
+          <div
+            className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+              isSelected
+                ? "bg-[var(--color-orange-500)] border-[var(--color-orange-500)]"
+                : "bg-white/80 border-gray-300"
+            }`}
+          >
+            {isSelected && <Check size={13} className="text-white" />}
           </div>
         )}
-      </CustomModal>
+      </div>
+
+      <div className="p-5">
+        <h3 className="font-bold text-stone-900 mb-0.5">{pet.name}</h3>
+        <p className="text-sm text-gray-500 mb-1">{pet.breed ?? "품종 미입력"}</p>
+        <p className="text-sm text-gray-500">
+          {pet.age ?? "-"}살 · {pet.weight ?? "-"}kg · {genderLabel(pet)}
+        </p>
+
+        {!isSelectionMode && (
+          <div className="border-t border-orange-100 mt-4 pt-4 flex gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              className="flex-1 h-9 rounded-xl border border-orange-100 text-sm font-medium text-gray-500 hover:border-[var(--color-orange-500)]/50 hover:text-[var(--color-orange-500)] transition-colors flex items-center justify-center gap-1.5"
+            >
+              <Pencil size={13} /> 수정하기
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="h-9 px-4 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 transition-colors flex items-center gap-1.5"
+            >
+              <Trash2 size={13} /> 삭제
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PetCardMobile({
+  pet,
+  onEdit,
+  onDelete,
+  isSelectionMode = false,
+  isSelected = false,
+  onSelect,
+}: {
+  pet: MyPet;
+  onEdit: () => void;
+  onDelete: () => void;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
+}) {
+  const animalType = normalizeAnimalType(pet.animalType);
+  return (
+    <div
+      onClick={isSelectionMode ? onSelect : undefined}
+      className={`bg-white border rounded-2xl p-4 flex gap-4 items-center transition-all ${
+        isSelectionMode
+          ? `cursor-pointer ${
+              isSelected
+                ? "border-[var(--color-orange-500)] shadow-[0_0_0_3px_rgba(232,116,42,0.15)]"
+                : "border-orange-100 hover:border-[var(--color-orange-500)]/40"
+            }`
+          : "border-orange-100"
+      }`}
+    >
+      <div className="relative shrink-0">
+        <div
+          className="w-24 h-24 rounded-xl overflow-hidden flex items-center justify-center text-4xl"
+          style={{ background: `linear-gradient(135deg, ${ANIMAL_VISUAL[animalType].bgFrom}, ${ANIMAL_VISUAL[animalType].bgTo})` }}
+        >
+          {ANIMAL_VISUAL[animalType].emoji}
+        </div>
+        {isSelectionMode && (
+          <div
+            className={`absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+              isSelected
+                ? "bg-[var(--color-orange-500)] border-[var(--color-orange-500)]"
+                : "bg-white border-gray-300"
+            }`}
+          >
+            {isSelected && <Check size={13} className="text-white" />}
+          </div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0 flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="font-bold text-stone-900">{pet.name}</span>
+            <span className="text-xs px-2 py-0.5 bg-orange-50 border border-orange-100 rounded-full text-[var(--color-orange-500)]">
+              {ANIMAL_TYPE_LABEL[animalType]}
+            </span>
+          </div>
+          <p className="text-sm text-gray-500">{pet.breed ?? "품종 미입력"}</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {pet.age ?? "-"}살 · {pet.weight ?? "-"}kg
+          </p>
+        </div>
+        {!isSelectionMode && (
+          <div className="flex flex-col gap-1.5 shrink-0">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+              className="h-8 px-3 rounded-lg border border-orange-100 text-xs font-medium text-gray-500 hover:border-[var(--color-orange-500)]/50 hover:text-[var(--color-orange-500)] transition-colors flex items-center gap-1"
+            >
+              <Pencil size={11} /> 수정
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete();
+              }}
+              className="h-8 px-3 rounded-lg text-xs font-medium text-red-500 hover:bg-red-50 transition-colors flex items-center gap-1"
+            >
+              <Trash2 size={11} /> 삭제
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EmptyState({ onAdd }: { onAdd: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="w-24 h-24 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+        <PawPrint size={40} className="text-[var(--color-orange-500)]" />
+      </div>
+      <h3 className="text-xl font-bold text-stone-900 mb-2">등록된 반려동물이 없어요</h3>
+      <p className="text-sm text-gray-500 mb-8">반려동물을 등록하고 돌봄 서비스를 이용해보세요</p>
+      <button
+        onClick={onAdd}
+        className="h-12 px-8 rounded-xl bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2"
+      >
+        <Plus size={18} />
+        반려동물 등록하기
+      </button>
+    </div>
+  );
+}
+
+type ModalType = "delete" | "bulk-delete" | "success" | "edit" | null;
+
+export default function MyPetsClient({ pets: initialPets }: { pets: MyPet[] }) {
+  const router = useRouter();
+  const [pets, setPets] = useState<MyPet[]>(initialPets);
+  const [modal, setModal] = useState<ModalType>(null);
+  const [targetPet, setTargetPet] = useState<MyPet | null>(null);
+  const [errorModal, setErrorModal] = useState<{ title: string; description?: string } | null>(null);
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const openDelete = (pet: MyPet) => {
+    setTargetPet(pet);
+    setModal("delete");
+  };
+  const openEdit = (pet: MyPet) => {
+    setTargetPet(pet);
+    setModal("edit");
+  };
+
+  const enterSelectionMode = () => {
+    setIsSelectionMode(true);
+    setSelectedIds([]);
+  };
+  const exitSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedIds([]);
+  };
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]));
+  };
+
+  const handleDelete = async () => {
+    if (!targetPet) return;
+    const result = await deletePet(targetPet.id);
+    if (!result.ok) {
+      setErrorModal({ title: "오류가 발생했습니다.", description: result.error });
+      return;
+    }
+    setPets((prev) => prev.filter((p) => p.id !== targetPet.id));
+    setModal(null);
+  };
+
+  const handleBulkDelete = async () => {
+    const results = await Promise.all(selectedIds.map((id) => deletePet(id)));
+    const failedIds = selectedIds.filter((_, i) => !results[i].ok);
+    const failedMessages = results
+      .filter((r): r is { ok: false; error: string } => !r.ok)
+      .map((r) => r.error);
+
+    setPets((prev) => prev.filter((p) => !selectedIds.includes(p.id) || failedIds.includes(p.id)));
+    setSelectedIds([]);
+    setIsSelectionMode(false);
+    setModal(null);
+
+    if (failedMessages.length > 0) {
+      setErrorModal({ title: "일부 삭제에 실패했습니다.", description: failedMessages.join("\n") });
+    }
+  };
+
+  const handleSaveEdit = (updated: MyPet) => {
+    setPets((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setTargetPet(updated);
+    setModal("success");
+  };
+
+  const handleAddPet = () => router.push("/pet-register");
+
+  return (
+    <div className="min-h-screen bg-orange-50">
+      <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
+        <div className="h-14 px-5 flex items-center gap-3">
+          {isSelectionMode ? (
+            <>
+              <button onClick={exitSelectionMode} className="text-sm font-medium text-gray-500 shrink-0">
+                취소
+              </button>
+              <span className="flex-1 font-semibold text-stone-900 text-center">
+                {selectedIds.length > 0 ? `${selectedIds.length}마리 선택됨` : "반려동물 선택"}
+              </span>
+              <button
+                onClick={() => setModal("bulk-delete")}
+                disabled={selectedIds.length === 0}
+                className="h-9 px-4 rounded-xl text-sm font-semibold flex items-center gap-1 shrink-0 disabled:text-gray-300 text-red-500"
+              >
+                <Trash2 size={14} /> 삭제
+              </button>
+            </>
+          ) : (
+            <>
+              <MobileBackButton />
+              <span className="flex-1 font-semibold text-stone-900">내 반려동물</span>
+              {pets.length > 0 && (
+                <button
+                  onClick={enterSelectionMode}
+                  className="h-9 px-3 rounded-xl border border-orange-100 text-gray-500 text-sm font-medium"
+                >
+                  선택
+                </button>
+              )}
+              <button
+                onClick={handleAddPet}
+                className="h-9 px-4 rounded-xl bg-orange-500 text-white text-sm font-semibold flex items-center gap-1 hover:bg-orange-600 transition-colors"
+              >
+                <Plus size={15} /> 추가
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden md:block w-full max-w-[1280px] mx-auto px-4 sm:px-10 pt-10 pb-20">
+        <div className="flex items-start justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <DesktopBackButton />
+            <div>
+              <h2 className="text-2xl font-bold text-stone-900">내 반려동물</h2>
+              <p className="text-sm text-gray-500 mt-1">등록된 반려동물을 관리할 수 있어요</p>
+            </div>
+          </div>
+          <div className="flex gap-3 items-center">
+            {isSelectionMode ? (
+              <>
+                {selectedIds.length > 0 && (
+                  <span className="text-sm text-gray-500">{selectedIds.length}마리 선택됨</span>
+                )}
+                <button
+                  onClick={exitSelectionMode}
+                  className="h-11 px-5 rounded-xl border border-orange-100 text-gray-500 font-medium hover:border-[var(--color-orange-500)]/50 transition-colors text-sm"
+                >
+                  선택 취소
+                </button>
+                <button
+                  onClick={() => setModal("bulk-delete")}
+                  disabled={selectedIds.length === 0}
+                  className="h-11 px-5 rounded-xl bg-[var(--color-orange-500)] text-white font-semibold hover:bg-orange-600 disabled:bg-orange-100 disabled:text-gray-500 transition-colors flex items-center gap-2 text-sm"
+                >
+                  <Trash2 size={16} /> 삭제하기
+                </button>
+              </>
+            ) : (
+              <>
+                {pets.length > 0 && (
+                  <button
+                    onClick={enterSelectionMode}
+                    className="h-11 px-5 rounded-xl border border-orange-100 text-gray-500 font-medium hover:border-[var(--color-orange-500)]/50 hover:text-[var(--color-orange-500)] transition-colors text-sm"
+                  >
+                    반려동물 선택
+                  </button>
+                )}
+                <Link
+                  href="/pet-register"
+                  className="h-11 px-5 rounded-xl bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2 text-sm"
+                >
+                  <Plus size={16} /> 반려동물 추가
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+
+        {pets.length === 0 ? (
+          <EmptyState onAdd={handleAddPet} />
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {pets.map((pet) => (
+              <PetCard
+                key={pet.id}
+                pet={pet}
+                onEdit={() => openEdit(pet)}
+                onDelete={() => openDelete(pet)}
+                isSelectionMode={isSelectionMode}
+                isSelected={selectedIds.includes(pet.id)}
+                onSelect={() => toggleSelection(pet.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="md:hidden px-4 pt-4 pb-28">
+        {pets.length === 0 ? (
+          <EmptyState onAdd={handleAddPet} />
+        ) : (
+          <div className="flex flex-col gap-3">
+            {pets.map((pet) => (
+              <PetCardMobile
+                key={pet.id}
+                pet={pet}
+                onEdit={() => openEdit(pet)}
+                onDelete={() => openDelete(pet)}
+                isSelectionMode={isSelectionMode}
+                isSelected={selectedIds.includes(pet.id)}
+                onSelect={() => toggleSelection(pet.id)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {!isSelectionMode && (
+        <button
+          onClick={handleAddPet}
+          className="md:hidden fixed bottom-22 right-5 w-14 h-14 bg-orange-500 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(249,115,22,0.4)] hover:bg-orange-600 transition-colors z-30"
+        >
+          <Plus size={24} className="text-white" />
+        </button>
+      )}
+
+      {modal === "delete" && targetPet && (
+        <DeleteModal pet={targetPet} onClose={() => setModal(null)} onConfirm={handleDelete} />
+      )}
+      {modal === "bulk-delete" && (
+        <BulkDeleteModal count={selectedIds.length} onClose={() => setModal(null)} onConfirm={handleBulkDelete} />
+      )}
+      {modal === "success" && targetPet && (
+        <SuccessModal petName={targetPet.name} onClose={() => setModal(null)} />
+      )}
+      {modal === "edit" && targetPet && (
+        <EditModal pet={targetPet} onClose={() => setModal(null)} onSave={handleSaveEdit} />
+      )}
+      <CustomModal
+        open={!!errorModal}
+        type="error"
+        title={errorModal?.title ?? "오류가 발생했습니다."}
+        description={errorModal?.description}
+        confirmText="확인"
+        onConfirm={() => setErrorModal(null)}
+        onClose={() => setErrorModal(null)}
+        showCloseButton={false}
+      />
     </div>
   );
 }

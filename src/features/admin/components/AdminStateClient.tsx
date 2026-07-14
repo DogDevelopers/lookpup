@@ -14,6 +14,7 @@ import {
   Play,
   CalendarCheck,
 } from "lucide-react";
+import { adminUpdateReservationStatus } from "../actions";
 import type { Reservation, ReservationStatus, ReservationUserInfo } from "../types";
 
 export type { Reservation };
@@ -59,11 +60,6 @@ const ALL_STATUSES: ReservationStatus[] = [
 
 const STATUS_FILTERS = ["all", ...ALL_STATUSES] as const;
 
-// TODO: features/admin/actions.ts의 adminUpdateReservationStatus로 교체.
-async function todoUpdateReservationStatus(): Promise<{ error?: { message: string } }> {
-  return {};
-}
-
 export default function AdminStateClient({
   initialReservations,
 }: {
@@ -106,12 +102,16 @@ export default function AdminStateClient({
     setLoadingId(key);
     setErrors((prev) => ({ ...prev, [reservation.id]: "" }));
 
-    const result = await todoUpdateReservationStatus();
+    const result = await adminUpdateReservationStatus(
+      reservation.id,
+      newStatus,
+      cancelReason[reservation.id],
+    );
 
     setLoadingId(null);
 
-    if (result.error) {
-      setErrors((prev) => ({ ...prev, [reservation.id]: result.error!.message }));
+    if (!result.ok) {
+      setErrors((prev) => ({ ...prev, [reservation.id]: result.error }));
       return;
     }
 

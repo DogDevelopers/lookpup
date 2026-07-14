@@ -13,6 +13,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { SERVICES, ANIMALS } from "@/lib/sitter-options";
+import { adminUpdateSitterStatus } from "../actions";
 import type { SitterApplicantUser, SitterApplication, SitterStatus } from "../types";
 
 export type { SitterApplication };
@@ -47,11 +48,6 @@ const SERVICE_LABEL: Record<string, string> = Object.fromEntries(
 const ANIMAL_LABEL: Record<string, string> = Object.fromEntries(
   ANIMALS.map((a) => [a.id, a.label]),
 );
-
-// TODO: features/admin/actions.ts의 adminUpdateSitterStatus로 교체.
-async function todoUpdateSitterStatus(): Promise<{ error?: { message: string } }> {
-  return {};
-}
 
 export default function AdminSittersClient({
   initialSitters,
@@ -88,12 +84,12 @@ export default function AdminSittersClient({
     setLoadingId(key);
     setErrors((prev) => ({ ...prev, [sitter.id]: "" }));
 
-    const result = await todoUpdateSitterStatus();
+    const result = await adminUpdateSitterStatus(sitter.id, newStatus);
 
     setLoadingId(null);
 
-    if (result.error) {
-      setErrors((prev) => ({ ...prev, [sitter.id]: result.error!.message }));
+    if (!result.ok) {
+      setErrors((prev) => ({ ...prev, [sitter.id]: result.error }));
       return;
     }
 

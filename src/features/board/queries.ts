@@ -8,6 +8,7 @@ import type {
   PostData,
   RequestDetail,
   OtherPost,
+  MyRequestRow,
 } from "./types";
 
 function formatPeriod(start: string | null, end: string | null): string {
@@ -117,6 +118,28 @@ export async function getRequestForEdit(id: string): Promise<PostData | null> {
 
   if (error || !data) return null;
   return data as unknown as PostData;
+}
+
+export async function getMyRequests(): Promise<MyRequestRow[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("requests")
+    .select(
+      `id, title, status, request_type, start_datetime, end_datetime, budget, location, created_at,
+       pets:pet_id ( name, animal_type ),
+       applications ( status, sitters ( users:user_id ( full_name ) ) ),
+       reservations ( status )`,
+    )
+    .eq("owner_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error || !data) return [];
+  return data as unknown as MyRequestRow[];
 }
 
 export async function getUserPets(userId: string): Promise<Pet[]> {

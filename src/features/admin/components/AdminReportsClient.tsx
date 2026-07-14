@@ -14,6 +14,14 @@ import {
   Ban,
   PowerOff,
 } from "lucide-react";
+import {
+  adminUpdateReport,
+  adminDemoteUser,
+  adminCancelRequest,
+  adminDeactivateService,
+  adminSuspendUser,
+  adminUnsuspendUser,
+} from "../actions";
 import type { Report, Reporter, ReportStatus } from "../types";
 
 export type { Report };
@@ -27,12 +35,12 @@ const STATUS_LABELS: Record<
     color: "bg-yellow-50 text-yellow-700 border-yellow-200",
     icon: <Clock className="w-3.5 h-3.5" />,
   },
-  processing: {
+  in_review: {
     label: "처리중",
     color: "bg-blue-50 text-blue-700 border-blue-200",
     icon: <Loader2 className="w-3.5 h-3.5" />,
   },
-  completed: {
+  resolved: {
     label: "완료",
     color: "bg-green-50 text-green-700 border-green-200",
     icon: <CheckCircle2 className="w-3.5 h-3.5" />,
@@ -57,15 +65,10 @@ const TARGET_TYPE_LABELS: Record<string, string> = {
 const STATUS_FILTERS = [
   "all",
   "pending",
-  "processing",
-  "completed",
+  "in_review",
+  "resolved",
   "rejected",
 ] as const;
-
-// TODO: features/admin/actions.ts로 교체.
-async function todoAdminAction(): Promise<{ error?: { message: string } }> {
-  return {};
-}
 
 export interface AdminReportsClientProps {
   initialReports: Report[];
@@ -124,15 +127,15 @@ export default function AdminReportsClient({
 
   const runAction = async (
     key: string,
-    fn: () => Promise<{ error?: { message: string } }>,
+    fn: () => Promise<{ ok: boolean; error?: string }>,
   ) => {
     setActionLoading(key);
     const result = await fn();
     setActionLoading(null);
-    if (result.error) {
+    if (!result.ok) {
       setActionResults((prev) => ({
         ...prev,
-        [key]: `오류: ${result.error!.message}`,
+        [key]: `오류: ${result.error}`,
       }));
     } else {
       setActionResults((prev) => ({ ...prev, [key]: "완료" }));
@@ -143,8 +146,13 @@ export default function AdminReportsClient({
     setSaving(true);
     setSaveError(null);
 
-    // TODO: features/admin/actions.ts의 updateReport로 교체.
+    const result = await adminUpdateReport(reportId, editStatus, editMemo || null);
     setSaving(false);
+
+    if (!result.ok) {
+      setSaveError(result.error);
+      return;
+    }
 
     setReports((prev) =>
       prev.map((r) =>
@@ -153,6 +161,7 @@ export default function AdminReportsClient({
               ...r,
               status: editStatus,
               admin_memo: editMemo || null,
+              handled_at: new Date().toISOString(),
             }
           : r,
       ),
@@ -309,7 +318,7 @@ export default function AdminReportsClient({
                             <div>
                               <p className="text-xs font-semibold text-stone-400 mb-2">처리 상태 변경</p>
                               <div className="grid grid-cols-2 gap-2">
-                                {(["pending", "processing", "completed", "rejected"] as ReportStatus[]).map((s) => (
+                                {(["pending", "in_review", "resolved", "rejected"] as ReportStatus[]).map((s) => (
                                   <button
                                     key={s}
                                     type="button"
@@ -385,19 +394,29 @@ export default function AdminReportsClient({
                               actionLoading={actionLoading}
                               actionResults={actionResults}
                               onDemote={(id) =>
-                                runAction(`demote-${id}`, todoAdminAction)
+                                runAction(`demote-${id}`, () =>
+                                  adminDemoteUser(id, report.target_type === "sitter" ? "sitter" : "user"),
+                                )
                               }
                               onCancelRequest={(id) =>
-                                runAction(`cancel-${id}`, todoAdminAction)
+                                runAction(`cancel-${id}`, () => adminCancelRequest(id))
                               }
                               onDeactivateService={(id) =>
-                                runAction(`deactivate-${id}`, todoAdminAction)
+                                runAction(`deactivate-${id}`, () => adminDeactivateService(id))
                               }
-                              onSuspend={(id) =>
-                                runAction(`suspend-${id}`, todoAdminAction)
+                              onSuspend={(id, suspendedUntil) =>
+                                runAction(`suspend-${id}`, () =>
+                                  adminSuspendUser(
+                                    id,
+                                    report.target_type === "sitter" ? "sitter" : "user",
+                                    suspendedUntil,
+                                  ),
+                                )
                               }
                               onUnsuspend={(id) =>
-                                runAction(`unsuspend-${id}`, todoAdminAction)
+                                runAction(`unsuspend-${id}`, () =>
+                                  adminUnsuspendUser(id, report.target_type === "sitter" ? "sitter" : "user"),
+                                )
                               }
                             />
 
@@ -430,7 +449,7 @@ interface AdminActionsProps {
   onDemote: (userId: string) => void;
   onCancelRequest: (requestId: string) => void;
   onDeactivateService: (serviceId: string) => void;
-  onSuspend: (targetId: string) => void;
+  onSuspend: (targetId: string, suspendedUntil: string) => void;
   onUnsuspend: (targetId: string) => void;
 }
 
@@ -462,7 +481,8 @@ function AdminActions({
   const handleSuspend = () => {
     const days = parseInt(suspendDays, 10);
     if (!days || days < 1) return;
-    onSuspend(target_id);
+    const suspendedUntil = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+    onSuspend(target_id, suspendedUntil);
   };
 
   return (

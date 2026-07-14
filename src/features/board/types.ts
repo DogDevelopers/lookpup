@@ -72,6 +72,24 @@ export type OtherPost = {
   created_at: string;
 };
 
+export type MyRequestRow = {
+  id: string;
+  title: string;
+  status: string;
+  request_type: string;
+  start_datetime: string | null;
+  end_datetime: string | null;
+  budget: number | null;
+  location: string | null;
+  created_at: string;
+  pets: { name: string; animal_type: string } | null;
+  applications: {
+    status: string;
+    sitters: { users: { full_name: string | null } | null } | null;
+  }[];
+  reservations: { status: string }[];
+};
+
 export type RequestDetail = {
   id: string;
   owner_id: string;
