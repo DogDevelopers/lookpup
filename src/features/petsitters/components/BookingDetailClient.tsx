@@ -8,7 +8,8 @@ import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
-import { cancelReservation, type ReservationDetail, type ReservationUiStatus } from "@/features/petsitters/actions";
+import { cancelReservation } from "@/features/reservations/actions";
+import type { ReservationDetail, ReservationUiStatus } from "@/features/reservations/types";
 
 const STATUS_CONFIG: Record<ReservationUiStatus, { label: string; bg: string; text: string; border: string }> = {
   pending: { label: "예약 요청", bg: "#F3F4F6", text: "#6B7280", border: "#E5E7EB" },

@@ -8,7 +8,8 @@ import { MobileBackButton, DesktopBackButton } from "@/components/common/BackBut
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
 import { CustomModal } from "@/components/common/CustomModal";
-import { cancelReservation, type MyReservation, type ReservationUiStatus } from "@/features/petsitters/actions";
+import { cancelReservation } from "@/features/reservations/actions";
+import type { MyReservation, ReservationUiStatus } from "@/features/reservations/types";
 
 type TabId = "all" | "in-progress" | "confirmed" | "completed" | "cancelled";
 

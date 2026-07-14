@@ -12,7 +12,7 @@ import {
   type ReservationRequest,
   type Badge,
 } from "./chat_components";
-import type { Post } from "../mock-data";
+import type { Post } from "../hooks/use-chat-rooms";
 
 interface ChatSidebarProps {
   className: string;
