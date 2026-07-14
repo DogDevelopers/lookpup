@@ -15,7 +15,7 @@ export default async function SettingsPage() {
     supabase
       .from("users")
       .select(
-        "full_name, email, phone_number, address, display_area, birthdate, profile_image, is_verified, role",
+        "full_name, email, phone_number, address, latitude, longitude, display_area, birthdate, profile_image, is_verified, role",
       )
       .eq("id", user.id)
       .maybeSingle(),
@@ -33,6 +33,8 @@ export default async function SettingsPage() {
     email: profile.email,
     phoneNumber: profile.phone_number,
     address: profile.address,
+    latitude: profile.latitude != null ? Number(profile.latitude) : null,
+    longitude: profile.longitude != null ? Number(profile.longitude) : null,
     displayArea: profile.display_area,
     birthdate: profile.birthdate,
     profileImage: profile.profile_image,

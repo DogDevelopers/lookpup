@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { CustomModal } from "@/components/common/CustomModal";
 import { Progress } from "@/components/ui/progress";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { createSitter } from "../actions";
 import { useSitterRegisterForm } from "../hooks/useSitterRegisterForm";
 import SitterRegisterStep1 from "./SitterRegisterStep1";
@@ -28,23 +29,36 @@ export default function SitterRegisterClient() {
     setIsSubmitting(true);
     setSubmitError(null);
 
-    // TODO: 사진 업로드(Cloudinary) 연동 후 프로필/자격증/활동 사진 전달.
-    const result = await createSitter({
-      introduction: values.introduction,
-      career: values.career,
-      location: values.location,
-      selectedServices: values.selectedServices,
-      selectedAnimals: values.selectedAnimals,
-    });
+    try {
+      const [profilePhotoUrl, certificateUrls, activityPhotoUrls] = await Promise.all([
+        values.profilePhotoFile ? uploadToCloudinary(values.profilePhotoFile, "sitters/avatars") : Promise.resolve(null),
+        Promise.all(values.certificateFiles.map((f) => uploadToCloudinary(f, "sitters/certificates"))),
+        Promise.all(values.activityPhotoFiles.map((f) => uploadToCloudinary(f, "sitters/activity-photos"))),
+      ]);
 
-    setIsSubmitting(false);
+      const result = await createSitter({
+        introduction: values.introduction,
+        career: values.career,
+        location: values.location,
+        selectedServices: values.selectedServices,
+        selectedAnimals: values.selectedAnimals,
+        profilePhotoUrl,
+        certificateUrls,
+        activityPhotoUrls,
+      });
 
-    if (!result.ok) {
-      setSubmitError(result.error);
-      return;
+      if (!result.ok) {
+        setSubmitError(result.error);
+        setIsSubmitting(false);
+        return;
+      }
+
+      setShowApprovalModal(true);
+      setIsSubmitting(false);
+    } catch {
+      setSubmitError("사진 업로드에 실패했습니다.");
+      setIsSubmitting(false);
     }
-
-    setShowApprovalModal(true);
   });
 
   const goToMyProfile = () => router.push("/myprofile");

@@ -56,6 +56,9 @@ export const createSitterSchema = z.object({
   location: locationSchema,
   selectedServices: z.array(z.enum(["visit", "foster", "walk", "pickup"])).min(1),
   selectedAnimals: z.array(z.enum(["small_dog", "medium_dog", "large_dog", "cat"])).min(1),
+  profilePhotoUrl: z.string().nullable().optional(),
+  certificateUrls: z.array(z.string()).default([]),
+  activityPhotoUrls: z.array(z.string()).default([]),
 });
 export type CreateSitterInput = z.infer<typeof createSitterSchema>;
 
@@ -74,6 +77,7 @@ export const updateSitterProfileSchema = z.object({
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   availableAnimals: z.array(z.enum(["small_dog", "medium_dog", "large_dog", "cat"])).min(1),
+  profilePhotoUrl: z.string().nullable().optional(),
   activityPhotoUrls: z.array(z.string()),
   services: z.array(serviceInputSchema),
   deletedServiceIds: z.array(z.string()),

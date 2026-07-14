@@ -1,6 +1,7 @@
+import { getAdminReports } from "@/features/admin/actions";
 import AdminReportsClient from "@/features/admin/components/AdminReportsClient";
 
-// TODO: features/admin/queries.ts로 reports 실데이터 조회.
-export default function AdminReportsPage() {
-  return <AdminReportsClient initialReports={[]} />;
+export default async function AdminReportsPage() {
+  const reports = await getAdminReports();
+  return <AdminReportsClient initialReports={reports} />;
 }

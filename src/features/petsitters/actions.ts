@@ -285,6 +285,7 @@ export interface ReservationDetail {
   pet: {
     name: string;
     breed: string;
+    animalType: string;
     age: number;
     weight: number;
     imageUrl: string | null;
@@ -362,6 +363,7 @@ export async function getReservationById(id: string): Promise<ReservationDetail 
     pet: {
       name: firstPet?.name ?? "-",
       breed: firstPet?.breed ?? firstPet?.animal_type ?? "-",
+      animalType: firstPet?.animal_type ?? "other",
       age: firstPet?.age ?? 0,
       weight: firstPet?.weight != null ? Number(firstPet.weight) : 0,
       imageUrl: firstPet?.image_url ?? null,

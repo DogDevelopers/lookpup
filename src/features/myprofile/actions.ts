@@ -2,7 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { bankAccountSchema, type BankAccountInput } from "@/features/myprofile/schema";
+import { fuzzCoordinate } from "@/lib/geo";
+import {
+  bankAccountSchema,
+  ownerLocationSchema,
+  type BankAccountInput,
+  type OwnerLocationInput,
+} from "@/features/myprofile/schema";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -36,6 +42,39 @@ export async function upsertBankAccount(input: BankAccountInput): Promise<Action
   }
 
   revalidatePath("/myprofile/settings");
+  return { ok: true };
+}
+
+export async function updateOwnerLocation(input: OwnerLocationInput): Promise<ActionResult> {
+  const parsed = ownerLocationSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: "입력값을 확인해주세요." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { ok: false, error: "로그인이 필요합니다." };
+  }
+
+  const { error } = await supabase
+    .from("users")
+    .update({
+      address: parsed.data.address,
+      display_area: parsed.data.dong,
+      latitude: fuzzCoordinate(parsed.data.lat),
+      longitude: fuzzCoordinate(parsed.data.lng),
+    })
+    .eq("id", user.id);
+
+  if (error) {
+    return { ok: false, error: "위치 정보를 저장하지 못했습니다." };
+  }
+
+  revalidatePath("/myprofile");
   return { ok: true };
 }
 
