@@ -1,6 +1,6 @@
 import SitterDetailClient from "@/features/petsitters/components/SitterDetailClient";
+import { getSitterDetail, getSitterReviews } from "@/features/petsitters/queries";
 
-// TODO: features/petsitters/queries.ts로 sitter/reviews 실데이터를 조회해 전달.
 export default async function PetsitterProfilePage({
   params,
   searchParams,
@@ -10,5 +10,8 @@ export default async function PetsitterProfilePage({
 }) {
   const { id } = await params;
   const { from, roomId } = await searchParams;
-  return <SitterDetailClient sitterId={id} from={from} roomId={roomId} />;
+  const [sitter, reviews] = await Promise.all([getSitterDetail(id), getSitterReviews(id)]);
+  return (
+    <SitterDetailClient sitterId={id} from={from} roomId={roomId} sitter={sitter} reviews={reviews} />
+  );
 }

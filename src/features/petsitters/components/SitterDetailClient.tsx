@@ -29,7 +29,6 @@ interface SitterDetailClientProps {
   sitterId: string;
   from?: string;
   roomId?: string;
-  // TODO: features/petsitters/queries.ts로 실데이터 조회해 전달.
   sitter?: SitterDetail | null;
   reviews?: ReviewRow[];
   isLoading?: boolean;

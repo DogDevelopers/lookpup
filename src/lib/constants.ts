@@ -41,13 +41,6 @@ export const SITTER_STATUS_VALUES = [
 
 export type SitterStatus = (typeof SITTER_STATUS_VALUES)[number];
 
-export const SITTER_STATUS = {
-  PENDING: "pending",
-  APPROVED: "approved",
-  REJECTED: "rejected",
-  SUSPENDED: "suspended",
-} as const satisfies Record<string, SitterStatus>;
-
 export const RESERVATION_STATUS = {
   PENDING: "pending",
   ACCEPTED: "accepted",

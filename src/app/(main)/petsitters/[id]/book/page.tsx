@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BookingClient from "@/features/petsitters/components/BookingClient";
+import { getSitterBookingInfo, getBookedRanges, getUserPets } from "@/features/petsitters/queries";
 
-// TODO: features/petsitters/queries.ts로 sitter/bookedRanges, pet-register 이식 후 pets 실데이터를 조회해 전달.
 export default async function BookPage({
   params,
 }: {
@@ -30,5 +30,11 @@ export default async function BookPage({
     redirect(`/auth/verification?next=${encodeURIComponent(bookPath)}`);
   }
 
-  return <BookingClient sitterId={id} />;
+  const [sitter, bookedRanges, pets] = await Promise.all([
+    getSitterBookingInfo(id),
+    getBookedRanges(id),
+    getUserPets(user.id),
+  ]);
+
+  return <BookingClient sitterId={id} sitter={sitter} bookedRanges={bookedRanges} pets={pets} />;
 }

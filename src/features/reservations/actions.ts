@@ -1,6 +1,5 @@
 "use server";
 
-import { differenceInCalendarDays } from "date-fns";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createNotification } from "@/lib/notifications";
@@ -31,112 +30,8 @@ const SERVICE_TYPE_LABEL: Record<string, string> = {
 };
 
 // ---------------------------------------------------------------------------
-// petsitters/actions.ts에서 그대로 이동한 4개 함수 (로직 변경 없음)
+// petsitters/actions.ts에서 그대로 이동한 함수 (로직 변경 없음)
 // ---------------------------------------------------------------------------
-
-const SERVICE_KEY_TO_TITLE: Record<string, string> = {
-  visit: "방문돌봄",
-  home: "위탁돌봄",
-  walk: "산책",
-  pickup: "픽업",
-};
-
-type CreateReservationResult = { ok: true; id: string } | { ok: false; error: string };
-
-interface CreateReservationInput {
-  sitterId: string;
-  petIds: string[];
-  selectedService: string;
-  startDatetime: string;
-  endDatetime: string;
-  memo?: string;
-}
-
-export async function createReservation(
-  input: CreateReservationInput,
-): Promise<CreateReservationResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
-
-  if (input.petIds.length === 0) {
-    return { ok: false, error: "반려동물을 선택해주세요." };
-  }
-
-  const start = new Date(input.startDatetime);
-  const end = new Date(input.endDatetime);
-  if (start <= new Date()) {
-    return { ok: false, error: "시작일은 오늘 이후여야 합니다." };
-  }
-  if (end <= start) {
-    return { ok: false, error: "종료일은 시작일 이후여야 합니다." };
-  }
-
-  const { count: ownedCount } = await supabase
-    .from("pets")
-    .select("id", { count: "exact", head: true })
-    .in("id", input.petIds)
-    .eq("owner_id", user.id)
-    .is("deleted_at", null);
-
-  if ((ownedCount ?? 0) !== new Set(input.petIds).size) {
-    return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
-  }
-
-  const { data: services } = await supabase
-    .from("services")
-    .select("id, title, price")
-    .eq("sitter_id", input.sitterId)
-    .eq("is_active", true);
-
-  if (!services || services.length === 0) {
-    return { ok: false, error: "이용 가능한 서비스가 없습니다." };
-  }
-
-  // StepPetService.tsx의 표시 금액 계산과 동일한 매칭/폴백을 사용해
-  // 화면에 보여준 금액과 실제 청구 금액이 항상 같도록 보장한다.
-  const targetTitle = SERVICE_KEY_TO_TITLE[input.selectedService];
-  const matchedService = services.find((s) => s.title === targetTitle) ?? services[0];
-
-  const days = Math.max(1, differenceInCalendarDays(end, start) + 1);
-  const totalPrice = matchedService.price * days;
-
-  const { data: reservation, error: reservationError } = await supabase
-    .from("reservations")
-    .insert({
-      owner_id: user.id,
-      sitter_id: input.sitterId,
-      service_id: matchedService.id,
-      start_datetime: input.startDatetime,
-      end_datetime: input.endDatetime,
-      total_price: totalPrice,
-      status: RESERVATION_STATUS.PENDING,
-      memo: input.memo || null,
-    })
-    .select("id")
-    .single();
-
-  if (reservationError || !reservation) {
-    return { ok: false, error: "예약 생성에 실패했습니다." };
-  }
-
-  const { error: itemsError } = await supabase.from("reservation_items").insert(
-    input.petIds.map((petId) => ({ reservation_id: reservation.id, pet_id: petId })),
-  );
-
-  if (itemsError) {
-    await supabase.from("reservations").delete().eq("id", reservation.id);
-    return { ok: false, error: "예약 생성에 실패했습니다." };
-  }
-
-  revalidatePath("/myprofile/booking-history");
-  return { ok: true, id: reservation.id };
-}
 
 const CANCELABLE_STATUSES: string[] = [RESERVATION_STATUS.PENDING, RESERVATION_STATUS.ACCEPTED];
 
