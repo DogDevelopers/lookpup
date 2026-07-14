@@ -21,7 +21,6 @@ const SERVICE_TYPE_MAP: Record<string, string> = {
 };
 
 interface PetsitterSearchClientProps {
-  // TODO: features/petsitters/queries.ts의 실데이터 조회로 교체.
   initialSitters?: SitterRow[];
 }
 
