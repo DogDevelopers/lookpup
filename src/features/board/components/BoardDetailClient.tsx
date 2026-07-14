@@ -20,7 +20,8 @@ import BackButton from "@/components/common/BackButton";
 import KakaoMap from "@/components/common/KakaoMap";
 import { ImageGallery } from "@/components/common/ImageGallery";
 import { splitConditions } from "../utils";
-import { createApplication, closeRequest, deleteRequest } from "../actions";
+import { closeRequest, deleteRequest } from "../actions";
+import { createApplication } from "@/features/applications/actions";
 import type { OtherPost, RequestDetail } from "../types";
 
 export type { OtherPost, RequestDetail };
@@ -111,8 +112,7 @@ export default function BoardDetailClient({
     setApplying(true);
     setApplyError(null);
 
-    const result = await createApplication({
-      request_id: post.id,
+    const result = await createApplication(post.id, {
       message: null,
       proposed_price: null,
     });
@@ -123,7 +123,11 @@ export default function BoardDetailClient({
       return;
     }
     setShowApplyModal(false);
-    router.push("/chat?tab=applicants");
+    router.push(
+      result.data.roomId
+        ? `/chat?roomId=${result.data.roomId}&tab=applicants`
+        : "/chat?tab=applicants",
+    );
   };
 
   if (!post) {

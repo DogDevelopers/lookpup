@@ -28,14 +28,6 @@ export const requestStatusSchema = z.enum([
   REQUEST_STATUS.CANCELED,
 ]);
 
-export const applicationSchema = z.object({
-  request_id: z.string().uuid(),
-  message: z.string().max(500).nullable(),
-  proposed_price: z.number().int().min(0).nullable(),
-});
-
-export type ApplicationInput = z.infer<typeof applicationSchema>;
-
 export const applicationStatusSchema = z.enum([
   APPLICATION_STATUS.PENDING,
   APPLICATION_STATUS.ACCEPTED,
