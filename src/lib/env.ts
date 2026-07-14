@@ -7,11 +7,14 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_PORTONE_STORE_ID: z.string().min(1),
   NEXT_PUBLIC_PORTONE_PAY_CHANNEL_KEY: z.string().min(1),
   NEXT_PUBLIC_PORTONE_IDENTITY_CHANNEL_KEY: z.string().min(1),
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: z.string().min(1),
 });
 
 const serverEnvSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   PORTONE_API_SECRET: z.string().min(1),
+  CLOUDINARY_API_KEY: z.string().min(1),
+  CLOUDINARY_API_SECRET: z.string().min(1),
 });
 
 export const clientEnv = clientEnvSchema.parse({
@@ -22,11 +25,14 @@ export const clientEnv = clientEnvSchema.parse({
   NEXT_PUBLIC_PORTONE_PAY_CHANNEL_KEY: process.env.NEXT_PUBLIC_PORTONE_PAY_CHANNEL_KEY,
   NEXT_PUBLIC_PORTONE_IDENTITY_CHANNEL_KEY:
     process.env.NEXT_PUBLIC_PORTONE_IDENTITY_CHANNEL_KEY,
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
 });
 
 export function getServerEnv() {
   return serverEnvSchema.parse({
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     PORTONE_API_SECRET: process.env.PORTONE_API_SECRET,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   });
 }

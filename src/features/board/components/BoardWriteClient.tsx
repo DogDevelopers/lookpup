@@ -13,15 +13,18 @@ import {
   MapPin,
   LocateFixed,
   Download,
+  X,
 } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
 import KakaoMap from "@/components/common/KakaoMap";
+import { ImageUploadButton } from "@/components/common/ImageUploadButton";
 import {
   searchAddressList,
   coordToAddress,
+  coordToRegion,
   type AddressSuggestion,
 } from "@/lib/kakao-geocode";
 import { mergeConditions, appendConditionLine } from "../utils";
@@ -73,15 +76,21 @@ type FormState = {
   title: string;
   content: string;
   conditions: string;
+  image_urls: string[];
 };
 
 interface BoardWriteClientProps {
   // TODO: 로그인 여부 확인 후 리다이렉트, features/pet-register 이식 후 pets 실데이터 조회.
   userId?: string;
   pets?: Pet[];
+  userLocation?: { lat: number; lng: number } | null;
 }
 
-export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClientProps) {
+export default function BoardWriteClient({
+  userId,
+  pets = [],
+  userLocation = null,
+}: BoardWriteClientProps) {
   const router = useRouter();
 
   const draftKey = userId ? `board-write-draft:${userId}` : null;
@@ -113,6 +122,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
     title: "",
     content: "",
     conditions: "",
+    image_urls: [],
   });
 
   const {
@@ -176,6 +186,58 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
     }
   };
 
+  const handleLocationTypeChange = async (tab: string) => {
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setSearchError(null);
+    setLocationError(null);
+
+    if (tab === "우리 집") {
+      if (!userLocation) {
+        setForm((prev) => ({
+          ...prev,
+          location_type: tab,
+          location: "",
+          latitude: null,
+          longitude: null,
+        }));
+        setLocationError("등록된 주소가 없어요. 마이페이지에서 위치를 먼저 설정해주세요.");
+        return;
+      }
+      const region = await coordToRegion(userLocation.lat, userLocation.lng);
+      setForm((prev) => ({
+        ...prev,
+        location_type: tab,
+        location: region ? `${region.sido} ${region.sigungu} ${region.dong}` : "우리 집",
+        latitude: userLocation.lat,
+        longitude: userLocation.lng,
+      }));
+      if (!region) {
+        setLocationError("정확한 지역명을 불러오지 못했어요.");
+      }
+      return;
+    }
+
+    if (tab === "펫시터 집") {
+      setForm((prev) => ({
+        ...prev,
+        location_type: tab,
+        location: "펫시터 집",
+        latitude: null,
+        longitude: null,
+      }));
+      return;
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      location_type: tab,
+      location: "",
+      latitude: null,
+      longitude: null,
+    }));
+  };
+
   const canSubmit = () =>
     !!form.service_type &&
     !!form.startDate &&
@@ -227,6 +289,15 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
       conditions: appendConditionLine(prev.conditions, sentence),
     }));
 
+  const addImage = (url: string) =>
+    setForm((prev) => ({ ...prev, image_urls: [...prev.image_urls, url] }));
+
+  const removeImage = (url: string) =>
+    setForm((prev) => ({
+      ...prev,
+      image_urls: prev.image_urls.filter((u) => u !== url),
+    }));
+
   const handleSubmit = async () => {
     if (!form.startDate || !canSubmit()) return;
     setIsSubmitting(true);
@@ -243,6 +314,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
       longitude: form.longitude,
       pet_id: form.selected_pets[0] ?? null,
       sitter_conditions: [],
+      image_urls: form.image_urls,
     });
 
     setIsSubmitting(false);
@@ -452,9 +524,7 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                   <button
                     key={tab}
                     type="button"
-                    onClick={() =>
-                      setForm((prev) => ({ ...prev, location_type: tab }))
-                    }
+                    onClick={() => handleLocationTypeChange(tab)}
                     className={`flex-1 h-10 rounded-xl text-sm font-medium transition-colors ${
                       form.location_type === tab
                         ? "bg-[var(--color-orange-500)] text-white"
@@ -466,131 +536,148 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                 ))}
               </div>
 
-              <div className="relative mt-3">
-                <MapPin className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={form.location}
-                  onChange={(e) => handleLocationChange(e.target.value)}
-                  onFocus={() => {
-                    if (suggestions.length > 0) setShowSuggestions(true);
-                  }}
-                  onBlur={() =>
-                    setTimeout(() => setShowSuggestions(false), 150)
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      setShowSuggestions(false);
-                      handleAddressSearch(form.location);
-                    } else if (e.key === "Escape") {
-                      setShowSuggestions(false);
-                    }
-                  }}
-                  placeholder="도로명 주소를 입력하면 추천이 떠요"
-                  className="w-full h-12 pl-9 pr-20 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none focus:border-[var(--color-orange-500)] transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleAddressSearch(form.location)}
-                  disabled={addressSearching}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 rounded-lg bg-[var(--color-orange-500)] text-white text-xs font-medium disabled:opacity-50 transition-opacity"
-                >
-                  검색
-                </button>
+              {form.location_type === "직접 입력" ? (
+                <>
+                  <div className="relative mt-3">
+                    <MapPin className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      value={form.location}
+                      onChange={(e) => handleLocationChange(e.target.value)}
+                      onFocus={() => {
+                        if (suggestions.length > 0) setShowSuggestions(true);
+                      }}
+                      onBlur={() =>
+                        setTimeout(() => setShowSuggestions(false), 150)
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          setShowSuggestions(false);
+                          handleAddressSearch(form.location);
+                        } else if (e.key === "Escape") {
+                          setShowSuggestions(false);
+                        }
+                      }}
+                      placeholder="도로명 주소를 입력하면 추천이 떠요"
+                      className="w-full h-12 pl-9 pr-20 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none focus:border-[var(--color-orange-500)] transition"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleAddressSearch(form.location)}
+                      disabled={addressSearching}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 px-3 rounded-lg bg-[var(--color-orange-500)] text-white text-xs font-medium disabled:opacity-50 transition-opacity"
+                    >
+                      검색
+                    </button>
 
-                {showSuggestions && suggestions.length > 0 && (
-                  <ul className="absolute left-0 right-0 top-[calc(100%+4px)] z-20 max-h-60 overflow-y-auto bg-white border border-orange-100 rounded-xl shadow-lg py-1">
-                    {suggestions.map((s, i) => (
-                      <li key={`${s.addressName}-${i}`}>
-                        <button
-                          type="button"
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            handleSelectSuggestion(s);
-                          }}
-                          className="w-full text-left px-4 py-2.5 hover:bg-orange-50 transition-colors"
-                        >
-                          <div className="text-sm text-brown-900">
-                            {s.roadAddress ?? s.addressName}
-                          </div>
-                          {s.jibunAddress &&
-                            s.jibunAddress !== s.roadAddress && (
-                              <div className="text-xs text-stone-400 mt-0.5">
-                                {s.jibunAddress}
+                    {showSuggestions && suggestions.length > 0 && (
+                      <ul className="absolute left-0 right-0 top-[calc(100%+4px)] z-20 max-h-60 overflow-y-auto bg-white border border-orange-100 rounded-xl shadow-lg py-1">
+                        {suggestions.map((s, i) => (
+                          <li key={`${s.addressName}-${i}`}>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => {
+                                e.preventDefault();
+                                handleSelectSuggestion(s);
+                              }}
+                              className="w-full text-left px-4 py-2.5 hover:bg-orange-50 transition-colors"
+                            >
+                              <div className="text-sm text-brown-900">
+                                {s.roadAddress ?? s.addressName}
                               </div>
-                            )}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <p className="text-stone-400 text-xs mt-2">
-                도로명 주소를 입력하거나, 지도를 누르거나 마커를 드래그해 위치를
-                지정하세요.
-              </p>
-
-              <div className="relative w-full h-56 rounded-xl overflow-hidden border border-orange-100 mt-3">
-                <KakaoMap
-                  markers={
-                    form.latitude !== null && form.longitude !== null
-                      ? [
-                          {
-                            id: "selected-location",
-                            lat: form.latitude,
-                            lng: form.longitude,
-                            name: form.location || "선택한 위치",
-                          },
-                        ]
-                      : []
-                  }
-                  center={
-                    form.latitude !== null && form.longitude !== null
-                      ? { lat: form.latitude, lng: form.longitude }
-                      : { lat: 37.5665, lng: 126.978 }
-                  }
-                  level={4}
-                  className="w-full h-full"
-                  onMapClick={handleMapClick}
-                  draggable
-                  onMarkerDragEnd={handleMapClick}
-                />
-                {form.latitude === null && (
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-9 h-9 bg-[var(--color-orange-500)] rounded-full flex items-center justify-center shadow-md">
-                        <MapPin className="w-5 h-5 text-white" />
-                      </div>
-                      <span className="px-3 py-1 bg-white rounded-full text-xs text-brown-900 shadow-sm">
-                        위치를 검색해주세요
-                      </span>
-                    </div>
+                              {s.jibunAddress &&
+                                s.jibunAddress !== s.roadAddress && (
+                                  <div className="text-xs text-stone-400 mt-0.5">
+                                    {s.jibunAddress}
+                                  </div>
+                                )}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {(searchError || locationError) && (
-                <p className="text-red-500 text-xs mt-3">
-                  {searchError ?? locationError}
-                </p>
+                  <p className="text-stone-400 text-xs mt-2">
+                    도로명 주소를 입력하거나, 지도를 누르거나 마커를 드래그해 위치를
+                    지정하세요.
+                  </p>
+
+                  <div className="relative w-full h-56 rounded-xl overflow-hidden border border-orange-100 mt-3">
+                    <KakaoMap
+                      markers={
+                        form.latitude !== null && form.longitude !== null
+                          ? [
+                              {
+                                id: "selected-location",
+                                lat: form.latitude,
+                                lng: form.longitude,
+                                name: form.location || "선택한 위치",
+                              },
+                            ]
+                          : []
+                      }
+                      center={
+                        form.latitude !== null && form.longitude !== null
+                          ? { lat: form.latitude, lng: form.longitude }
+                          : { lat: 37.5665, lng: 126.978 }
+                      }
+                      level={4}
+                      className="w-full h-full"
+                      onMapClick={handleMapClick}
+                      draggable
+                      onMarkerDragEnd={handleMapClick}
+                    />
+                    {form.latitude === null && (
+                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div className="flex flex-col items-center gap-2">
+                          <div className="w-9 h-9 bg-[var(--color-orange-500)] rounded-full flex items-center justify-center shadow-md">
+                            <MapPin className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="px-3 py-1 bg-white rounded-full text-xs text-brown-900 shadow-sm">
+                            위치를 검색해주세요
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {(searchError || locationError) && (
+                    <p className="text-red-500 text-xs mt-3">
+                      {searchError ?? locationError}
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleUseCurrentLocation}
+                    disabled={addressSearching}
+                    className="flex items-center gap-1.5 text-[var(--color-orange-500)] text-sm font-medium mt-3 hover:opacity-80 disabled:opacity-50 transition-opacity"
+                  >
+                    <LocateFixed className="w-4 h-4" />
+                    {addressSearching ? "위치 확인 중..." : "현재 위치 사용"}
+                  </button>
+
+                  <p className="text-xs text-stone-400 mt-2">
+                    개인정보 보호를 위해 좌표는 약 100m 오차 내로 저장돼요. 지도 핀
+                    위치가 입력한 주소와 약간 다르게 보일 수 있어요.
+                  </p>
+                </>
+              ) : (
+                <div className="mt-4 flex items-center gap-2 px-4 py-3.5 bg-orange-50 rounded-xl">
+                  <MapPin className="w-4 h-4 text-[var(--color-orange-500)] shrink-0" />
+                  <p className="text-sm text-brown-900">
+                    {form.location_type === "우리 집"
+                      ? form.location || "위치를 불러오는 중이에요"
+                      : "펫시터 자택에서 진행돼요. 매칭 후 정확한 주소를 공유해주세요."}
+                  </p>
+                </div>
               )}
 
-              <button
-                type="button"
-                onClick={handleUseCurrentLocation}
-                disabled={addressSearching}
-                className="flex items-center gap-1.5 text-[var(--color-orange-500)] text-sm font-medium mt-3 hover:opacity-80 disabled:opacity-50 transition-opacity"
-              >
-                <LocateFixed className="w-4 h-4" />
-                {addressSearching ? "위치 확인 중..." : "현재 위치 사용"}
-              </button>
-
-              <p className="text-xs text-stone-400 mt-2">
-                개인정보 보호를 위해 좌표는 약 100m 오차 내로 저장돼요. 지도 핀
-                위치가 입력한 주소와 약간 다르게 보일 수 있어요.
-              </p>
+              {locationError && form.location_type !== "직접 입력" && (
+                <p className="text-red-500 text-xs mt-2">{locationError}</p>
+              )}
             </div>
 
             <div className="bg-white rounded-2xl border border-orange-100 p-7">
@@ -729,6 +816,35 @@ export default function BoardWriteClient({ userId, pets = [] }: BoardWriteClient
                   rows={7}
                   className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
                 />
+              </div>
+
+              <div className="flex flex-col gap-2 mt-6">
+                <label className="text-sm font-bold text-brown-900">
+                  사진
+                </label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {form.image_urls.map((url) => (
+                    <div key={url} className="relative w-20 h-20 shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt=""
+                        className="w-full h-full rounded-xl object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(url)}
+                        aria-label="사진 삭제"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-brown-900 text-white flex items-center justify-center"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  {form.image_urls.length < 5 && (
+                    <ImageUploadButton multiple maxFiles={5 - form.image_urls.length} onUploaded={addImage} />
+                  )}
+                </div>
               </div>
             </div>
 

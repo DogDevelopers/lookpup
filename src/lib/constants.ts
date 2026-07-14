@@ -13,3 +13,16 @@ export const APPLICATION_STATUS = {
   REJECTED: "rejected",
   CANCELED: "canceled",
 } as const;
+
+export const WITHDRAW_REASONS = [
+  { value: "not_useful", label: "서비스를 잘 이용하지 않아요" },
+  { value: "hard_to_use", label: "사용 방법이 어려워요" },
+  { value: "found_alternative", label: "다른 서비스를 이용하고 있어요" },
+  { value: "privacy_concern", label: "개인정보 이용이 걱정돼요" },
+  { value: "other", label: "기타" },
+] as const;
+
+export const WITHDRAW_REASON_VALUES = WITHDRAW_REASONS.map((r) => r.value) as [
+  string,
+  ...string[],
+];

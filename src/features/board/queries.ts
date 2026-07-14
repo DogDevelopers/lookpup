@@ -76,7 +76,7 @@ export async function getRequestDetail(id: string): Promise<RequestDetail | null
   const { data, error } = await supabase
     .from("requests")
     .select(
-      `id, owner_id, title, content, start_datetime, end_datetime, budget, location, latitude, longitude, status, view_count, created_at,
+      `id, owner_id, title, content, start_datetime, end_datetime, budget, location, latitude, longitude, status, view_count, created_at, image_urls,
        users:owner_id ( full_name, profile_image, is_verified, created_at ),
        pets:pet_id ( id, name, animal_type, breed ),
        applications ( id, message, proposed_price, status, sitters ( id, users:user_id ( full_name, profile_image ) ) )`,
@@ -110,7 +110,7 @@ export async function getRequestForEdit(id: string): Promise<PostData | null> {
   const { data, error } = await supabase
     .from("requests")
     .select(
-      "status, request_type, budget, start_datetime, end_datetime, content, location, latitude, longitude, title, pets:pet_id ( id )",
+      "status, request_type, budget, start_datetime, end_datetime, content, location, latitude, longitude, title, image_urls, pets:pet_id ( id )",
     )
     .eq("id", id)
     .maybeSingle();
