@@ -1136,6 +1136,13 @@ export type Database = {
           profile_image: string
         }[]
       }
+      get_sitter_booked_ranges: {
+        Args: { p_sitter_id: string }
+        Returns: {
+          end_datetime: string
+          start_datetime: string
+        }[]
+      }
       get_unread_counts: {
         Args: { my_id: string; room_ids: string[] }
         Returns: {
@@ -1279,3 +1286,9 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const

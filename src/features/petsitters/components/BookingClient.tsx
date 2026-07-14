@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useBookingStore } from "@/stores/booking-store";
 import Footer from "@/components/layout/Footer";
-import { createReservation } from "@/features/reservations/actions";
+import { createPetsitterReservationRequest } from "@/features/reservations/actions";
 import {
   step1Schema,
   step2Schema,
@@ -39,7 +39,6 @@ export { SERVICE_KEY_TO_TYPE };
 
 interface BookingClientProps {
   sitterId: string;
-  // TODO: features/petsitters/queries.ts로 실데이터 조회해 전달.
   sitter?: SitterBookingInfo | null;
   sitterLoading?: boolean;
   bookedRanges?: BookedRange[];
@@ -122,12 +121,23 @@ export default function BookingClient({
       end.setHours(23, 59, 0, 0);
     }
 
-    const result = await createReservation({
-      sitterId,
-      petIds,
-      selectedService: selectedService ?? "",
-      startDatetime: start.toISOString(),
-      endDatetime: end.toISOString(),
+    const matchedService =
+      sitter.services.find(
+        (s) => s.title === SERVICE_KEY_TO_TYPE[selectedService ?? "visit"],
+      ) ?? sitter.services[0];
+
+    if (!matchedService) {
+      setIsSubmitting(false);
+      toast.error("이용 가능한 서비스가 없습니다.");
+      return;
+    }
+
+    const result = await createPetsitterReservationRequest({
+      sitter_id: sitterId,
+      service_id: matchedService.id,
+      pet_ids: petIds,
+      start_datetime: start.toISOString(),
+      end_datetime: end.toISOString(),
       memo: step3Form.getValues("note"),
     });
 
@@ -139,7 +149,7 @@ export default function BookingClient({
     }
 
     setStep(4);
-    setChatRoomId(null);
+    setChatRoomId(result.data.room_id);
   }
 
   function canProceed(): boolean {
