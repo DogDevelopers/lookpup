@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { uploadImage } from "@/lib/upload-image";
 import { petRegisterSchema, petUpdateSchema, type PetUpdateInput } from "@/features/pet-register/schema";
 import type { PetRegisterFormValues } from "@/features/pet-register/types";
 
@@ -34,7 +35,16 @@ export async function createPet(input: PetRegisterFormValues): Promise<ActionRes
     return { ok: false, error: `반려동물은 최대 ${MAX_PETS_PER_OWNER}마리까지 등록할 수 있습니다.` };
   }
 
-  const { petType, name, breed, age, weight, gender, neutered, notes } = parsed.data;
+  const { petType, name, breed, age, weight, gender, neutered, notes, photoFile } = parsed.data;
+
+  let imageUrl: string | null = null;
+  if (photoFile) {
+    const formData = new FormData();
+    formData.append("file", photoFile);
+    const uploadResult = await uploadImage(formData);
+    if (!uploadResult.ok) return { ok: false, error: uploadResult.error };
+    imageUrl = uploadResult.url;
+  }
 
   const { error } = await supabase.from("pets").insert({
     owner_id: user.id,
@@ -46,6 +56,7 @@ export async function createPet(input: PetRegisterFormValues): Promise<ActionRes
     weight: weight ? Number(weight) : null,
     neutered,
     caution: notes || null,
+    image_url: imageUrl,
   });
 
   if (error) {

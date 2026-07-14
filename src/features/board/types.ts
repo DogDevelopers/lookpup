@@ -42,6 +42,7 @@ export type PostData = {
   longitude: number | null;
   pets: { id: string } | null;
   title: string;
+  image_urls: string[];
 };
 
 export type DetailPet = {
@@ -85,6 +86,7 @@ export type RequestDetail = {
   status: string;
   view_count: number;
   created_at: string;
+  image_urls: string[];
   users: {
     full_name: string;
     profile_image: string | null;

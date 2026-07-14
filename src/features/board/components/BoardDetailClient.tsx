@@ -18,6 +18,7 @@ import SectionCard from "@/components/common/SectionCard";
 import { CustomModal } from "@/components/common/CustomModal";
 import BackButton from "@/components/common/BackButton";
 import KakaoMap from "@/components/common/KakaoMap";
+import { ImageGallery } from "@/components/common/ImageGallery";
 import { splitConditions } from "../utils";
 import { createApplication, closeRequest, deleteRequest } from "../actions";
 import type { OtherPost, RequestDetail } from "../types";
@@ -185,34 +186,8 @@ export default function BoardDetailClient({
       <main className="flex-1 bg-orange-50 min-h-screen">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-6 md:py-8">
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-6">
-            <div className="flex-1 min-w-0 flex items-center justify-between gap-2">
+            <div className="flex-1 min-w-0">
               <BackButton href="/board" />
-              {isAuthor && (
-                <div className="flex gap-2">
-                  {post.status === "open" && (
-                    <button
-                      onClick={handleClose}
-                      className="px-3 py-1.5 bg-stone-100 rounded-lg text-stone-500 text-xs font-medium hover:bg-stone-200 transition-colors"
-                    >
-                      모집마감
-                    </button>
-                  )}
-                  <Link
-                    href={`/board/${post.id}/edit`}
-                    className="px-3 py-1.5 bg-stone-100 rounded-lg text-stone-500 text-xs font-medium flex items-center gap-1 hover:bg-stone-200 transition-colors"
-                  >
-                    <Pencil size={12} />
-                    수정
-                  </Link>
-                  <button
-                    onClick={() => setDeleteTargetId(post.id)}
-                    className="px-3 py-1.5 bg-stone-100 rounded-lg text-stone-500 text-xs font-medium flex items-center gap-1 hover:bg-stone-200 transition-colors"
-                  >
-                    <Trash2 size={12} />
-                    삭제
-                  </button>
-                </div>
-              )}
             </div>
             <div className="hidden lg:block lg:w-96 shrink-0" aria-hidden />
           </div>
@@ -253,9 +228,37 @@ export default function BoardDetailClient({
                     </div>
                   </div>
 
-                  <h1 className="text-2xl md:text-3xl font-bold text-brown-900">
-                    {post.title}
-                  </h1>
+                  <div className="flex items-start justify-between gap-3">
+                    <h1 className="text-2xl md:text-3xl font-bold text-brown-900">
+                      {post.title}
+                    </h1>
+                    {isAuthor && (
+                      <div className="flex items-center gap-1.5 shrink-0 pt-1">
+                        {post.status === "open" && (
+                          <button
+                            onClick={handleClose}
+                            className="px-3 py-1.5 rounded-lg border border-orange-100 text-orange-500 text-xs font-medium hover:bg-orange-50 transition-colors"
+                          >
+                            모집마감
+                          </button>
+                        )}
+                        <Link
+                          href={`/board/${post.id}/edit`}
+                          aria-label="게시글 수정"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 text-stone-400 hover:text-orange-500 hover:bg-orange-50 transition-colors"
+                        >
+                          <Pencil size={14} />
+                        </Link>
+                        <button
+                          onClick={() => setDeleteTargetId(post.id)}
+                          aria-label="게시글 삭제"
+                          className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div className="flex items-start gap-3">
@@ -324,6 +327,9 @@ export default function BoardDetailClient({
                 <p className="text-brown-900 text-base leading-7 whitespace-pre-line">
                   {parsed.content}
                 </p>
+                {post.image_urls.length > 0 && (
+                  <ImageGallery urls={post.image_urls} />
+                )}
               </SectionCard>
 
               {conditionsText && (
