@@ -1,6 +1,6 @@
 "use server";
 
-import cloudinary from "@/lib/cloudinary-server";
+import getCloudinaryClient from "@/lib/cloudinary-server";
 import { createClient } from "@/lib/supabase/server";
 
 type UploadResult = { ok: true; url: string } | { ok: false; error: string };
@@ -24,6 +24,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+  const cloudinary = getCloudinaryClient();
 
   try {
     const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
