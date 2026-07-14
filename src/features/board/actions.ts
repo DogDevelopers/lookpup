@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { REQUEST_STATUS, APPLICATION_STATUS } from "@/lib/constants";
-import { requestSchema, applicationSchema } from "./schema";
+import { REQUEST_STATUS } from "@/lib/constants";
+import { requestSchema } from "./schema";
 
 type ActionResult<T = undefined> =
   | { ok: true; data: T }
@@ -128,50 +128,4 @@ export async function deleteRequest(id: string): Promise<ActionResult> {
 
   revalidatePath("/board");
   return { ok: true, data: undefined };
-}
-
-export async function createApplication(input: unknown): Promise<ActionResult<{ id: string }>> {
-  const auth = await getAuthedUser();
-  if (!auth) return { ok: false, error: "로그인이 필요합니다." };
-
-  const { data: sitter } = await auth.supabase
-    .from("sitters")
-    .select("id, status")
-    .eq("user_id", auth.userId)
-    .maybeSingle();
-  if (!sitter) return { ok: false, error: "펫시터 등록이 필요합니다." };
-  if (sitter.status !== "approved") {
-    return { ok: false, error: "승인된 펫시터만 지원할 수 있습니다." };
-  }
-
-  const parsed = applicationSchema.safeParse(input);
-  if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
-  }
-
-  const { data: request } = await auth.supabase
-    .from("requests")
-    .select("status")
-    .eq("id", parsed.data.request_id)
-    .maybeSingle();
-  if (!request || request.status !== REQUEST_STATUS.OPEN) {
-    return { ok: false, error: "지원할 수 없는 게시글입니다." };
-  }
-
-  const { data, error } = await auth.supabase
-    .from("applications")
-    .insert({
-      request_id: parsed.data.request_id,
-      sitter_id: sitter.id,
-      message: parsed.data.message,
-      proposed_price: parsed.data.proposed_price,
-      status: APPLICATION_STATUS.PENDING,
-    })
-    .select("id")
-    .single();
-
-  if (error || !data) return { ok: false, error: "지원에 실패했습니다." };
-
-  revalidatePath(`/board/${parsed.data.request_id}`);
-  return { ok: true, data: { id: data.id } };
 }
