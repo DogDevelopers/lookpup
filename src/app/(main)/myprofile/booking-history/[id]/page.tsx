@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getReservationById } from "@/features/petsitters/actions";
+import { getReservationById } from "@/features/reservations/actions";
 import BookingDetailClient from "@/features/petsitters/components/BookingDetailClient";
 
 export default async function BookingDetailPage({

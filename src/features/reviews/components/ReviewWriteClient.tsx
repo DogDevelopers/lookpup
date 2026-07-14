@@ -8,7 +8,7 @@ import { MobileBackButton, DesktopBackButton } from "@/components/common/BackBut
 import { CustomModal } from "@/components/common/CustomModal";
 import Avatar from "@/components/ui/Avatar";
 import { createReview } from "@/features/reviews/actions";
-import type { ReservationDetail } from "@/features/petsitters/actions";
+import type { ReservationDetail } from "@/features/reservations/types";
 
 const RATING_LABELS: Record<number, string> = {
   1: "별로였어요",

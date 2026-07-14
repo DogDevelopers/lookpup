@@ -1,4 +1,4 @@
-import { getReservationById } from "@/features/petsitters/actions";
+import { getReservationById } from "@/features/reservations/actions";
 import ReviewWriteClient from "@/features/reviews/components/ReviewWriteClient";
 
 export default async function ReviewWritePage({

@@ -40,3 +40,37 @@ export const SITTER_STATUS_VALUES = [
 ] as const;
 
 export type SitterStatus = (typeof SITTER_STATUS_VALUES)[number];
+
+export const RESERVATION_STATUS = {
+  PENDING: "pending",
+  ACCEPTED: "accepted",
+  PAID: "paid",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+  CANCELED: "canceled",
+} as const;
+
+export type ReservationStatus =
+  (typeof RESERVATION_STATUS)[keyof typeof RESERVATION_STATUS];
+
+export const PAYMENT_STATUS = {
+  READY: "ready",
+  PAID: "paid",
+  PARTIAL_CANCELED: "partial_canceled",
+  CANCELED: "canceled",
+  FAILED: "failed",
+  SETTLED: "settled",
+} as const;
+
+export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS];
+
+export const EXTRA_CHARGE_STATUS = {
+  PENDING: "pending",
+  ACCEPTED: "accepted",
+  REJECTED: "rejected",
+  PAID: "paid",
+  CANCELED: "canceled",
+} as const;
+
+export type ExtraChargeStatus =
+  (typeof EXTRA_CHARGE_STATUS)[keyof typeof EXTRA_CHARGE_STATUS];

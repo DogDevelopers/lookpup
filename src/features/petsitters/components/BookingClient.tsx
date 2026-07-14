@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useBookingStore } from "@/stores/booking-store";
 import Footer from "@/components/layout/Footer";
-import { createReservation } from "../actions";
+import { createReservation } from "@/features/reservations/actions";
 import {
   step1Schema,
   step2Schema,
