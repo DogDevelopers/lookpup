@@ -79,7 +79,7 @@ export async function createApplication(
 
   let roomId = existingRoom?.id ?? null;
   if (!existingRoom) {
-    const { data: newRoom } = await supabase
+    const { data: newRoom, error: roomError } = await supabase
       .from("chat_rooms")
       .insert({
         room_type: "request",
@@ -89,7 +89,10 @@ export async function createApplication(
       })
       .select("id")
       .single();
-    roomId = newRoom?.id ?? null;
+    if (roomError || !newRoom) {
+      return { ok: false, error: "채팅방 개설에 실패했습니다." };
+    }
+    roomId = newRoom.id;
   }
 
   const { data: sitterUser } = await supabase
