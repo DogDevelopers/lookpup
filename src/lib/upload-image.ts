@@ -1,6 +1,6 @@
 "use server";
 
-import cloudinary from "@/lib/cloudinary";
+import cloudinary from "@/lib/cloudinary-server";
 import { createClient } from "@/lib/supabase/server";
 
 type UploadResult = { ok: true; url: string } | { ok: false; error: string };
