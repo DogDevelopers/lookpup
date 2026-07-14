@@ -16,6 +16,7 @@ export const requestSchema = z.object({
   longitude: z.number().nullable(),
   pet_id: z.string().uuid().nullable(),
   sitter_conditions: z.array(z.string()),
+  image_urls: z.array(z.string()),
 });
 
 export type RequestInput = z.infer<typeof requestSchema>;

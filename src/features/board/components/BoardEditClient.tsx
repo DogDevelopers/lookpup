@@ -10,12 +10,14 @@ import {
   Send,
   MapPin,
   LocateFixed,
+  X,
 } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
 import KakaoMap from "@/components/common/KakaoMap";
+import { ImageUploadButton } from "@/components/common/ImageUploadButton";
 import { coordToAddress } from "@/lib/kakao-geocode";
 import {
   mergeConditions,
@@ -58,6 +60,7 @@ type FormState = {
   title: string;
   content: string;
   conditions: string;
+  image_urls: string[];
 };
 
 export default function BoardEditClient({
@@ -88,6 +91,7 @@ export default function BoardEditClient({
     title: "",
     content: "",
     conditions: "",
+    image_urls: [],
   });
 
   const {
@@ -135,6 +139,7 @@ export default function BoardEditClient({
       title: initialData.title,
       content: split.content,
       conditions: split.conditions,
+      image_urls: initialData.image_urls,
     });
   }, [initialData]);
 
@@ -150,6 +155,15 @@ export default function BoardEditClient({
     setForm((prev) => ({
       ...prev,
       conditions: appendConditionLine(prev.conditions, sentence),
+    }));
+
+  const addImage = (url: string) =>
+    setForm((prev) => ({ ...prev, image_urls: [...prev.image_urls, url] }));
+
+  const removeImage = (url: string) =>
+    setForm((prev) => ({
+      ...prev,
+      image_urls: prev.image_urls.filter((u) => u !== url),
     }));
 
   const handleSubmit = async () => {
@@ -168,6 +182,7 @@ export default function BoardEditClient({
       longitude: form.longitude,
       pet_id: form.selected_pets[0] ?? null,
       sitter_conditions: [],
+      image_urls: form.image_urls,
     });
 
     setIsSubmitting(false);
@@ -552,6 +567,35 @@ export default function BoardEditClient({
                   rows={7}
                   className="w-full px-4 py-3 bg-white border border-orange-100 rounded-xl text-brown-900 placeholder:text-stone-400 outline-none resize-none focus:border-[var(--color-orange-500)] transition mt-1"
                 />
+              </div>
+
+              <div className="flex flex-col gap-2 mt-6">
+                <label className="text-sm font-bold text-brown-900">
+                  사진
+                </label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {form.image_urls.map((url) => (
+                    <div key={url} className="relative w-20 h-20 shrink-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={url}
+                        alt=""
+                        className="w-full h-full rounded-xl object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(url)}
+                        aria-label="사진 삭제"
+                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-brown-900 text-white flex items-center justify-center"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  {form.image_urls.length < 5 && (
+                    <ImageUploadButton multiple maxFiles={5 - form.image_urls.length} onUploaded={addImage} />
+                  )}
+                </div>
               </div>
             </div>
 

@@ -10,6 +10,15 @@ export default async function BoardWritePage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/auth/login");
 
-  const pets = await getUserPets(user.id);
-  return <BoardWriteClient userId={user.id} pets={pets} />;
+  const [pets, { data: profile }] = await Promise.all([
+    getUserPets(user.id),
+    supabase.from("users").select("latitude, longitude").eq("id", user.id).maybeSingle(),
+  ]);
+
+  const userLocation =
+    profile?.latitude != null && profile?.longitude != null
+      ? { lat: Number(profile.latitude), lng: Number(profile.longitude) }
+      : null;
+
+  return <BoardWriteClient userId={user.id} pets={pets} userLocation={userLocation} />;
 }
