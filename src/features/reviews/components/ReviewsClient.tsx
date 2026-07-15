@@ -12,31 +12,35 @@ import { deleteReview } from "@/features/reviews/actions";
 import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
 
 type TabId = "written" | "received";
+type Accent = "orange" | "brown";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "written", label: "작성한 후기" },
   { id: "received", label: "받은 후기" },
 ];
 
-function MiniStarRating({ value }: { value: number }) {
+const ACCENT: Record<Accent, { star: string; starMuted: string; bg: string; border: string; text: string }> = {
+  orange: { star: "fill-orange-400 text-orange-400", starMuted: "fill-orange-100 text-orange-100", bg: "bg-orange-50", border: "border-orange-100", text: "text-orange-500" },
+  brown: { star: "fill-brown-600 text-brown-600", starMuted: "fill-brown-600/20 text-brown-600/20", bg: "bg-brown-600/10", border: "border-brown-600/20", text: "text-brown-600" },
+};
+
+function MiniStarRating({ value, accent }: { value: number; accent: Accent }) {
+  const a = ACCENT[accent];
   return (
     <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          size={11}
-          className={i <= value ? "fill-orange-400 text-orange-400" : "fill-orange-100 text-orange-100"}
-        />
+        <Star key={i} size={11} className={i <= value ? a.star : a.starMuted} />
       ))}
     </div>
   );
 }
 
-function RatingBlock({ rating }: { rating: number }) {
+function RatingBlock({ rating, accent }: { rating: number; accent: Accent }) {
+  const a = ACCENT[accent];
   return (
-    <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-100 rounded-xl px-3 py-1.5 shrink-0">
-      <Star size={15} className="fill-orange-400 text-orange-400" />
-      <span className="text-base font-bold text-orange-500 leading-none">{rating}.0</span>
+    <div className={`flex items-center gap-1.5 ${a.bg} border ${a.border} rounded-xl px-3 py-1.5 shrink-0`}>
+      <Star size={15} className={a.star} />
+      <span className={`text-base font-bold ${a.text} leading-none`}>{rating}.0</span>
     </div>
   );
 }
@@ -44,10 +48,13 @@ function RatingBlock({ rating }: { rating: number }) {
 function WrittenReviewCard({
   review,
   onDelete,
+  accent,
 }: {
   review: WrittenReview;
   onDelete: (id: string) => void;
+  accent: Accent;
 }) {
+  const a = ACCENT[accent];
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -77,31 +84,31 @@ function WrittenReviewCard({
               </p>
             </div>
           </div>
-          <RatingBlock rating={review.rating} />
+          <RatingBlock rating={review.rating} accent={accent} />
         </div>
 
         {Object.keys(review.detail_ratings).length > 0 && (
-          <div className="px-5 pb-4 border-t border-orange-100 pt-3 space-y-2">
+          <div className={`px-5 pb-4 border-t ${a.border} pt-3 space-y-2`}>
             {Object.entries(review.detail_ratings).map(([label, val]) => (
               <div key={label} className="flex items-center justify-between">
                 <span className="text-xs text-stone-500">{label}</span>
-                <MiniStarRating value={val} />
+                <MiniStarRating value={val} accent={accent} />
               </div>
             ))}
           </div>
         )}
 
-        <div className="px-5 pt-4 border-t border-orange-100 space-y-3">
+        <div className={`px-5 pt-4 border-t ${a.border} space-y-3`}>
           {review.image_urls.length > 0 && <ImageGallery urls={review.image_urls} />}
           <p className="text-sm text-stone-900 leading-relaxed">{review.content}</p>
         </div>
 
-        <div className="px-5 py-3 border-t border-orange-100 mt-4 flex items-center justify-between gap-2">
+        <div className={`px-5 py-3 border-t ${a.border} mt-4 flex items-center justify-between gap-2`}>
           <div className="flex flex-wrap gap-1.5">
             {review.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2.5 py-1 bg-orange-50 text-orange-500 text-xs font-medium rounded-full border border-orange-200"
+                className={`px-2.5 py-1 ${a.bg} ${a.text} text-xs font-medium rounded-full border ${a.border}`}
               >
                 {tag}
               </span>
@@ -154,7 +161,7 @@ function ReceivedReviewCard({ review }: { review: ReceivedReview }) {
             </p>
           </div>
         </div>
-        <RatingBlock rating={review.rating} />
+        <RatingBlock rating={review.rating} accent="orange" />
       </div>
 
       {Object.keys(review.detail_ratings).length > 0 && (
@@ -162,7 +169,7 @@ function ReceivedReviewCard({ review }: { review: ReceivedReview }) {
           {Object.entries(review.detail_ratings).map(([label, val]) => (
             <div key={label} className="flex items-center justify-between">
               <span className="text-xs text-stone-500">{label}</span>
-              <MiniStarRating value={val} />
+              <MiniStarRating value={val} accent="orange" />
             </div>
           ))}
         </div>
@@ -199,12 +206,16 @@ export default function ReviewsClient({
   isSitter,
   initialWrittenReviews,
   initialReceivedReviews,
+  mode = "both",
+  embedded = false,
 }: {
   isSitter: boolean;
   initialWrittenReviews: WrittenReview[];
   initialReceivedReviews: ReceivedReview[];
+  mode?: TabId | "both";
+  embedded?: boolean;
 }) {
-  const [activeTab, setActiveTab] = useState<TabId>("written");
+  const [activeTab, setActiveTab] = useState<TabId>(mode === "received" ? "received" : "written");
   const [writtenReviews, setWrittenReviews] = useState(initialWrittenReviews);
 
   const handleDeleteWritten = (id: string) => {
@@ -213,53 +224,62 @@ export default function ReviewsClient({
 
   const writtenCount = writtenReviews.length;
   const receivedCount = initialReceivedReviews.length;
+  const visibleTabs = mode === "both" ? TABS : TABS.filter((tab) => tab.id === mode);
+  const accent: Accent = mode === "written" ? "brown" : "orange";
+  const a = ACCENT[accent];
 
   return (
-    <div className="min-h-screen bg-orange-50">
-      <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
-        <div className="h-14 px-5 flex items-center gap-3">
-          <MobileBackButton />
-          <span className="flex-1 font-semibold text-stone-900">후기 관리</span>
-        </div>
-      </div>
-
-      <main className="w-full max-w-[1280px] mx-auto px-4 sm:px-10 pt-6 md:pt-12 pb-10 md:pb-20">
-        <div className="hidden md:flex items-center gap-4 mb-8">
-          <DesktopBackButton />
-          <div>
-            <h2 className="text-2xl font-bold text-stone-900">후기 관리</h2>
-            <p className="text-sm text-gray-500 mt-1">작성한 후기와 받은 후기를 확인하세요</p>
+    <div className={embedded ? "" : "min-h-screen bg-orange-50"}>
+      {!embedded && (
+        <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
+          <div className="h-14 px-5 flex items-center gap-3">
+            <MobileBackButton />
+            <span className="flex-1 font-semibold text-stone-900">후기 관리</span>
           </div>
         </div>
+      )}
 
-        <div className="flex gap-1 mb-6 bg-white border border-orange-100 rounded-2xl p-1">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                activeTab === tab.id ? "bg-orange-500 text-white" : "text-orange-500 hover:text-orange-600"
-              }`}
-            >
-              {tab.label}
-              <span className={`ml-1.5 text-xs ${activeTab === tab.id ? "text-white/80" : "text-orange-500/70"}`}>
-                {tab.id === "written" ? writtenCount : receivedCount}
-              </span>
-            </button>
-          ))}
-        </div>
+      <main className={embedded ? "w-full" : "w-full max-w-[1280px] mx-auto px-4 sm:px-10 pt-6 md:pt-12 pb-10 md:pb-20"}>
+        {!embedded && (
+          <div className="hidden md:flex items-center gap-4 mb-8">
+            <DesktopBackButton />
+            <div>
+              <h2 className="text-2xl font-bold text-stone-900">후기 관리</h2>
+              <p className="text-sm text-gray-500 mt-1">작성한 후기와 받은 후기를 확인하세요</p>
+            </div>
+          </div>
+        )}
+
+        {visibleTabs.length > 1 && (
+          <div className="flex gap-1 mb-6 bg-white border border-orange-100 rounded-2xl p-1">
+            {visibleTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  activeTab === tab.id ? "bg-orange-500 text-white" : "text-orange-500 hover:text-orange-600"
+                }`}
+              >
+                {tab.label}
+                <span className={`ml-1.5 text-xs ${activeTab === tab.id ? "text-white/80" : "text-orange-500/70"}`}>
+                  {tab.id === "written" ? writtenCount : receivedCount}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
 
         {activeTab === "written" ? (
           writtenReviews.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-4">
-                <Star size={28} className="text-orange-200" />
+              <div className={`w-16 h-16 ${a.bg} rounded-full flex items-center justify-center mb-4`}>
+                <Star size={28} className={accent === "brown" ? "text-brown-600/40" : "text-orange-200"} />
               </div>
               <p className="font-semibold text-stone-900 mb-1">작성한 후기가 없어요</p>
               <p className="text-sm text-gray-500 mb-6">서비스를 이용하고 후기를 남겨보세요</p>
               <Link
                 href="/petsitters"
-                className="px-6 py-3 bg-orange-500 text-white rounded-xl text-sm font-semibold hover:bg-orange-600 transition-colors"
+                className={`px-6 py-3 ${accent === "brown" ? "bg-brown-600 hover:bg-brown-900" : "bg-orange-500 hover:bg-orange-600"} text-white rounded-xl text-sm font-semibold transition-colors`}
               >
                 펫시터 찾기
               </Link>
@@ -267,7 +287,7 @@ export default function ReviewsClient({
           ) : (
             <div className="flex flex-col gap-4">
               {writtenReviews.map((review) => (
-                <WrittenReviewCard key={review.id} review={review} onDelete={handleDeleteWritten} />
+                <WrittenReviewCard key={review.id} review={review} onDelete={handleDeleteWritten} accent={accent} />
               ))}
             </div>
           )
