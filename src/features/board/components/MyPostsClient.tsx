@@ -16,7 +16,10 @@ import {
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
+import {
+  MobileBackButton,
+  DesktopBackButton,
+} from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
 import SectionCard from "@/components/common/SectionCard";
 import { deleteRequest, closeRequest } from "@/features/board/actions";
@@ -38,12 +41,15 @@ function formatTimeRange(start: string | null, end: string | null) {
   if (!start || !end) return "-";
   const s = new Date(start);
   const e = new Date(end);
-  const fmt = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  const fmt = (d: Date) =>
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
   return `${fmt(s)} – ${fmt(e)}`;
 }
 
 function formatRelativeTime(dateStr: string) {
-  const diffH = Math.floor((Date.now() - new Date(dateStr).getTime()) / 3600000);
+  const diffH = Math.floor(
+    (Date.now() - new Date(dateStr).getTime()) / 3600000,
+  );
   if (diffH < 1) return "방금 전";
   if (diffH < 24) return `${diffH}시간 전`;
   return `${Math.floor(diffH / 24)}일 전`;
@@ -78,7 +84,11 @@ function toPost(r: MyRequestRow): Post {
     effectiveStatus = "completed";
   } else if (r.status === "matched" && reservationStatus === "in_progress") {
     effectiveStatus = "in-progress";
-  } else if (r.status === "open" || r.status === "matched" || r.status === "canceled") {
+  } else if (
+    r.status === "open" ||
+    r.status === "matched" ||
+    r.status === "canceled"
+  ) {
     effectiveStatus = r.status;
   } else {
     effectiveStatus = "canceled";
@@ -101,11 +111,30 @@ function toPost(r: MyRequestRow): Post {
   };
 }
 
-const STATUS_CONFIG: Record<PostStatus, { label: string; badgeBg: string; badgeText: string }> = {
-  open: { label: "모집중", badgeBg: "bg-emerald-100", badgeText: "text-emerald-500" },
-  matched: { label: "예약완료", badgeBg: "bg-blue-100", badgeText: "text-blue-500" },
-  "in-progress": { label: "진행중", badgeBg: "bg-orange-50", badgeText: "text-orange-500" },
-  completed: { label: "완료", badgeBg: "bg-gray-100", badgeText: "text-gray-500" },
+const STATUS_CONFIG: Record<
+  PostStatus,
+  { label: string; badgeBg: string; badgeText: string }
+> = {
+  open: {
+    label: "모집중",
+    badgeBg: "bg-emerald-100",
+    badgeText: "text-emerald-500",
+  },
+  matched: {
+    label: "예약완료",
+    badgeBg: "bg-blue-100",
+    badgeText: "text-blue-500",
+  },
+  "in-progress": {
+    label: "진행중",
+    badgeBg: "bg-brown-600/10",
+    badgeText: "text-brown-600",
+  },
+  completed: {
+    label: "완료",
+    badgeBg: "bg-gray-100",
+    badgeText: "text-gray-500",
+  },
   canceled: { label: "취소", badgeBg: "bg-red-100", badgeText: "text-red-500" },
 };
 
@@ -145,14 +174,18 @@ function PostCard({
   return (
     <SectionCard>
       <div className="flex items-start gap-3 flex-wrap">
-        <span className="text-sm font-bold text-stone-900 leading-5 flex-1 min-w-0">{post.title}</span>
+        <span className="text-sm font-bold text-stone-900 leading-5 flex-1 min-w-0">
+          {post.title}
+        </span>
         <span
           className={`shrink-0 whitespace-nowrap px-2.5 py-1 rounded-full text-xs flex items-center gap-1 ${config.badgeBg} ${config.badgeText}`}
         >
-          {(post.status === "open" || post.status === "matched" || post.status === "completed") && (
-            <CheckCircle size={10} />
+          {(post.status === "open" ||
+            post.status === "matched" ||
+            post.status === "completed") && <CheckCircle size={10} />}
+          {post.status === "in-progress" && (
+            <span className="size-2 rounded-full bg-brown-600 shrink-0" />
           )}
-          {post.status === "in-progress" && <span className="size-2 rounded-full bg-orange-500 shrink-0" />}
           {post.status === "canceled" && <XCircle size={10} />}
           {config.label}
         </span>
@@ -160,40 +193,46 @@ function PostCard({
 
       <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
         <div className="flex items-center gap-1.5">
-          <Dog size={12} className="text-orange-500 shrink-0" />
+          <Dog size={12} className="text-brown-600 shrink-0" />
           <span className="text-xs text-gray-500">{post.petName}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <User size={12} className="text-orange-500 shrink-0" />
+          <User size={12} className="text-brown-600 shrink-0" />
           <span className="text-xs text-gray-500">{post.serviceType}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Calendar size={12} className="text-orange-500 shrink-0" />
+          <Calendar size={12} className="text-brown-600 shrink-0" />
           <span className="text-xs text-gray-500">{post.date}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Clock size={12} className="text-orange-500 shrink-0" />
+          <Clock size={12} className="text-brown-600 shrink-0" />
           <span className="text-xs text-gray-500">{post.time}</span>
         </div>
         <div className="flex items-center gap-1.5 col-span-2">
-          <MapPin size={12} className="text-orange-500 shrink-0" />
+          <MapPin size={12} className="text-brown-600 shrink-0" />
           <span className="text-xs text-gray-500">{post.location}</span>
         </div>
       </div>
 
-      <div className="border-t border-orange-100" />
+      <div className="border-t border-brown-600/20" />
 
       <div className="flex items-center justify-between">
-        <span className="text-sm font-bold text-orange-500">{formatPrice(post.price)}</span>
+        <span className="text-sm font-bold text-brown-600">
+          {formatPrice(post.price)}
+        </span>
         {post.applicantCount !== undefined ? (
           <div className="flex items-center gap-1">
             <User size={12} className="text-gray-500" />
-            <span className="text-xs text-gray-500">지원자 {post.applicantCount}명</span>
+            <span className="text-xs text-gray-500">
+              지원자 {post.applicantCount}명
+            </span>
           </div>
         ) : post.sitterName ? (
           <div className="flex items-center gap-1">
             <User size={12} className="text-gray-500" />
-            <span className="text-xs text-gray-500">펫시터 {post.sitterName}</span>
+            <span className="text-xs text-gray-500">
+              펫시터 {post.sitterName}
+            </span>
           </div>
         ) : (
           <div />
@@ -205,13 +244,13 @@ function PostCard({
         <div className="flex gap-2">
           <button
             onClick={() => onDetail(post.id)}
-            className="flex-1 py-2 bg-orange-50 border border-orange-100 rounded-xl text-orange-500 text-xs hover:bg-orange-100 transition-colors"
+            className="flex-1 py-2 bg-brown-600/10 border border-brown-600/20 rounded-xl text-brown-600 text-xs hover:bg-brown-600/20 transition-colors"
           >
             상세보기
           </button>
           <button
             onClick={() => onEdit(post.id)}
-            className="flex-1 py-2 bg-orange-500 rounded-xl text-white text-xs flex items-center justify-center gap-1 hover:bg-orange-600 transition-colors"
+            className="flex-1 py-2 bg-brown-600 rounded-xl text-white text-xs flex items-center justify-center gap-1 hover:bg-brown-900 transition-colors"
           >
             <Pencil size={10} />
             수정하기
@@ -233,7 +272,7 @@ function PostCard({
       ) : (
         <button
           onClick={() => onDetail(post.id)}
-          className="w-full py-2 bg-orange-50 border border-orange-100 rounded-xl text-orange-500 text-xs hover:bg-orange-100 transition-colors"
+          className="w-full py-2 bg-brown-600/10 border border-brown-600/20 rounded-xl text-brown-600 text-xs hover:bg-brown-600/20 transition-colors"
         >
           상세보기
         </button>
@@ -242,7 +281,13 @@ function PostCard({
   );
 }
 
-export default function MyPostsClient({ posts: initialPosts }: { posts: MyRequestRow[] }) {
+export default function MyPostsClient({
+  posts: initialPosts,
+  embedded = false,
+}: {
+  posts: MyRequestRow[];
+  embedded?: boolean;
+}) {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>(initialPosts.map(toPost));
   const [activeTab, setActiveTab] = useState<TabId>("all");
@@ -272,12 +317,17 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
     const el = tabsRef.current;
     if (!el) return;
     const amount = el.clientWidth * 0.7;
-    el.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+    el.scrollBy({
+      left: dir === "left" ? -amount : amount,
+      behavior: "smooth",
+    });
   };
 
-  const filtered = activeTab === "all" ? posts : posts.filter((p) => p.status === activeTab);
+  const filtered =
+    activeTab === "all" ? posts : posts.filter((p) => p.status === activeTab);
   const sorted = [...filtered].sort(
-    (a, b) => new Date(b.createdAtRaw).getTime() - new Date(a.createdAtRaw).getTime(),
+    (a, b) =>
+      new Date(b.createdAtRaw).getTime() - new Date(a.createdAtRaw).getTime(),
   );
 
   const confirmDelete = async () => {
@@ -294,7 +344,11 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
   const handleClose = async (id: string) => {
     const result = await closeRequest(id);
     if (result.ok) {
-      setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status: "matched" as PostStatus } : p)));
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === id ? { ...p, status: "matched" as PostStatus } : p,
+        ),
+      );
     } else {
       toast.error(result.error);
     }
@@ -310,22 +364,42 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-orange-50">
-      <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
-        <div className="h-14 px-5 flex items-center gap-3">
-          <MobileBackButton />
-          <span className="flex-1 font-semibold text-stone-900">게시글 관리</span>
-        </div>
-      </div>
-
-      <main className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-10 pt-6 pb-10">
-        <div className="hidden md:flex items-center gap-3 mb-2">
-          <DesktopBackButton />
-          <div>
-            <h1 className="text-2xl font-bold text-stone-900">게시글 관리</h1>
-            <p className="text-sm text-gray-500 mt-1">작성한 돌봄 요청글을 확인하고 관리할 수 있어요.</p>
+    <div
+      className={
+        embedded
+          ? "flex flex-col"
+          : "min-h-screen flex flex-col bg-brown-600/10"
+      }
+    >
+      {!embedded && (
+        <div className="md:hidden sticky top-16 z-50 bg-white border-b border-brown-600/20">
+          <div className="h-14 px-5 flex items-center gap-3">
+            <MobileBackButton />
+            <span className="flex-1 font-semibold text-stone-900">
+              게시글 관리
+            </span>
           </div>
         </div>
+      )}
+
+      <main
+        className={
+          embedded
+            ? "flex-1 w-full"
+            : "flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-10 pt-6 pb-10"
+        }
+      >
+        {!embedded && (
+          <div className="hidden md:flex items-center gap-3 mb-2">
+            <DesktopBackButton />
+            <div>
+              <h1 className="text-2xl font-bold text-stone-900">게시글 관리</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                작성한 돌봄 요청글을 확인하고 관리할 수 있어요.
+              </p>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-1.5 mt-6">
           <button
@@ -333,14 +407,14 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
             aria-label="이전 탭"
             onClick={() => scrollTabs("left")}
             disabled={!canScrollLeft}
-            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-orange-100 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
+            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-brown-600/20 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
           >
             <ChevronLeft size={16} />
           </button>
 
           <div
             ref={tabsRef}
-            className="flex-1 min-w-0 flex gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden bg-white border border-orange-100 rounded-2xl p-1 scroll-smooth"
+            className="flex-1 min-w-0 flex gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden bg-white border border-brown-600/20 rounded-2xl p-1 scroll-smooth"
           >
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -349,12 +423,16 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 min-w-fit px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                    isActive ? "bg-[var(--color-orange-500)] text-white" : "text-gray-500 hover:text-stone-900"
+                    isActive
+                      ? "bg-[var(--color-brown-600)] text-white"
+                      : "text-gray-500 hover:text-stone-900"
                   }`}
                 >
                   {tab.label}
                   {tabCounts[tab.id] > 0 && (
-                    <span className={`ml-1.5 text-xs ${isActive ? "text-white/80" : "text-gray-400"}`}>
+                    <span
+                      className={`ml-1.5 text-xs ${isActive ? "text-white/80" : "text-gray-400"}`}
+                    >
                       {tabCounts[tab.id]}
                     </span>
                   )}
@@ -368,7 +446,7 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
             aria-label="다음 탭"
             onClick={() => scrollTabs("right")}
             disabled={!canScrollRight}
-            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-orange-100 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
+            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-brown-600/20 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
           >
             <ChevronRight size={16} />
           </button>
@@ -380,7 +458,9 @@ export default function MyPostsClient({ posts: initialPosts }: { posts: MyReques
 
         <div className="flex flex-col gap-3">
           {sorted.length === 0 ? (
-            <div className="py-20 text-center text-gray-400 text-sm">게시글이 없습니다.</div>
+            <div className="py-20 text-center text-gray-400 text-sm">
+              게시글이 없습니다.
+            </div>
           ) : (
             sorted.map((post) => (
               <PostCard

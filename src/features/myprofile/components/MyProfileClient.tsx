@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, type ReactElement } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import { useRouter } from "next/navigation";
 import {
   ChevronRight,
   Dog,
   Calendar,
+  ClipboardList,
   FileText,
   Settings,
   HelpCircle,
@@ -19,15 +19,35 @@ import {
   UserX,
   Pencil,
   MapPin,
+  BadgeCheck,
 } from "lucide-react";
-import { toast } from "sonner";
-import Avatar, { AvatarMobile } from "@/components/ui/Avatar";
-import SitterProfileCard from "@/components/common/SitterProfileCard";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import Avatar from "@/components/ui/Avatar";
+import Pill from "@/components/ui/Pill";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import SectionCard from "@/components/common/SectionCard";
 import { clientEnv } from "@/lib/env";
 import LocationEditModal from "@/features/myprofile/components/LocationEditModal";
-import type { MyProfileUser, MyProfileSitterSummary } from "@/features/myprofile/types";
+import BookingHistoryClient from "@/features/petsitters/components/BookingHistoryClient";
+import WorksHistoryClient from "@/features/petsitters/components/WorksHistoryClient";
+import ReviewsClient from "@/features/reviews/components/ReviewsClient";
+import MyPetsClient, {
+  type MyPet,
+} from "@/features/pet-register/components/MyPetsClient";
+import MyPostsClient from "@/features/board/components/MyPostsClient";
+import type {
+  MyProfileUser,
+  MyProfileSitterSummary,
+} from "@/features/myprofile/types";
+import type {
+  MyReservation,
+  MySitterReservation,
+} from "@/features/reservations/types";
+import type { MyRequestRow } from "@/features/board/types";
+import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
 
 interface LocationData {
   address: string;
@@ -36,92 +56,168 @@ interface LocationData {
   dong: string;
 }
 
+type Role = "owner" | "sitter";
+
 interface MenuItem {
   id: string;
   icon: React.ElementType;
   label: string;
-  link: string | null;
-}
-
-function getMenuIconColor(index: number, total: number) {
-  const colors = [
-    "var(--color-orange-500)",
-    "#EA7B32",
-    "#EC833C",
-    "#EE8B46",
-    "#F09450",
-    "#F29D5C",
-    "#F4A667",
-    "#F6AF72",
-    "#F8B77C",
-    "#FABF86",
-  ];
-  if (total <= 1) return colors[0];
-  const colorIndex = Math.round((index / (total - 1)) * (colors.length - 1));
-  return colors[colorIndex];
-}
-
-function MenuIcon({ icon: Icon, size, color }: { icon: React.ElementType; size: number; color: string }) {
-  return <Icon size={size} color={color} />;
+  kind: "view" | "link";
+  href?: string;
 }
 
 const OWNER_MENU: MenuItem[] = [
-  { id: "profile", icon: User, label: "내 프로필", link: "/myprofile" },
-  { id: "pets", icon: Dog, label: "내 반려동물", link: "/myprofile/mypets" },
-  { id: "bookings", icon: Calendar, label: "예약 내역", link: "/myprofile/booking-history" },
-  { id: "posts", icon: FileText, label: "게시글 관리", link: "/myprofile/posts" },
-  { id: "reviews", icon: BookOpen, label: "후기 관리", link: "/myprofile/reviews" },
-  { id: "settings", icon: Settings, label: "설정", link: "/myprofile/settings" },
-  { id: "terms", icon: HelpCircle, label: "이용약관", link: "/terms" },
-  { id: "report", icon: AlertTriangle, label: "신고하기", link: "/myprofile/report" },
-  { id: "withdraw", icon: UserX, label: "회원 탈퇴", link: "/myprofile/settings/withdraw" },
+  { id: "pets", icon: Dog, label: "내 반려동물", kind: "view" },
+  { id: "bookings", icon: Calendar, label: "예약 목록", kind: "view" },
+  { id: "reviews", icon: BookOpen, label: "작성한 후기", kind: "view" },
+  { id: "posts", icon: FileText, label: "게시글 관리", kind: "view" },
+  {
+    id: "settings",
+    icon: Settings,
+    label: "설정",
+    kind: "link",
+    href: "/myprofile/settings",
+  },
+  {
+    id: "terms",
+    icon: HelpCircle,
+    label: "이용약관",
+    kind: "link",
+    href: "/terms",
+  },
+  {
+    id: "report",
+    icon: AlertTriangle,
+    label: "신고하기",
+    kind: "link",
+    href: "/myprofile/report",
+  },
+  {
+    id: "withdraw",
+    icon: UserX,
+    label: "회원 탈퇴",
+    kind: "link",
+    href: "/myprofile/settings/withdraw",
+  },
 ];
 
 const SITTER_MENU: MenuItem[] = [
-  { id: "profile", icon: User, label: "내 프로필", link: "/myprofile" },
-  { id: "bookings", icon: Calendar, label: "예약 내역", link: "/myprofile/booking-history" },
-  { id: "reviews", icon: BookOpen, label: "후기 관리", link: "/myprofile/reviews" },
-  { id: "earnings", icon: Wallet, label: "수익 관리", link: null },
-  { id: "settings", icon: Settings, label: "설정", link: "/myprofile/settings" },
-  { id: "terms", icon: HelpCircle, label: "이용약관", link: "/terms" },
-  { id: "report", icon: AlertTriangle, label: "신고하기", link: "/myprofile/report" },
-  { id: "withdraw", icon: UserX, label: "회원 탈퇴", link: "/myprofile/settings/withdraw" },
+  { id: "profile", icon: User, label: "펫시터 프로필", kind: "view" },
+  { id: "works", icon: ClipboardList, label: "예약 관리", kind: "view" },
+  { id: "reviews", icon: BookOpen, label: "받은 후기", kind: "view" },
+  { id: "earnings", icon: Wallet, label: "수익 관리", kind: "view" },
+  {
+    id: "settings",
+    icon: Settings,
+    label: "설정",
+    kind: "link",
+    href: "/myprofile/settings",
+  },
+  {
+    id: "terms",
+    icon: HelpCircle,
+    label: "이용약관",
+    kind: "link",
+    href: "/terms",
+  },
+  {
+    id: "report",
+    icon: AlertTriangle,
+    label: "신고하기",
+    kind: "link",
+    href: "/myprofile/report",
+  },
+  {
+    id: "withdraw",
+    icon: UserX,
+    label: "회원 탈퇴",
+    kind: "link",
+    href: "/myprofile/settings/withdraw",
+  },
 ];
+
+const ICON_COLOR: Record<Role, string> = {
+  owner: "var(--color-brown-600)",
+  sitter: "var(--color-orange-500)",
+};
+
+const ROLE_ACTIVE_BG: Record<Role, string> = {
+  owner: "bg-[var(--color-brown-600)]",
+  sitter: "bg-orange-500",
+};
+
+const ROLE_CONTENT_BOX: Record<Role, string> = {
+  owner:
+    "rounded-2xl border border-[var(--color-brown-600)]/20 shadow-[0px_2px_12px_0px_rgba(114,65,33,0.10)] p-5",
+  sitter:
+    "rounded-2xl border border-orange-100 shadow-[0px_2px_12px_0px_rgba(232,116,42,0.10)] p-5",
+};
+
+const ROLE_ACCENT: Record<Role, { text: string; bg: string; bar: string }> = {
+  owner: {
+    text: "text-[var(--color-brown-600)]",
+    bg: "bg-[var(--color-brown-600)]/10",
+    bar: "bg-[var(--color-brown-600)]",
+  },
+  sitter: { text: "text-orange-500", bg: "bg-orange-50", bar: "bg-orange-500" },
+};
+
+function MenuIcon({
+  icon: Icon,
+  size,
+  color,
+}: {
+  icon: React.ElementType;
+  size: number;
+  color: string;
+}) {
+  return <Icon size={size} color={color} />;
+}
 
 function SidebarItem({
   item,
-  index,
-  total,
+  role,
   selected,
   onClick,
 }: {
   item: MenuItem;
-  index: number;
-  total: number;
+  role: Role;
   selected: boolean;
   onClick: () => void;
 }) {
   const Icon = item.icon;
-  const iconColor = getMenuIconColor(index, total);
+  const accent = ROLE_ACCENT[role];
   return (
     <button
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative ${
-        selected ? "bg-orange-50 text-orange-500" : "text-gray-500 hover:bg-orange-50 hover:text-stone-900"
+        selected
+          ? `${accent.bg} ${accent.text}`
+          : "text-gray-500 hover:bg-gray-50 hover:text-stone-900"
       }`}
     >
       {selected && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-orange-500 rounded-r-full" />
+        <div
+          className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full ${accent.bar}`}
+        />
       )}
-      <MenuIcon icon={Icon} size={16} color={iconColor} />
-      <span className={`text-sm font-medium ${selected ? "text-orange-500" : "text-stone-900"}`}>
+      <MenuIcon icon={Icon} size={16} color={ICON_COLOR[role]} />
+      <span
+        className={`text-sm font-medium ${selected ? accent.text : "text-stone-900"}`}
+      >
         {item.label}
       </span>
     </button>
   );
 }
 
-function IconHoverAction({ label, children }: { label: string; children: ReactElement }) {
+function IconHoverAction({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactElement;
+}) {
   return (
     <HoverCard>
       <HoverCardTrigger delay={150} closeDelay={80} render={children} />
@@ -136,27 +232,161 @@ function IconHoverAction({ label, children }: { label: string; children: ReactEl
   );
 }
 
-function SitterActions() {
+function IdentityHeader({
+  name,
+  profileImage,
+  isVerified,
+  location,
+  onEditLocation,
+  locationLabel,
+}: {
+  name: string;
+  profileImage: string | null;
+  isVerified: boolean;
+  location: string;
+  onEditLocation: () => void;
+  locationLabel: string;
+}) {
   return (
-    <div className="flex shrink-0 gap-2">
-      <IconHoverAction label="프로필 보기">
-        <Link
-          href="/myprofile/sitter-profile"
-          aria-label="프로필 보기"
-          className="flex size-9 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-orange-500 transition-colors hover:bg-orange-100"
+    <div className="flex items-center gap-4">
+      <Avatar
+        initial={name.charAt(0) || "?"}
+        src={profileImage}
+        size="lg"
+        variant="orange"
+      />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1">
+          <h2 className="text-lg font-bold text-stone-900 truncate">{name}</h2>
+          {isVerified && (
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium text-orange-500">
+              <BadgeCheck size={11} /> 인증완료
+            </span>
+          )}
+        </div>
+        <div className="flex items-center gap-1">
+          <MapPin size={12} className="text-gray-400" />
+          <span
+            className={`text-xs ${location ? "text-gray-500" : "text-gray-300"}`}
+          >
+            {location || "위치 미등록"}
+          </span>
+        </div>
+      </div>
+      <IconHoverAction label={locationLabel}>
+        <button
+          type="button"
+          onClick={onEditLocation}
+          aria-label={locationLabel}
+          className="flex size-9 items-center justify-center rounded-full border border-gray-200 bg-gray-50 text-gray-600 transition-colors hover:bg-gray-100 shrink-0"
         >
-          <User size={16} />
-        </Link>
+          <MapPin size={16} />
+        </button>
       </IconHoverAction>
-      <IconHoverAction label="수정하기">
-        <Link
-          href="/myprofile/sitter-edit"
-          aria-label="수정하기"
-          className="flex size-9 items-center justify-center rounded-full bg-orange-500 text-white transition-colors hover:bg-orange-600"
-        >
-          <Pencil size={16} />
-        </Link>
-      </IconHoverAction>
+    </div>
+  );
+}
+
+function SitterProfileView({
+  name,
+  profileImage,
+  location,
+  sitter,
+}: {
+  name: string;
+  profileImage: string | null;
+  location: string;
+  sitter: MyProfileSitterSummary | null;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start gap-4">
+        <Avatar
+          initial={name.charAt(0) || "?"}
+          src={profileImage}
+          size="xl"
+          variant="orange"
+        />
+        <div className="flex-1 min-w-0 pt-1">
+          <h2 className="text-lg font-bold text-stone-900 truncate">{name}</h2>
+          <div className="flex items-center gap-1 mt-1">
+            <MapPin size={12} className="text-gray-400" />
+            <span className="text-xs text-gray-500">
+              {location || "위치 미등록"}
+            </span>
+          </div>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <IconHoverAction label="프로필 미리보기">
+            <Link
+              href="/myprofile/sitter-profile"
+              aria-label="프로필 미리보기"
+              className="flex size-9 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-orange-500 transition-colors hover:bg-orange-100"
+            >
+              <User size={16} />
+            </Link>
+          </IconHoverAction>
+          <IconHoverAction label="시터 정보 수정">
+            <Link
+              href="/myprofile/sitter-edit"
+              aria-label="시터 정보 수정"
+              className="flex size-9 items-center justify-center rounded-full bg-orange-500 text-white transition-colors hover:bg-orange-600"
+            >
+              <Pencil size={16} />
+            </Link>
+          </IconHoverAction>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2 rounded-xl bg-gray-50 p-3">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-1 mb-0.5">
+            <Star size={12} className="fill-amber-400 text-amber-400" />
+            <span className="text-sm font-bold text-stone-900">
+              {sitter?.rating.toFixed(1) ?? "-"}
+            </span>
+          </div>
+          <span className="text-[11px] text-gray-400">평점</span>
+        </div>
+        <div className="text-center border-x border-gray-200">
+          <div className="text-sm font-bold text-stone-900 mb-0.5">
+            {sitter ? `${sitter.reviewCount}건` : "-"}
+          </div>
+          <span className="text-[11px] text-gray-400">완료 건수</span>
+        </div>
+        <div className="text-center">
+          <div className="text-sm font-bold text-stone-900 mb-0.5">
+            {sitter?.career ?? "-"}
+          </div>
+          <span className="text-[11px] text-gray-400">경력</span>
+        </div>
+      </div>
+
+      {!!sitter?.services.length && (
+        <div className="flex gap-2 flex-wrap">
+          {[...new Set(sitter.services)].map((s) => (
+            <Pill key={s}>{s}</Pill>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EarningsView() {
+  return (
+    <div>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center mb-4">
+          <Wallet size={28} className="text-orange-200" />
+        </div>
+        <p className="font-semibold text-stone-900 mb-1">
+          수익 관리는 준비 중이에요
+        </p>
+        <p className="text-sm text-gray-500">
+          곧 정산 내역과 수익 통계를 확인할 수 있어요
+        </p>
+      </div>
     </div>
   );
 }
@@ -164,15 +394,26 @@ function SitterActions() {
 export default function MyProfileClient({
   user,
   sitter,
+  bookings,
+  works,
+  pets,
+  posts,
+  writtenReviews,
+  receivedReviews,
 }: {
   user: MyProfileUser;
-  sitter?: MyProfileSitterSummary | null;
+  sitter: MyProfileSitterSummary | null;
+  bookings: MyReservation[];
+  works: MySitterReservation[];
+  pets: MyPet[];
+  posts: MyRequestRow[];
+  writtenReviews: WrittenReview[];
+  receivedReviews: ReceivedReview[];
 }) {
-  const router = useRouter();
   const isSitter = user.role === "both" || user.role === "admin";
 
-  const [userType, setUserType] = useState<"owner" | "sitter">("owner");
-  const [selectedMenu, setSelectedMenu] = useState("profile");
+  const [role, setRole] = useState<Role>("owner");
+  const [selectedMenu, setSelectedMenu] = useState("pets");
   const [locationData, setLocationData] = useState<LocationData | null>(
     user.address && user.latitude != null && user.longitude != null
       ? {
@@ -185,55 +426,83 @@ export default function MyProfileClient({
   );
   const [showLocationModal, setShowLocationModal] = useState(false);
 
-  const menuItems = userType === "owner" ? OWNER_MENU : SITTER_MENU;
-  const ownerProfile = {
-    name: user.fullName || "이름 미등록",
-    initial: user.fullName?.charAt(0) || "?",
-    src: user.profileImage,
-    verified: user.isVerified,
-    location: locationData?.dong || "위치 미등록",
-  };
+  const name = user.fullName || "이름 미등록";
+  const location = locationData?.dong || "위치 미등록";
+  const menuItems = role === "owner" ? OWNER_MENU : SITTER_MENU;
 
-  const sitterProfile = sitter
-    ? {
-        name: user.fullName || "이름 미등록",
-        initial: user.fullName?.charAt(0) || "?",
-        src: user.profileImage,
-        verified: user.isVerified,
-        location: locationData?.dong || "위치 미등록",
-        rating: sitter.rating,
-        reviewCount: sitter.reviewCount,
-        services: sitter.services,
-        career: sitter.career ?? "-",
-      }
-    : null;
+  const handleRoleChange = (next: Role) => {
+    setRole(next);
+    setSelectedMenu(next === "owner" ? "pets" : "profile");
+  };
 
   const handleMenuClick = (item: MenuItem) => {
-    setSelectedMenu(item.id);
-    if (!item.link) {
-      toast.error("준비 중인 기능이에요.");
-      return;
+    if (item.kind === "view") {
+      setSelectedMenu(item.id);
     }
-    if (item.id !== "profile") router.push(item.link);
   };
 
-  const quickMenuItems = menuItems.filter((m) => m.id !== "profile" && m.id !== "report" && m.id !== "withdraw");
-
-  const ownerLocationAction = (
-    <IconHoverAction label={locationData ? "위치 수정하기" : "위치 등록하기"}>
-      <button
-        type="button"
-        onClick={() => setShowLocationModal(true)}
-        aria-label={locationData ? "위치 수정하기" : "위치 등록하기"}
-        className="flex size-9 items-center justify-center rounded-full border border-orange-100 bg-orange-50 text-orange-500 transition-colors hover:bg-orange-100"
-      >
-        <MapPin size={16} />
-      </button>
-    </IconHoverAction>
+  const identity = (
+    <IdentityHeader
+      name={name}
+      profileImage={user.profileImage}
+      isVerified={user.isVerified}
+      location={location}
+      onEditLocation={() => setShowLocationModal(true)}
+      locationLabel={locationData ? "위치 수정하기" : "위치 등록하기"}
+    />
   );
 
+  const content = (() => {
+    if (role === "owner") {
+      switch (selectedMenu) {
+        case "bookings":
+          return <BookingHistoryClient bookings={bookings} embedded />;
+        case "reviews":
+          return (
+            <ReviewsClient
+              isSitter={isSitter}
+              initialWrittenReviews={writtenReviews}
+              initialReceivedReviews={receivedReviews}
+              mode="written"
+              embedded
+            />
+          );
+        case "posts":
+          return <MyPostsClient posts={posts} embedded />;
+        default:
+          return <MyPetsClient pets={pets} embedded />;
+      }
+    }
+
+    switch (selectedMenu) {
+      case "works":
+        return <WorksHistoryClient works={works} embedded />;
+      case "reviews":
+        return (
+          <ReviewsClient
+            isSitter={isSitter}
+            initialWrittenReviews={writtenReviews}
+            initialReceivedReviews={receivedReviews}
+            mode="received"
+            embedded
+          />
+        );
+      case "earnings":
+        return <EarningsView />;
+      default:
+        return (
+          <SitterProfileView
+            name={name}
+            profileImage={user.profileImage}
+            location={location}
+            sitter={sitter}
+          />
+        );
+    }
+  })();
+
   return (
-    <div className="min-h-screen flex flex-col bg-orange-50">
+    <div className="min-h-screen flex flex-col bg-white">
       <Script
         src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${clientEnv.NEXT_PUBLIC_KAKAO_MAP_KEY}&autoload=false&libraries=services`}
         strategy="afterInteractive"
@@ -247,224 +516,176 @@ export default function MyProfileClient({
         onSave={(data) => setLocationData(data)}
       />
 
-      <div className="md:hidden bg-linear-to-br from-orange-500 to-orange-300 rounded-b-3xl px-5 pt-8 pb-8 shrink-0">
-        <div className="flex items-center gap-4 mb-6">
-          <AvatarMobile initial={user.fullName?.charAt(0) ?? "?"} src={user.profileImage} />
-          <div className="flex-1">
-            <h3 className="text-white font-semibold text-lg mb-1">{user.fullName ?? ""}</h3>
-            {user.isVerified && (
-              <div className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full border border-white/30">
-                <span className="text-white text-xs font-medium">본인인증</span>
-              </div>
-            )}
-          </div>
-        </div>
-        {isSitter && (
-          <div className="flex bg-white/20 backdrop-blur-sm rounded-full p-1">
-            {(["owner", "sitter"] as const).map((type) => (
-              <button
-                key={type}
-                onClick={() => setUserType(type)}
-                className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
-                  userType === type ? "bg-white text-orange-500" : "text-white"
-                }`}
-              >
-                {type === "owner" ? "보호자" : "펫시터"}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
       <div className="hidden md:block flex-1">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-12">
           <div className="flex gap-6">
             <div className="w-72 shrink-0">
-              <SectionCard className="sticky top-24 gap-0 overflow-hidden">
-                <div className="text-center pb-5 mb-4 border-b border-orange-100">
-                  <Avatar
-                    initial={user.fullName?.charAt(0) ?? "?"}
-                    src={user.profileImage}
-                    size="xl"
-                    className="mx-auto mb-3"
-                  />
-                  <h2 className="text-2xl font-bold text-stone-900 mb-1">{user.fullName ?? ""}</h2>
-                  <p className="text-xs text-gray-500">{user.email ?? ""}</p>
+              <SectionCard
+                className={`sticky top-24 gap-0 overflow-hidden ${
+                  role === "owner"
+                    ? "border-[var(--color-brown-600)]/20 shadow-[0px_2px_12px_0px_rgba(114,65,33,0.10)]"
+                    : ""
+                }`}
+              >
+                <div className="pb-4 mb-3 border-b border-gray-100">
+                  {identity}
                 </div>
 
                 {isSitter && (
-                  <div className="flex bg-orange-50 rounded-full p-1 mb-4">
-                    {(["owner", "sitter"] as const).map((type) => (
+                  <div className="flex bg-gray-50 rounded-full p-1 mb-3">
+                    {(["owner", "sitter"] as const).map((r) => (
                       <button
-                        key={type}
-                        onClick={() => {
-                          setUserType(type);
-                          setSelectedMenu("profile");
-                        }}
+                        key={r}
+                        onClick={() => handleRoleChange(r)}
                         className={`flex-1 py-2 rounded-full text-sm transition-all ${
-                          userType === type ? "bg-orange-500 text-white" : "text-gray-500"
+                          role === r
+                            ? `${ROLE_ACTIVE_BG[r]} text-white`
+                            : "text-gray-500"
                         }`}
                       >
-                        {type === "owner" ? "보호자" : "펫시터"}
+                        {r === "owner" ? "보호자" : "펫시터"}
                       </button>
                     ))}
                   </div>
                 )}
 
-                {userType === "sitter" && (
-                  <div className="space-y-3 mb-4 pb-4 border-b border-orange-100">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">평점</span>
-                      <div className="flex items-center gap-1">
-                        <Star size={12} className="fill-amber-400 text-amber-400" />
-                        <span className="text-sm font-bold text-stone-900">
-                          {sitter?.rating.toFixed(1) ?? "-"}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">완료 건수</span>
-                      <span className="text-sm font-bold text-stone-900">
-                        {sitter ? `${sitter.reviewCount}건` : "-"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">이번 달 수익</span>
-                      <span className="text-sm font-bold text-orange-500">-</span>
-                    </div>
-                  </div>
-                )}
-
-                <nav className="space-y-0.5">
-                  {menuItems.map((item, index) => (
-                    <SidebarItem
-                      key={item.id}
-                      item={item}
-                      index={index}
-                      total={menuItems.length}
-                      selected={selectedMenu === item.id}
-                      onClick={() => handleMenuClick(item)}
-                    />
-                  ))}
+                <nav className="space-y-0.5 pt-1">
+                  {menuItems.map((item) =>
+                    item.kind === "link" ? (
+                      <Link key={item.id} href={item.href!} className="block">
+                        <SidebarItem
+                          item={item}
+                          role={role}
+                          selected={false}
+                          onClick={() => {}}
+                        />
+                      </Link>
+                    ) : (
+                      <SidebarItem
+                        key={item.id}
+                        item={item}
+                        role={role}
+                        selected={selectedMenu === item.id}
+                        onClick={() => handleMenuClick(item)}
+                      />
+                    ),
+                  )}
                 </nav>
               </SectionCard>
             </div>
 
-            <div className="flex-1 min-w-0">
-              {selectedMenu === "profile" && (
-                <div className="space-y-5">
-                  <h2 className="text-xl font-bold text-stone-900">내 프로필</h2>
+            <div className="flex-1 min-w-0 space-y-5">
+              <div className={ROLE_CONTENT_BOX[role]}>{content}</div>
 
-                  {userType === "owner" && (
-                    <SitterProfileCard profile={ownerProfile} variant="owner" action={ownerLocationAction} />
-                  )}
-
-                  {userType === "sitter" && sitterProfile && (
-                    <SitterProfileCard profile={sitterProfile} variant="sitter" action={<SitterActions />} />
-                  )}
-
-                  <div className="bg-white border border-orange-100 rounded-2xl p-6">
-                    <h3 className="text-lg text-stone-900 mb-4">빠른 메뉴</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {quickMenuItems.map((item) => {
-                        const Icon = item.icon;
-                        const iconColor = getMenuIconColor(
-                          menuItems.findIndex((menu) => menu.id === item.id),
-                          menuItems.length,
-                        );
-                        const disabled = !item.link;
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            onClick={() => handleMenuClick(item)}
-                            className="flex items-center gap-3 p-4 bg-orange-50 hover:bg-orange-100 rounded-xl transition-colors text-left disabled:opacity-50"
-                            disabled={disabled}
-                          >
-                            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 bg-white shadow-sm border border-orange-100">
-                              <MenuIcon icon={Icon} size={16} color={iconColor} />
-                            </div>
-                            <span className="text-sm font-medium text-stone-900">{item.label}</span>
-                            {disabled ? (
-                              <span className="ml-auto text-[10px] text-gray-400">준비중</span>
-                            ) : (
-                              <ChevronRight size={16} className="text-gray-500 ml-auto" />
-                            )}
-                          </button>
-                        );
-                      })}
+              {!isSitter && role === "owner" && (
+                <Link href="/sitter-register">
+                  <div className="bg-gradient-to-r from-orange-500 to-stone-600 rounded-2xl p-7 flex items-center justify-between hover:opacity-90 transition-opacity">
+                    <div>
+                      <h3 className="font-bold text-white text-lg mb-1">
+                        펫시터로 활동하기
+                      </h3>
+                      <p className="text-white/80 text-sm">
+                        추가 수입을 만들어보세요
+                      </p>
                     </div>
+                    <ChevronRight size={32} className="text-white" />
                   </div>
-
-                  {userType === "owner" &&
-                    (isSitter ? null : (
-                      <Link href="/sitter-register">
-                        <div className="bg-gradient-to-r from-orange-500 to-stone-600 rounded-2xl p-7 flex items-center justify-between hover:opacity-90 transition-opacity">
-                          <div>
-                            <h3 className="font-bold text-white text-lg mb-1">펫시터로 활동하기</h3>
-                            <p className="text-white/80 text-sm">추가 수입을 만들어보세요</p>
-                          </div>
-                          <ChevronRight size={32} className="text-white" />
-                        </div>
-                      </Link>
-                    ))}
-                </div>
+                </Link>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="md:hidden flex-1 overflow-y-auto px-5 py-6">
-        {userType === "owner" && (
-          <SitterProfileCard profile={ownerProfile} variant="owner" action={ownerLocationAction} className="mb-4" />
-        )}
+      <div className="md:hidden flex-1 overflow-y-auto">
+        <div className="px-5 pt-8 pb-5 border-b border-gray-100">
+          {identity}
 
-        {userType === "sitter" && sitterProfile && (
-          <SitterProfileCard profile={sitterProfile} variant="sitter" action={<SitterActions />} className="mb-4" />
-        )}
-
-        <div className="space-y-2 mb-5">
-          {menuItems.map((item, index) => {
-            const Icon = item.icon;
-            const iconColor = getMenuIconColor(index, menuItems.length);
-            const disabled = !item.link;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleMenuClick(item)}
-                className="w-full bg-white rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm border border-orange-100 disabled:opacity-50"
-                disabled={disabled}
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-white shadow-sm border border-orange-100">
-                  <MenuIcon icon={Icon} size={20} color={iconColor} />
-                </div>
-                <span className="flex-1 text-left text-sm font-medium text-stone-900">{item.label}</span>
-                {disabled ? (
-                  <span className="text-[10px] text-gray-400">준비중</span>
-                ) : (
-                  <ChevronRight size={18} className="text-gray-400" />
-                )}
-              </button>
-            );
-          })}
+          {isSitter && (
+            <div className="flex bg-gray-50 rounded-full p-1 mt-4">
+              {(["owner", "sitter"] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => handleRoleChange(r)}
+                  className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                    role === r
+                      ? `${ROLE_ACTIVE_BG[r]} text-white`
+                      : "text-gray-500"
+                  }`}
+                >
+                  {r === "owner" ? "보호자" : "펫시터"}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {userType === "owner" &&
-          (isSitter ? null : (
+        <div className="px-5 py-5">
+          <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-5 bg-gray-50 border border-gray-100 rounded-2xl p-1">
+            {menuItems
+              .filter((item) => item.kind === "view")
+              .map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => handleMenuClick(item)}
+                  className={`flex-1 min-w-fit px-3 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
+                    selectedMenu === item.id
+                      ? `${ROLE_ACTIVE_BG[role]} text-white`
+                      : "text-gray-500"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+          </div>
+
+          <div className={ROLE_CONTENT_BOX[role]}>{content}</div>
+
+          <div className="mt-6 space-y-2">
+            {menuItems
+              .filter((item) => item.kind === "link")
+              .map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.id}
+                    href={item.href!}
+                    className="w-full bg-white rounded-2xl px-4 py-3.5 flex items-center gap-4 shadow-sm border border-gray-100"
+                  >
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-gray-50 border border-gray-100">
+                      <MenuIcon
+                        icon={Icon}
+                        size={20}
+                        color={ICON_COLOR[role]}
+                      />
+                    </div>
+                    <span className="flex-1 text-left text-sm font-medium text-stone-900">
+                      {item.label}
+                    </span>
+                    <ChevronRight size={18} className="text-gray-400" />
+                  </Link>
+                );
+              })}
+          </div>
+
+          {!isSitter && (
             <Link href="/sitter-register">
-              <div className="bg-gradient-to-r from-orange-500 to-stone-600 rounded-2xl p-5 mb-5">
+              <div className="bg-gradient-to-r from-orange-500 to-stone-600 rounded-2xl p-5 mt-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h4 className="text-white font-semibold text-sm mb-0.5">펫시터로 활동하기</h4>
-                    <p className="text-xs text-white/80">추가 수입을 만들어보세요</p>
+                    <h4 className="text-white font-semibold text-sm mb-0.5">
+                      펫시터로 활동하기
+                    </h4>
+                    <p className="text-xs text-white/80">
+                      추가 수입을 만들어보세요
+                    </p>
                   </div>
                   <ChevronRight size={28} className="text-white" />
                 </div>
               </div>
             </Link>
-          ))}
+          )}
+        </div>
       </div>
     </div>
   );

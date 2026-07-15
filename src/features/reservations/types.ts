@@ -22,6 +22,20 @@ export interface MyReservation {
   reviewWritten: boolean;
 }
 
+export interface MySitterReservation {
+  id: string;
+  bookingNo: string;
+  serviceType: string;
+  status: ReservationUiStatus;
+  ownerName: string;
+  ownerImage: string | null;
+  date: string;
+  time: string;
+  petName: string;
+  petType: string;
+  price: number;
+}
+
 export interface ReservationDetail {
   id: string;
   bookingNo: string;

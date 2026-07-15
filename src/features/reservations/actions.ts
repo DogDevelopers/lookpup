@@ -15,6 +15,7 @@ import {
 import type {
   ReservationUiStatus,
   MyReservation,
+  MySitterReservation,
   ReservationDetail,
   ActiveReservation,
   ReservationRequestDetails,
@@ -164,6 +165,59 @@ export async function getMyReservations(): Promise<MyReservation[]> {
       petType: firstPet?.breed ?? firstPet?.animal_type ?? "-",
       price: row.total_price,
       reviewWritten: reviewWasWritten(row.reviews),
+    };
+  });
+}
+
+export async function getMySitterReservations(): Promise<MySitterReservation[]> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data: sitter } = await supabase
+    .from("sitters")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (!sitter) return [];
+
+  const { data } = await supabase
+    .from("reservations")
+    .select(
+      `id, status, start_datetime, end_datetime, total_price, created_at,
+       services(title),
+       owner:users!owner_id(full_name, profile_image),
+       reservation_items(pets(name, breed, animal_type))`,
+    )
+    .eq("sitter_id", sitter.id)
+    .order("created_at", { ascending: false });
+
+  return (data ?? []).map((row) => {
+    const start = new Date(row.start_datetime ?? "");
+    const end = new Date(row.end_datetime ?? "");
+    const service = row.services as unknown as { title: string | null } | null;
+    const owner = row.owner as unknown as { full_name: string | null; profile_image: string | null } | null;
+    const items = row.reservation_items as unknown as {
+      pets: { name: string; breed: string | null; animal_type: string } | null;
+    }[];
+    const firstPet = items?.[0]?.pets ?? null;
+
+    return {
+      id: row.id,
+      bookingNo: bookingNumber(row.id, row.created_at ?? ""),
+      serviceType: service?.title ?? "-",
+      status: STATUS_MAP[row.status] ?? "pending",
+      ownerName: owner?.full_name ?? "-",
+      ownerImage: owner?.profile_image ?? null,
+      date: formatDate(start),
+      time: formatTime(start, end),
+      petName: firstPet?.name ?? "-",
+      petType: firstPet?.breed ?? firstPet?.animal_type ?? "-",
+      price: row.total_price,
     };
   });
 }
