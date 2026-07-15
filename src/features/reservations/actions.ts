@@ -790,13 +790,14 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
   }
 
-  const { data: existingRoom } = await supabase
+  const { data: existingRooms } = await supabase
     .from("chat_rooms")
     .select("id, reservations(status)")
     .eq("owner_id", user.id)
     .eq("sitter_id", input.sitter_id)
-    .eq("room_type", "reservation_request")
-    .maybeSingle();
+    .order("created_at", { ascending: false })
+    .limit(1);
+  const existingRoom = existingRooms?.[0] ?? null;
 
   const activeStatuses: string[] = [
     RESERVATION_STATUS.PENDING,
@@ -858,21 +859,37 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "예약 요청 생성에 실패했습니다." };
   }
 
-  const { data: room, error: roomError } = await supabase
-    .from("chat_rooms")
-    .insert({
-      room_type: "reservation_request",
-      owner_id: user.id,
-      sitter_id: input.sitter_id,
-      reservation_id: reservation.id,
-    })
-    .select("id")
-    .single();
-
-  if (roomError || !room) {
-    await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
-    await supabase.from("reservations").delete().eq("id", reservation.id);
-    return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+  let room: { id: string } | null = null;
+  if (existingRoom) {
+    const { data: updatedRoom, error: roomError } = await supabase
+      .from("chat_rooms")
+      .update({ room_type: "reservation_request", reservation_id: reservation.id })
+      .eq("id", existingRoom.id)
+      .select("id")
+      .single();
+    if (roomError || !updatedRoom) {
+      await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
+      await supabase.from("reservations").delete().eq("id", reservation.id);
+      return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+    }
+    room = updatedRoom;
+  } else {
+    const { data: newRoom, error: roomError } = await supabase
+      .from("chat_rooms")
+      .insert({
+        room_type: "reservation_request",
+        owner_id: user.id,
+        sitter_id: input.sitter_id,
+        reservation_id: reservation.id,
+      })
+      .select("id")
+      .single();
+    if (roomError || !newRoom) {
+      await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
+      await supabase.from("reservations").delete().eq("id", reservation.id);
+      return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+    }
+    room = newRoom;
   }
 
   const { data: pets } = await supabase.from("pets").select("name").in("id", input.pet_ids);

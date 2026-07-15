@@ -284,7 +284,7 @@ export async function updateApplication(
 
     if (!existingRoom) {
       await supabase.from("chat_rooms").insert({
-        room_type: "request",
+        room_type: "direct",
         owner_id: requestRow.owner_id,
         sitter_id: application.sitter_id,
         request_id: requestRow.id,
@@ -294,7 +294,7 @@ export async function updateApplication(
     } else {
       await supabase
         .from("chat_rooms")
-        .update({ reservation_id: reservation.id, application_id: id })
+        .update({ room_type: "direct", reservation_id: reservation.id, application_id: id })
         .eq("id", existingRoom.id);
     }
 
