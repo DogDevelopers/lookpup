@@ -139,27 +139,27 @@ const SITTER_MENU: MenuItem[] = [
 ];
 
 const ICON_COLOR: Record<Role, string> = {
-  owner: "var(--color-brown-600)",
+  owner: "var(--color-orange-300)",
   sitter: "var(--color-orange-500)",
 };
 
 const ROLE_ACTIVE_BG: Record<Role, string> = {
-  owner: "bg-[var(--color-brown-600)]",
+  owner: "bg-[var(--color-orange-300)]",
   sitter: "bg-orange-500",
 };
 
 const ROLE_CONTENT_BOX: Record<Role, string> = {
   owner:
-    "rounded-2xl border border-[var(--color-brown-600)]/20 shadow-[0px_2px_12px_0px_rgba(114,65,33,0.10)] p-5",
+    "rounded-2xl border border-[var(--color-orange-300)]/20 shadow-[0px_2px_12px_0px_rgba(253,186,116,0.10)] p-5",
   sitter:
     "rounded-2xl border border-orange-100 shadow-[0px_2px_12px_0px_rgba(232,116,42,0.10)] p-5",
 };
 
 const ROLE_ACCENT: Record<Role, { text: string; bg: string; bar: string }> = {
   owner: {
-    text: "text-[var(--color-brown-600)]",
-    bg: "bg-[var(--color-brown-600)]/10",
-    bar: "bg-[var(--color-brown-600)]",
+    text: "text-[var(--color-orange-300)]",
+    bg: "bg-[var(--color-orange-300)]/10",
+    bar: "bg-[var(--color-orange-300)]",
   },
   sitter: { text: "text-orange-500", bg: "bg-orange-50", bar: "bg-orange-500" },
 };
@@ -515,7 +515,7 @@ export default function MyProfileClient({
               <SectionCard
                 className={`sticky top-24 gap-0 overflow-hidden ${
                   role === "owner"
-                    ? "border-[var(--color-brown-600)]/20 shadow-[0px_2px_12px_0px_rgba(114,65,33,0.10)]"
+                    ? "border-[var(--color-orange-300)]/20 shadow-[0px_2px_12px_0px_rgba(253,186,116,0.10)]"
                     : ""
                 }`}
               >
@@ -571,7 +571,7 @@ export default function MyProfileClient({
 
               {!isSitter && role === "owner" && (
                 <Link href="/sitter-register">
-                  <div className="bg-gradient-to-r from-orange-500 to-stone-600 rounded-2xl p-7 flex items-center justify-between hover:opacity-90 transition-opacity">
+                  <div className="bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl p-7 flex items-center justify-between hover:opacity-90 transition-opacity">
                     <div>
                       <h3 className="font-bold text-white text-lg mb-1">
                         펫시터로 활동하기
@@ -662,7 +662,7 @@ export default function MyProfileClient({
 
           {!isSitter && (
             <Link href="/sitter-register">
-              <div className="bg-gradient-to-r from-orange-500 to-stone-600 rounded-2xl p-5 mt-5">
+              <div className="bg-gradient-to-r from-orange-400 to-orange-600 rounded-2xl p-5 mt-5">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-white font-semibold text-sm mb-0.5">

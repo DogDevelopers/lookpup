@@ -21,7 +21,7 @@ const TABS: { id: TabId; label: string }[] = [
 
 const ACCENT: Record<Accent, { star: string; starMuted: string; bg: string; border: string; text: string }> = {
   orange: { star: "fill-orange-400 text-orange-400", starMuted: "fill-orange-100 text-orange-100", bg: "bg-orange-50", border: "border-orange-100", text: "text-orange-500" },
-  brown: { star: "fill-brown-600 text-brown-600", starMuted: "fill-brown-600/20 text-brown-600/20", bg: "bg-brown-600/10", border: "border-brown-600/20", text: "text-brown-600" },
+  brown: { star: "fill-orange-300 text-orange-300", starMuted: "fill-orange-300/20 text-orange-300/20", bg: "bg-orange-300/10", border: "border-orange-300/20", text: "text-orange-300" },
 };
 
 function MiniStarRating({ value, accent }: { value: number; accent: Accent }) {
@@ -273,13 +273,13 @@ export default function ReviewsClient({
           writtenReviews.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className={`w-16 h-16 ${a.bg} rounded-full flex items-center justify-center mb-4`}>
-                <Star size={28} className={accent === "brown" ? "text-brown-600/40" : "text-orange-200"} />
+                <Star size={28} className={accent === "brown" ? "text-orange-300/40" : "text-orange-200"} />
               </div>
               <p className="font-semibold text-stone-900 mb-1">작성한 후기가 없어요</p>
               <p className="text-sm text-gray-500 mb-6">서비스를 이용하고 후기를 남겨보세요</p>
               <Link
                 href="/petsitters"
-                className={`px-6 py-3 ${accent === "brown" ? "bg-brown-600 hover:bg-brown-900" : "bg-orange-500 hover:bg-orange-600"} text-white rounded-xl text-sm font-semibold transition-colors`}
+                className={`px-6 py-3 ${accent === "brown" ? "bg-orange-300 hover:bg-orange-500" : "bg-orange-500 hover:bg-orange-600"} text-white rounded-xl text-sm font-semibold transition-colors`}
               >
                 펫시터 찾기
               </Link>
