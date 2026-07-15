@@ -38,10 +38,12 @@ import MyPetsClient, {
   type MyPet,
 } from "@/features/pet-register/components/MyPetsClient";
 import MyPostsClient from "@/features/board/components/MyPostsClient";
+import EarningsClient from "@/features/earnings/components/EarningsClient";
 import type {
   MyProfileUser,
   MyProfileSitterSummary,
 } from "@/features/myprofile/types";
+import type { EarningsData } from "@/features/earnings/types";
 import type {
   MyReservation,
   MySitterReservation,
@@ -373,24 +375,6 @@ function SitterProfileView({
   );
 }
 
-function EarningsView() {
-  return (
-    <div>
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center mb-4">
-          <Wallet size={28} className="text-orange-200" />
-        </div>
-        <p className="font-semibold text-stone-900 mb-1">
-          수익 관리는 준비 중이에요
-        </p>
-        <p className="text-sm text-gray-500">
-          곧 정산 내역과 수익 통계를 확인할 수 있어요
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export default function MyProfileClient({
   user,
   sitter,
@@ -400,6 +384,7 @@ export default function MyProfileClient({
   posts,
   writtenReviews,
   receivedReviews,
+  earnings,
 }: {
   user: MyProfileUser;
   sitter: MyProfileSitterSummary | null;
@@ -409,6 +394,7 @@ export default function MyProfileClient({
   posts: MyRequestRow[];
   writtenReviews: WrittenReview[];
   receivedReviews: ReceivedReview[];
+  earnings: EarningsData;
 }) {
   const isSitter = user.role === "both" || user.role === "admin";
 
@@ -488,7 +474,13 @@ export default function MyProfileClient({
           />
         );
       case "earnings":
-        return <EarningsView />;
+        return (
+          <EarningsClient
+            data={earnings}
+            embedded
+            onViewReservations={() => setSelectedMenu("works")}
+          />
+        );
       default:
         return (
           <SitterProfileView

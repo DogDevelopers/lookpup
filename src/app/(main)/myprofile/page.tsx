@@ -4,8 +4,10 @@ import { getMySitterProfile } from "@/features/sitter-register/actions";
 import { getMyReservations, getMySitterReservations } from "@/features/reservations/actions";
 import { getMyWrittenReviews, getReceivedReviews } from "@/features/reviews/actions";
 import { getMyRequests } from "@/features/board/queries";
+import { getMyEarnings } from "@/features/earnings/actions";
 import MyProfileClient from "@/features/myprofile/components/MyProfileClient";
 import type { MyProfileUser, MyProfileSitterSummary } from "@/features/myprofile/types";
+import type { EarningsData } from "@/features/earnings/types";
 import type { MyPet } from "@/features/pet-register/components/MyPetsClient";
 
 export default async function MyProfilePage() {
@@ -44,20 +46,33 @@ export default async function MyProfilePage() {
     role,
   };
 
-  const [sitterDetail, bookings, works, pets, posts, writtenReviews, receivedReviews] = await Promise.all([
-    isSitter ? getMySitterProfile() : Promise.resolve(null),
-    getMyReservations(),
-    isSitter ? getMySitterReservations() : Promise.resolve([]),
-    supabase
-      .from("pets")
-      .select("id, name, animal_type, breed, age, gender, weight, neutered, caution")
-      .eq("owner_id", user.id)
-      .is("deleted_at", null)
-      .order("created_at", { ascending: false }),
-    getMyRequests(),
-    getMyWrittenReviews(),
-    isSitter ? getReceivedReviews() : Promise.resolve([]),
-  ]);
+  const emptyEarnings: EarningsData = {
+    availableBalance: 0,
+    totalEarnings: 0,
+    thisMonthEarnings: 0,
+    pendingSettlement: 0,
+    bankAccount: null,
+    monthly: [],
+    yearly: [],
+    rows: [],
+  };
+
+  const [sitterDetail, bookings, works, pets, posts, writtenReviews, receivedReviews, earnings] =
+    await Promise.all([
+      isSitter ? getMySitterProfile() : Promise.resolve(null),
+      getMyReservations(),
+      isSitter ? getMySitterReservations() : Promise.resolve([]),
+      supabase
+        .from("pets")
+        .select("id, name, animal_type, breed, age, gender, weight, neutered, caution")
+        .eq("owner_id", user.id)
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false }),
+      getMyRequests(),
+      getMyWrittenReviews(),
+      isSitter ? getReceivedReviews() : Promise.resolve([]),
+      isSitter ? getMyEarnings() : Promise.resolve(emptyEarnings),
+    ]);
 
   let sitterSummary: MyProfileSitterSummary | null = null;
   if (sitterDetail) {
@@ -92,6 +107,7 @@ export default async function MyProfilePage() {
       posts={posts}
       writtenReviews={writtenReviews}
       receivedReviews={receivedReviews}
+      earnings={earnings}
     />
   );
 }
