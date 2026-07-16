@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { fuzzCoordinate } from "@/lib/geo";
+import { fuzzCoordinate, syncLocationAcrossProfiles } from "@/lib/geo";
 import {
   bankAccountSchema,
   ownerLocationSchema,
@@ -74,7 +74,20 @@ export async function updateOwnerLocation(input: OwnerLocationInput): Promise<Ac
     return { ok: false, error: "위치 정보를 저장하지 못했습니다." };
   }
 
+  await syncLocationAcrossProfiles(
+    supabase,
+    user.id,
+    {
+      address: parsed.data.address,
+      displayArea: parsed.data.dong,
+      lat: parsed.data.lat,
+      lng: parsed.data.lng,
+    },
+    "users",
+  );
+
   revalidatePath("/myprofile");
+  revalidatePath("/myprofile/sitter-profile");
   return { ok: true };
 }
 

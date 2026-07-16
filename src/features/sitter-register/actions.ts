@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { fuzzCoordinate } from "@/lib/geo";
+import { fuzzCoordinate, syncLocationAcrossProfiles } from "@/lib/geo";
 import { SERVICES } from "@/lib/sitter-options";
 import {
   createSitterSchema,
@@ -84,6 +84,18 @@ export async function createSitter(input: CreateSitterInput): Promise<ActionResu
   if (sitterError || !sitter) {
     return { ok: false, error: "펫시터 등록에 실패했습니다." };
   }
+
+  await syncLocationAcrossProfiles(
+    supabase,
+    user.id,
+    {
+      address: location.address,
+      displayArea: location.displayArea,
+      lat: location.lat,
+      lng: location.lng,
+    },
+    "sitters",
+  );
 
   if (profilePhotoUrl) {
     await supabase.from("users").update({ profile_image: profilePhotoUrl }).eq("id", user.id);
@@ -257,6 +269,20 @@ export async function updateSitterProfile(
     return { ok: false, error: "프로필 수정에 실패했습니다." };
   }
 
+  if (latitude != null && longitude != null) {
+    await syncLocationAcrossProfiles(
+      supabase,
+      user.id,
+      {
+        address: availableArea,
+        displayArea: displayArea ?? availableArea,
+        lat: latitude,
+        lng: longitude,
+      },
+      "sitters",
+    );
+  }
+
   if (deletedServiceIds.length > 0) {
     await supabase
       .from("services")
@@ -310,6 +336,7 @@ export async function updateSitterProfile(
     }
   }
 
+  revalidatePath("/myprofile");
   revalidatePath("/myprofile/sitter-profile");
   revalidatePath("/myprofile/sitter-edit");
   return { ok: true };
