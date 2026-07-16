@@ -127,8 +127,8 @@ const STATUS_CONFIG: Record<
   },
   "in-progress": {
     label: "진행중",
-    badgeBg: "bg-brown-600/10",
-    badgeText: "text-brown-600",
+    badgeBg: "bg-orange-300/10",
+    badgeText: "text-orange-300",
   },
   completed: {
     label: "완료",
@@ -184,7 +184,7 @@ function PostCard({
             post.status === "matched" ||
             post.status === "completed") && <CheckCircle size={10} />}
           {post.status === "in-progress" && (
-            <span className="size-2 rounded-full bg-brown-600 shrink-0" />
+            <span className="size-2 rounded-full bg-orange-300 shrink-0" />
           )}
           {post.status === "canceled" && <XCircle size={10} />}
           {config.label}
@@ -193,31 +193,31 @@ function PostCard({
 
       <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
         <div className="flex items-center gap-1.5">
-          <Dog size={12} className="text-brown-600 shrink-0" />
+          <Dog size={12} className="text-orange-300 shrink-0" />
           <span className="text-xs text-gray-500">{post.petName}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <User size={12} className="text-brown-600 shrink-0" />
+          <User size={12} className="text-orange-300 shrink-0" />
           <span className="text-xs text-gray-500">{post.serviceType}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Calendar size={12} className="text-brown-600 shrink-0" />
+          <Calendar size={12} className="text-orange-300 shrink-0" />
           <span className="text-xs text-gray-500">{post.date}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Clock size={12} className="text-brown-600 shrink-0" />
+          <Clock size={12} className="text-orange-300 shrink-0" />
           <span className="text-xs text-gray-500">{post.time}</span>
         </div>
         <div className="flex items-center gap-1.5 col-span-2">
-          <MapPin size={12} className="text-brown-600 shrink-0" />
+          <MapPin size={12} className="text-orange-300 shrink-0" />
           <span className="text-xs text-gray-500">{post.location}</span>
         </div>
       </div>
 
-      <div className="border-t border-brown-600/20" />
+      <div className="border-t border-orange-300/20" />
 
       <div className="flex items-center justify-between">
-        <span className="text-sm font-bold text-brown-600">
+        <span className="text-sm font-bold text-orange-300">
           {formatPrice(post.price)}
         </span>
         {post.applicantCount !== undefined ? (
@@ -244,13 +244,13 @@ function PostCard({
         <div className="flex gap-2">
           <button
             onClick={() => onDetail(post.id)}
-            className="flex-1 py-2 bg-brown-600/10 border border-brown-600/20 rounded-xl text-brown-600 text-xs hover:bg-brown-600/20 transition-colors"
+            className="flex-1 py-2 bg-orange-300/10 border border-orange-300/20 rounded-xl text-orange-300 text-xs hover:bg-orange-300/20 transition-colors"
           >
             상세보기
           </button>
           <button
             onClick={() => onEdit(post.id)}
-            className="flex-1 py-2 bg-brown-600 rounded-xl text-white text-xs flex items-center justify-center gap-1 hover:bg-brown-900 transition-colors"
+            className="flex-1 py-2 bg-orange-300 rounded-xl text-white text-xs flex items-center justify-center gap-1 hover:bg-orange-500 transition-colors"
           >
             <Pencil size={10} />
             수정하기
@@ -272,7 +272,7 @@ function PostCard({
       ) : (
         <button
           onClick={() => onDetail(post.id)}
-          className="w-full py-2 bg-brown-600/10 border border-brown-600/20 rounded-xl text-brown-600 text-xs hover:bg-brown-600/20 transition-colors"
+          className="w-full py-2 bg-orange-300/10 border border-orange-300/20 rounded-xl text-orange-300 text-xs hover:bg-orange-300/20 transition-colors"
         >
           상세보기
         </button>
@@ -368,11 +368,11 @@ export default function MyPostsClient({
       className={
         embedded
           ? "flex flex-col"
-          : "min-h-screen flex flex-col bg-brown-600/10"
+          : "min-h-screen flex flex-col bg-orange-300/10"
       }
     >
       {!embedded && (
-        <div className="md:hidden sticky top-16 z-50 bg-white border-b border-brown-600/20">
+        <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-300/20">
           <div className="h-14 px-5 flex items-center gap-3">
             <MobileBackButton />
             <span className="flex-1 font-semibold text-stone-900">
@@ -401,20 +401,20 @@ export default function MyPostsClient({
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 mt-6">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             aria-label="이전 탭"
             onClick={() => scrollTabs("left")}
             disabled={!canScrollLeft}
-            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-brown-600/20 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
+            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-orange-300/20 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
           >
             <ChevronLeft size={16} />
           </button>
 
           <div
             ref={tabsRef}
-            className="flex-1 min-w-0 flex gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden bg-white border border-brown-600/20 rounded-2xl p-1 scroll-smooth"
+            className="flex-1 min-w-0 flex gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden bg-white border border-orange-300/20 rounded-2xl p-1 scroll-smooth"
           >
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
@@ -424,7 +424,7 @@ export default function MyPostsClient({
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 min-w-fit px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
                     isActive
-                      ? "bg-[var(--color-brown-600)] text-white"
+                      ? "bg-[var(--color-orange-300)] text-white"
                       : "text-gray-500 hover:text-stone-900"
                   }`}
                 >
@@ -446,7 +446,7 @@ export default function MyPostsClient({
             aria-label="다음 탭"
             onClick={() => scrollTabs("right")}
             disabled={!canScrollRight}
-            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-brown-600/20 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
+            className="md:hidden shrink-0 w-8 h-8 rounded-full bg-white border border-orange-300/20 flex items-center justify-center text-gray-500 disabled:opacity-30 transition-opacity"
           >
             <ChevronRight size={16} />
           </button>

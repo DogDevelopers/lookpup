@@ -48,7 +48,7 @@ function BookingCard({
 
   return (
     <SectionCard className="overflow-hidden p-0 gap-0">
-      <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-brown-600/20">
+      <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-orange-300/20">
         <div className="flex items-center gap-2">
           <span
             className="text-xs font-semibold px-3 py-1 rounded-full text-stone-900"
@@ -65,7 +65,7 @@ function BookingCard({
           {booking.status === "completed" && (
             <span
               className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                booking.reviewWritten ? "bg-gray-100 text-gray-500" : "bg-brown-600/10 text-brown-600"
+                booking.reviewWritten ? "bg-gray-100 text-gray-500" : "bg-orange-300/10 text-orange-300"
               }`}
             >
               {booking.reviewWritten ? "후기 작성 완료" : "후기 작성 가능"}
@@ -90,36 +90,36 @@ function BookingCard({
             </div>
             <div className="space-y-1.5 mt-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Calendar size={14} className="text-brown-600 shrink-0" />
+                <Calendar size={14} className="text-orange-300 shrink-0" />
                 <span>{booking.date}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock size={14} className="text-brown-600 shrink-0" />
+                <Clock size={14} className="text-orange-300 shrink-0" />
                 <span>{booking.time}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500">
-                <MapPin size={14} className="text-brown-600 shrink-0" />
+                <MapPin size={14} className="text-orange-300 shrink-0" />
                 <span>{booking.location}</span>
               </div>
             </div>
             <div className="mt-3">
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-brown-600/10 border border-brown-600/20 rounded-full text-xs text-stone-900">
+              <span className="inline-flex items-center gap-1 px-3 py-1 bg-orange-300/10 border border-orange-300/20 rounded-full text-xs text-stone-900">
                 🐾 {booking.petName} · {booking.petType}
               </span>
             </div>
           </div>
           <div className="text-right shrink-0">
-            <p className="font-bold text-brown-600">{booking.price.toLocaleString()}원</p>
+            <p className="font-bold text-orange-300">{booking.price.toLocaleString()}원</p>
           </div>
         </div>
       </div>
 
-      <div className="px-6 pb-5 flex gap-2 border-t border-brown-600/20 pt-4">
+      <div className="px-6 pb-5 flex gap-2 border-t border-orange-300/20 pt-4">
         {booking.status === "pending" && (
           <button
             type="button"
             onClick={() => onCancel(booking.id)}
-            className="flex-1 h-10 rounded-xl border border-brown-600/20 text-gray-500 text-sm font-medium hover:border-red-300 hover:text-red-500 transition-colors"
+            className="flex-1 h-10 rounded-xl border border-orange-300/20 text-gray-500 text-sm font-medium hover:border-red-300 hover:text-red-500 transition-colors"
           >
             예약 취소
           </button>
@@ -128,7 +128,7 @@ function BookingCard({
           <>
             <Link
               href="/chat"
-              className="flex-1 h-10 rounded-xl border border-brown-600/20 text-stone-900 text-sm font-medium hover:border-brown-600 transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 h-10 rounded-xl border border-orange-300/20 text-stone-900 text-sm font-medium hover:border-orange-300 transition-colors flex items-center justify-center gap-1.5"
             >
               <MessageCircle size={15} />
               채팅하기
@@ -136,7 +136,7 @@ function BookingCard({
             <button
               type="button"
               onClick={() => onCancel(booking.id)}
-              className="flex-1 h-10 rounded-xl border border-brown-600/20 text-gray-500 text-sm font-medium hover:border-red-300 hover:text-red-500 transition-colors"
+              className="flex-1 h-10 rounded-xl border border-orange-300/20 text-gray-500 text-sm font-medium hover:border-red-300 hover:text-red-500 transition-colors"
             >
               예약 취소
             </button>
@@ -146,13 +146,13 @@ function BookingCard({
           <>
             <Link
               href={`/myprofile/booking-history/${booking.id}`}
-              className="flex-1 h-10 rounded-xl border border-brown-600/20 text-stone-900 text-sm font-medium hover:border-brown-600 transition-colors flex items-center justify-center"
+              className="flex-1 h-10 rounded-xl border border-orange-300/20 text-stone-900 text-sm font-medium hover:border-orange-300 transition-colors flex items-center justify-center"
             >
               예약 상세보기
             </Link>
             <Link
               href="/chat"
-              className="flex-1 h-10 rounded-xl bg-brown-600/10 text-brown-600 text-sm font-semibold hover:bg-brown-600/20 transition-colors flex items-center justify-center gap-1.5"
+              className="flex-1 h-10 rounded-xl bg-orange-300/10 text-orange-300 text-sm font-semibold hover:bg-orange-300/20 transition-colors flex items-center justify-center gap-1.5"
             >
               <MessageCircle size={15} />
               채팅하기
@@ -163,14 +163,14 @@ function BookingCard({
           <>
             <Link
               href={`/myprofile/booking-history/${booking.id}`}
-              className="flex-1 h-10 rounded-xl border border-brown-600/20 text-stone-900 text-sm font-medium hover:border-brown-600 transition-colors flex items-center justify-center"
+              className="flex-1 h-10 rounded-xl border border-orange-300/20 text-stone-900 text-sm font-medium hover:border-orange-300 transition-colors flex items-center justify-center"
             >
               예약 상세보기
             </Link>
             {!booking.reviewWritten ? (
               <Link
                 href={`/myprofile/reviews/write?bookingId=${booking.id}`}
-                className="flex-1 h-10 rounded-xl bg-brown-600 text-white text-sm font-semibold hover:bg-brown-900 transition-colors flex items-center justify-center"
+                className="flex-1 h-10 rounded-xl bg-orange-300 text-white text-sm font-semibold hover:bg-orange-500 transition-colors flex items-center justify-center"
               >
                 후기 작성하기
               </Link>
@@ -188,7 +188,7 @@ function BookingCard({
         {booking.status === "cancelled" && (
           <Link
             href={`/myprofile/booking-history/${booking.id}`}
-            className="flex-1 h-10 rounded-xl border border-brown-600/20 text-gray-500 text-sm font-medium hover:border-brown-600 transition-colors flex items-center justify-center"
+            className="flex-1 h-10 rounded-xl border border-orange-300/20 text-gray-500 text-sm font-medium hover:border-orange-300 transition-colors flex items-center justify-center"
           >
             상세보기
           </Link>
@@ -241,9 +241,9 @@ export default function BookingHistoryClient({
   };
 
   return (
-    <div className={embedded ? "" : "min-h-screen bg-brown-600/10"}>
+    <div className={embedded ? "" : "min-h-screen bg-orange-300/10"}>
       {!embedded && (
-        <div className="md:hidden sticky top-16 z-50 bg-white border-b border-brown-600/20">
+        <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-300/20">
           <div className="h-14 px-5 flex items-center gap-3">
             <MobileBackButton />
             <span className="flex-1 font-semibold text-stone-900">예약 내역</span>
@@ -262,7 +262,7 @@ export default function BookingHistoryClient({
           </div>
         )}
 
-        <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-6 bg-white border border-brown-600/20 rounded-2xl p-1">
+        <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-6 bg-white border border-orange-300/20 rounded-2xl p-1">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -272,7 +272,7 @@ export default function BookingHistoryClient({
                 setPage(1);
               }}
               className={`flex-1 min-w-fit px-4 py-2.5 rounded-xl text-sm font-medium transition-all whitespace-nowrap ${
-                activeTab === tab.id ? "bg-brown-600 text-white" : "text-gray-500 hover:text-stone-900"
+                activeTab === tab.id ? "bg-orange-300 text-white" : "text-gray-500 hover:text-stone-900"
               }`}
             >
               {tab.label}
@@ -287,14 +287,14 @@ export default function BookingHistoryClient({
 
         {paged.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-16 h-16 bg-white border border-brown-600/20 rounded-full flex items-center justify-center mb-4">
-              <Calendar size={28} className="text-brown-600/30" />
+            <div className="w-16 h-16 bg-white border border-orange-300/20 rounded-full flex items-center justify-center mb-4">
+              <Calendar size={28} className="text-orange-300/30" />
             </div>
             <p className="font-semibold text-stone-900 mb-1">예약 내역이 없어요</p>
             <p className="text-sm text-gray-500">새로운 예약을 만들어보세요</p>
             <Link
               href="/petsitters"
-              className="mt-6 px-6 py-3 bg-[var(--color-brown-600)] text-white rounded-xl text-sm font-semibold hover:bg-brown-900 transition-colors"
+              className="mt-6 px-6 py-3 bg-[var(--color-orange-300)] text-white rounded-xl text-sm font-semibold hover:bg-orange-500 transition-colors"
             >
               펫시터 찾기
             </Link>
@@ -314,7 +314,7 @@ export default function BookingHistoryClient({
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
               aria-label="이전 페이지"
-              className="w-9 h-9 rounded-xl border border-brown-600/20 flex items-center justify-center text-gray-500 hover:border-brown-600 disabled:opacity-40 transition-colors"
+              className="w-9 h-9 rounded-xl border border-orange-300/20 flex items-center justify-center text-gray-500 hover:border-orange-300 disabled:opacity-40 transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
@@ -327,8 +327,8 @@ export default function BookingHistoryClient({
                 aria-current={page === p ? "page" : undefined}
                 className={`w-9 h-9 rounded-xl text-sm font-medium transition-all ${
                   page === p
-                    ? "bg-[var(--color-brown-600)] text-white"
-                    : "border border-brown-600/20 text-gray-500 hover:border-brown-600"
+                    ? "bg-[var(--color-orange-300)] text-white"
+                    : "border border-orange-300/20 text-gray-500 hover:border-orange-300"
                 }`}
               >
                 {p}
@@ -339,7 +339,7 @@ export default function BookingHistoryClient({
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               aria-label="다음 페이지"
-              className="w-9 h-9 rounded-xl border border-brown-600/20 flex items-center justify-center text-gray-500 hover:border-brown-600 disabled:opacity-40 transition-colors"
+              className="w-9 h-9 rounded-xl border border-orange-300/20 flex items-center justify-center text-gray-500 hover:border-orange-300 disabled:opacity-40 transition-colors"
             >
               <ChevronRight size={16} />
             </button>
