@@ -27,7 +27,7 @@ import {
   coordToRegion,
   type AddressSuggestion,
 } from "@/lib/kakao-geocode";
-import { mergeConditions, appendConditionLine } from "../utils";
+import { mergeConditions, appendConditionLine, getTimeErrorMessage } from "../utils";
 import { useAddressSearch } from "../hooks/useAddressSearch";
 import {
   SERVICE_TYPES,
@@ -106,6 +106,7 @@ export default function BoardWriteClient({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [dismissedTimeError, setDismissedTimeError] = useState<string | null>(null);
 
   const [form, setForm] = useState<FormState>({
     service_type: "",
@@ -238,12 +239,16 @@ export default function BoardWriteClient({
     }));
   };
 
+  const timeErrorMessage = getTimeErrorMessage(form.startDate, form.start_time, form.end_time);
+  const showTimeErrorModal = !!timeErrorMessage && timeErrorMessage !== dismissedTimeError;
+
   const canSubmit = () =>
     !!form.service_type &&
     !!form.startDate &&
     form.selected_pets.length > 0 &&
     !!form.title.trim() &&
-    !!form.content.trim();
+    !!form.content.trim() &&
+    !timeErrorMessage;
 
   const handleSaveDraft = () => {
     if (!draftKey) return;
@@ -924,6 +929,17 @@ export default function BoardWriteClient({
         confirmText="확인"
         onConfirm={() => setErrorMessage(null)}
         onClose={() => setErrorMessage(null)}
+        showCloseButton={false}
+      />
+
+      <CustomModal
+        open={showTimeErrorModal}
+        type="error"
+        title="시간을 확인해주세요"
+        description={timeErrorMessage ?? undefined}
+        confirmText="확인"
+        onConfirm={() => setDismissedTimeError(timeErrorMessage)}
+        onClose={() => setDismissedTimeError(timeErrorMessage)}
         showCloseButton={false}
       />
     </>

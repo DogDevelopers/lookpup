@@ -25,6 +25,24 @@ export function appendConditionLine(
   return base ? `${base}\n- ${sentence}` : `- ${sentence}`;
 }
 
+// 날짜 · 시간 선택이 유효한지 검사한다. 시작 시간이 종료 시간보다 늦거나, 과거 시간이면 오류 메시지를 반환.
+export function getTimeErrorMessage(
+  startDate: Date | undefined,
+  startTime: string,
+  endTime: string,
+): string | null {
+  if (startTime && endTime && startTime >= endTime) {
+    return "종료 시간은 시작 시간보다 늦어야 합니다.";
+  }
+  if (startDate && startTime) {
+    const [h, m] = startTime.split(":").map(Number);
+    const dt = new Date(startDate);
+    dt.setHours(h, m, 0, 0);
+    if (dt <= new Date()) return "과거 시간은 선택할 수 없습니다.";
+  }
+  return null;
+}
+
 // 저장된 content를 본문과 조건으로 분리한다. 마커가 없으면 조건은 빈 문자열.
 export function splitConditions(raw: string): {
   content: string;

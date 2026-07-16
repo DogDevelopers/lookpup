@@ -23,6 +23,7 @@ import {
   mergeConditions,
   splitConditions,
   appendConditionLine,
+  getTimeErrorMessage,
 } from "../utils";
 import { useAddressSearch } from "../hooks/useAddressSearch";
 import {
@@ -76,6 +77,8 @@ export default function BoardEditClient({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMatched, setIsMatched] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [dismissedTimeError, setDismissedTimeError] = useState<string | null>(null);
+  const [timeTouched, setTimeTouched] = useState(false);
   const [pets] = useState<Pet[]>(initialPets ?? []);
   const [form, setForm] = useState<FormState>({
     service_type: "",
@@ -142,6 +145,10 @@ export default function BoardEditClient({
       image_urls: initialData.image_urls,
     });
   }, [initialData]);
+
+  const timeErrorMessage = getTimeErrorMessage(form.startDate, form.start_time, form.end_time);
+  const showTimeErrorModal =
+    timeTouched && !!timeErrorMessage && timeErrorMessage !== dismissedTimeError;
 
   const togglePet = (petId: string) =>
     setForm((prev) => ({
@@ -215,7 +222,10 @@ export default function BoardEditClient({
   }
 
   const canSubmit =
-    !!form.title.trim() && !!form.startDate && !!form.service_type;
+    !!form.title.trim() &&
+    !!form.startDate &&
+    !!form.service_type &&
+    !timeErrorMessage;
 
   return (
     <>
@@ -333,13 +343,14 @@ export default function BoardEditClient({
                   value={
                     { from: form.startDate, to: form.endDate } as DateRange
                   }
-                  onChange={(range) =>
+                  onChange={(range) => {
+                    setTimeTouched(true);
                     setForm((prev) => ({
                       ...prev,
                       startDate: range?.from,
                       endDate: range?.to,
-                    }))
-                  }
+                    }));
+                  }}
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5">
@@ -349,9 +360,10 @@ export default function BoardEditClient({
                   </span>
                   <SimpleTimePicker
                     value={form.start_time}
-                    onChange={(value) =>
-                      setForm((prev) => ({ ...prev, start_time: value }))
-                    }
+                    onChange={(value) => {
+                      setTimeTouched(true);
+                      setForm((prev) => ({ ...prev, start_time: value }));
+                    }}
                     placeholder="시작 시간 선택"
                   />
                 </div>
@@ -361,9 +373,10 @@ export default function BoardEditClient({
                   </span>
                   <SimpleTimePicker
                     value={form.end_time}
-                    onChange={(value) =>
-                      setForm((prev) => ({ ...prev, end_time: value }))
-                    }
+                    onChange={(value) => {
+                      setTimeTouched(true);
+                      setForm((prev) => ({ ...prev, end_time: value }));
+                    }}
                     placeholder="종료 시간 선택"
                   />
                 </div>
@@ -656,6 +669,17 @@ export default function BoardEditClient({
         confirmText="확인"
         onConfirm={() => setErrorMessage(null)}
         onClose={() => setErrorMessage(null)}
+        showCloseButton={false}
+      />
+
+      <CustomModal
+        open={showTimeErrorModal}
+        type="error"
+        title="시간을 확인해주세요"
+        description={timeErrorMessage ?? undefined}
+        confirmText="확인"
+        onConfirm={() => setDismissedTimeError(timeErrorMessage)}
+        onClose={() => setDismissedTimeError(timeErrorMessage)}
         showCloseButton={false}
       />
     </>
