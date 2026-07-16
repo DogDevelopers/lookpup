@@ -178,7 +178,10 @@ export async function getRequestDetailsForReservation(
 }
 
 type UpdateApplicationResult =
-  | { ok: true; data: { applicationId: string; reservationId: string | null } }
+  | {
+      ok: true;
+      data: { applicationId: string; reservationId: string | null; roomId: string | null };
+    }
   | { ok: false; error: string };
 
 export async function updateApplication(
@@ -226,6 +229,7 @@ export async function updateApplication(
   }
 
   let reservationId: string | null = null;
+  let roomId: string | null = null;
 
   if (input.status === "accepted") {
     if (requestRow.status !== "open") {
@@ -283,19 +287,25 @@ export async function updateApplication(
       .maybeSingle();
 
     if (!existingRoom) {
-      await supabase.from("chat_rooms").insert({
-        room_type: "direct",
-        owner_id: requestRow.owner_id,
-        sitter_id: application.sitter_id,
-        request_id: requestRow.id,
-        reservation_id: reservation.id,
-        application_id: id,
-      });
+      const { data: newRoom } = await supabase
+        .from("chat_rooms")
+        .insert({
+          room_type: "direct",
+          owner_id: requestRow.owner_id,
+          sitter_id: application.sitter_id,
+          request_id: requestRow.id,
+          reservation_id: reservation.id,
+          application_id: id,
+        })
+        .select("id")
+        .single();
+      roomId = newRoom?.id ?? null;
     } else {
       await supabase
         .from("chat_rooms")
         .update({ room_type: "direct", reservation_id: reservation.id, application_id: id })
         .eq("id", existingRoom.id);
+      roomId = existingRoom.id;
     }
 
     await supabase.from("requests").update({ status: "matched" }).eq("id", requestRow.id);
@@ -318,13 +328,16 @@ export async function updateApplication(
       .single();
 
     if (applicantSitter?.user_id) {
-      const { data: chatRoom } = await supabase
-        .from("chat_rooms")
-        .select("id")
-        .eq("request_id", application.request_id)
-        .eq("sitter_id", application.sitter_id)
-        .maybeSingle();
-      const chatLink = chatRoom ? `/chat?roomId=${chatRoom.id}` : undefined;
+      if (!roomId) {
+        const { data: chatRoom } = await supabase
+          .from("chat_rooms")
+          .select("id")
+          .eq("request_id", application.request_id)
+          .eq("sitter_id", application.sitter_id)
+          .maybeSingle();
+        roomId = chatRoom?.id ?? null;
+      }
+      const chatLink = roomId ? `/chat?roomId=${roomId}` : undefined;
 
       if (input.status === "accepted") {
         await supabase.from("notifications").insert({
@@ -346,7 +359,7 @@ export async function updateApplication(
     }
   }
 
-  return { ok: true, data: { applicationId: data.id, reservationId } };
+  return { ok: true, data: { applicationId: data.id, reservationId, roomId } };
 }
 
 export async function updateApplicationByRoom(
