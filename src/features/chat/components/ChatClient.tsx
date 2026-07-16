@@ -45,7 +45,6 @@ import {
   sendServiceStartMessage,
   sendReservationEditMessage,
   sendReservationEditResponseMessage,
-  findOrCreateRoom,
 } from "@/features/chat/actions";
 import type { RoomApiItem, ChatMessageRow } from "@/features/chat/types";
 import {
@@ -568,32 +567,28 @@ function ChatPageContent({
           updatePreview(id, "선택 확정", msgResult.data.created_at ?? new Date().toISOString());
         }
 
-        if (confirmingApplicant?.sitterId) {
-          const roomResult = await findOrCreateRoom({
-            sitter_id: confirmingApplicant.sitterId,
-            room_type: "direct",
-            reservation_id: result.data.reservationId ?? undefined,
-          });
-          if (roomResult.ok) {
-            const newRoomId = roomResult.data.room_id;
-            broadcastReservationAccepted(newRoomId);
+        // updateApplication이 이미 정확한 방(request_id 기준)을 direct로 전환하고
+        // 그 id를 돌려주므로, 느슨한 owner+sitter 재조회(findOrCreateRoom)로
+        // 무관한 방을 잘못 집어올 위험 없이 그 id를 그대로 쓴다.
+        const newRoomId = result.data.roomId;
+        if (newRoomId) {
+          broadcastReservationAccepted(newRoomId);
 
-            if (overrides.totalPrice && overrides.totalPrice > 0) {
-              const deadline = getPaymentDeadline();
-              const payResult = await sendAutoPaymentRequestMessage(newRoomId, {
-                amount: overrides.totalPrice,
-                reason: postTitle || "반려동물 정보",
-                deadline,
-                postId: confirmingApplicant?.postId,
-              });
-              if (payResult.ok) updatePreview(newRoomId, "결제 요청", payResult.data.created_at ?? new Date().toISOString());
-            }
-
-            setActiveTab("one_on_one");
-            setSelectedRoomId(newRoomId);
-            setSelectedApplicantId(null);
-            setMobileChatView("room");
+          if (overrides.totalPrice && overrides.totalPrice > 0) {
+            const deadline = getPaymentDeadline();
+            const payResult = await sendAutoPaymentRequestMessage(newRoomId, {
+              amount: overrides.totalPrice,
+              reason: postTitle || "반려동물 정보",
+              deadline,
+              postId: confirmingApplicant?.postId,
+            });
+            if (payResult.ok) updatePreview(newRoomId, "결제 요청", payResult.data.created_at ?? new Date().toISOString());
           }
+
+          setActiveTab("one_on_one");
+          setSelectedRoomId(newRoomId);
+          setSelectedApplicantId(null);
+          setMobileChatView("room");
         }
       } catch {
         setApplicationActionError("오류가 발생했습니다. 다시 시도해주세요.");

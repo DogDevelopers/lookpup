@@ -790,11 +790,15 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
   }
 
+  // room_type을 "direct"/"reservation_request"로 좁혀서, 아직 수락되지 않은
+  // 구인글 지원 방("request")은 재사용 대상에서 제외한다 — 그 방은 별개의
+  // 지원 스레드이므로 무관한 예약 요청이 가로채면 안 된다.
   const { data: existingRooms } = await supabase
     .from("chat_rooms")
     .select("id, reservations(status)")
     .eq("owner_id", user.id)
     .eq("sitter_id", input.sitter_id)
+    .in("room_type", ["direct", "reservation_request"])
     .order("created_at", { ascending: false })
     .limit(1);
   const existingRoom = existingRooms?.[0] ?? null;
@@ -859,37 +863,35 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "예약 요청 생성에 실패했습니다." };
   }
 
-  let room: { id: string } | null = null;
-  if (existingRoom) {
-    const { data: updatedRoom, error: roomError } = await supabase
-      .from("chat_rooms")
-      .update({ room_type: "reservation_request", reservation_id: reservation.id })
-      .eq("id", existingRoom.id)
-      .select("id")
-      .single();
-    if (roomError || !updatedRoom) {
-      await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
-      await supabase.from("reservations").delete().eq("id", reservation.id);
-      return { ok: false, error: "예약 요청 생성에 실패했습니다." };
-    }
-    room = updatedRoom;
-  } else {
-    const { data: newRoom, error: roomError } = await supabase
-      .from("chat_rooms")
-      .insert({
-        room_type: "reservation_request",
-        owner_id: user.id,
-        sitter_id: input.sitter_id,
-        reservation_id: reservation.id,
-      })
-      .select("id")
-      .single();
-    if (roomError || !newRoom) {
-      await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
-      await supabase.from("reservations").delete().eq("id", reservation.id);
-      return { ok: false, error: "예약 요청 생성에 실패했습니다." };
-    }
-    room = newRoom;
+  // 기존 방을 재사용할 때는 이전 소유 흐름(구인글 지원 등)의 흔적을 지운다 —
+  // 안 지우면 채팅목록에 이번 예약과 무관한 옛 구인글 제목이 표시된다.
+  const { data: room, error: roomError } = existingRoom
+    ? await supabase
+        .from("chat_rooms")
+        .update({
+          room_type: "reservation_request",
+          reservation_id: reservation.id,
+          request_id: null,
+          application_id: null,
+        })
+        .eq("id", existingRoom.id)
+        .select("id")
+        .single()
+    : await supabase
+        .from("chat_rooms")
+        .insert({
+          room_type: "reservation_request",
+          owner_id: user.id,
+          sitter_id: input.sitter_id,
+          reservation_id: reservation.id,
+        })
+        .select("id")
+        .single();
+
+  if (roomError || !room) {
+    await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
+    await supabase.from("reservations").delete().eq("id", reservation.id);
+    return { ok: false, error: "예약 요청 생성에 실패했습니다." };
   }
 
   const { data: pets } = await supabase.from("pets").select("name").in("id", input.pet_ids);
@@ -1079,6 +1081,9 @@ export async function rejectReservationRequest(
     .insert({ room_id: room.id, sender_id: user.id, content: RESERVATION_REJECTED_PREFIX })
     .select("id, sender_id, content, created_at")
     .single();
+  // room_type은 "reservation_request"로 유지한다 — "direct"로 바꾸면
+  // use-chat-rooms.ts의 수락 감지 리스너(room_type이 direct로 바뀌는 걸
+  // "수락됨"으로 해석)가 거절도 수락으로 오인해서 상대방을 잘못 이동시킨다.
   await supabase
     .from("chat_rooms")
     .update({ last_message: "예약 거절", last_message_at: now })
