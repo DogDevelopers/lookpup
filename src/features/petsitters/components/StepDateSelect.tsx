@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Calendar } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { ko } from "date-fns/locale";
 import { DateRange } from "react-day-picker";
 import { useBookingStore } from "@/stores/booking-store";
+import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
 import BookingSummary from "./BookingSummary";
@@ -39,6 +41,9 @@ export default function StepDateSelect({
   const { dateRange, setDateRange } = useBookingStore();
   const startTime = watch("startTime") ?? "";
   const endTime = watch("endTime") ?? "";
+  const timeErrorMessage = errors.startTime?.message ?? errors.endTime?.message ?? null;
+  const [dismissedTimeError, setDismissedTimeError] = useState<string | null>(null);
+  const showTimeErrorModal = !!timeErrorMessage && timeErrorMessage !== dismissedTimeError;
 
   const days = dateRange?.from && dateRange?.to
     ? Math.max(1, differenceInDays(dateRange.to, dateRange.from) + 1)
@@ -99,9 +104,6 @@ export default function StepDateSelect({
               value={startTime}
               onChange={(v) => setValue("startTime", v, { shouldValidate: true })}
             />
-            {errors.startTime && (
-              <p className="text-red-500 text-xs">{errors.startTime.message}</p>
-            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-brown-900">종료 시간</label>
@@ -109,9 +111,6 @@ export default function StepDateSelect({
               value={endTime}
               onChange={(v) => setValue("endTime", v, { shouldValidate: true })}
             />
-            {errors.endTime && (
-              <p className="text-red-500 text-xs">{errors.endTime.message}</p>
-            )}
           </div>
         </div>
       </div>
@@ -120,6 +119,17 @@ export default function StepDateSelect({
         rows={[
           { label: "펫시터", value: sitter.name },
         ]}
+      />
+
+      <CustomModal
+        open={showTimeErrorModal}
+        type="error"
+        title="시간을 확인해주세요"
+        description={timeErrorMessage ?? undefined}
+        confirmText="확인"
+        onConfirm={() => setDismissedTimeError(timeErrorMessage)}
+        onClose={() => setDismissedTimeError(timeErrorMessage)}
+        showCloseButton={false}
       />
     </div>
   );
