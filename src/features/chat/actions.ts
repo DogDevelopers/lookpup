@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createNotification } from "@/lib/notifications";
+import { touchRoomPreview } from "@/lib/chat-rooms";
 import { EXTRA_CHARGE_STATUS, RESERVATION_STATUS } from "@/lib/constants";
 import {
   SYSTEM_MSG_PREFIX,
@@ -263,131 +264,6 @@ export async function getChatMessages(
   };
 }
 
-export async function findOrCreateRoom(input: {
-  sitter_id: string;
-  room_type: "request" | "direct" | "reservation_request";
-  request_id?: string | null;
-  reservation_id?: string | null;
-}): Promise<ActionResult<{ room_id: string }>> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
-
-  let existingRoom: { id: string } | null = null;
-
-  if (input.room_type === "request" && input.request_id) {
-    const { data } = await supabase
-      .from("chat_rooms")
-      .select("id")
-      .eq("request_id", input.request_id)
-      .eq("sitter_id", input.sitter_id)
-      .maybeSingle();
-    existingRoom = data;
-  } else if (input.reservation_id) {
-    const { data } = await supabase
-      .from("chat_rooms")
-      .select("id")
-      .eq("owner_id", user.id)
-      .eq("sitter_id", input.sitter_id)
-      .eq("room_type", "direct")
-      .order("created_at", { ascending: false })
-      .limit(1);
-    existingRoom = data?.[0] ?? null;
-  } else {
-    const [{ data: otherSitter }, { data: mySitter }] = await Promise.all([
-      supabase.from("sitters").select("user_id").eq("id", input.sitter_id).maybeSingle(),
-      supabase.from("sitters").select("id").eq("user_id", user.id).maybeSingle(),
-    ]);
-
-    const otherUserId = otherSitter?.user_id;
-    const mySitterId = mySitter?.id;
-
-    if (otherUserId && mySitterId) {
-      const { data } = await supabase
-        .from("chat_rooms")
-        .select("id")
-        .eq("room_type", "direct")
-        .or(
-          `and(owner_id.eq.${user.id},sitter_id.eq.${input.sitter_id}),` +
-            `and(owner_id.eq.${otherUserId},sitter_id.eq.${mySitterId})`,
-        )
-        .maybeSingle();
-      existingRoom = data;
-    } else {
-      const { data } = await supabase
-        .from("chat_rooms")
-        .select("id")
-        .eq("owner_id", user.id)
-        .eq("sitter_id", input.sitter_id)
-        .eq("room_type", "direct")
-        .maybeSingle();
-      existingRoom = data;
-    }
-  }
-
-  if (existingRoom) {
-    if (input.reservation_id) {
-      await supabase.from("chat_rooms").update({ reservation_id: input.reservation_id }).eq("id", existingRoom.id);
-    }
-    return { ok: true, data: { room_id: existingRoom.id } };
-  }
-
-  const { data: newRoom, error } = await supabase
-    .from("chat_rooms")
-    .insert({
-      room_type: input.room_type,
-      owner_id: user.id,
-      sitter_id: input.sitter_id,
-      request_id: input.request_id ?? null,
-      reservation_id: input.reservation_id ?? null,
-    })
-    .select("id")
-    .single();
-
-  if (error) return { ok: false, error: error.message };
-  return { ok: true, data: { room_id: newRoom.id } };
-}
-
-export async function findChatRoomAsSitter(
-  ownerId: string,
-  reservationId?: string,
-): Promise<ActionResult<{ room_id: string } | null>> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
-
-  if (reservationId) {
-    const { data: room } = await supabase
-      .from("chat_rooms")
-      .select("id")
-      .eq("reservation_id", reservationId)
-      .eq("room_type", "direct")
-      .maybeSingle();
-    if (room) return { ok: true, data: { room_id: room.id } };
-  }
-
-  const { data: sitterProfile } = await supabase
-    .from("sitters")
-    .select("id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-  if (!sitterProfile) return { ok: false, error: "시터 정보를 찾을 수 없습니다." };
-
-  const { data: room } = await supabase
-    .from("chat_rooms")
-    .select("id")
-    .eq("owner_id", ownerId)
-    .eq("sitter_id", sitterProfile.id)
-    .eq("room_type", "direct")
-    .maybeSingle();
-
-  return { ok: true, data: room ? { room_id: room.id } : null };
-}
-
 export async function sendMessage(
   roomId: string,
   content: string,
@@ -421,7 +297,6 @@ export async function sendMessage(
     return { ok: false, error: "상대방이 채팅을 종료하여 메시지를 보낼 수 없습니다." };
   }
 
-  const now = new Date().toISOString();
   const { data: message, error: msgError } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: user.id, content: trimmed })
@@ -429,10 +304,7 @@ export async function sendMessage(
     .single();
   if (msgError) return { ok: false, error: msgError.message };
 
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: truncatePreview(trimmed), last_message_at: now })
-    .eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, truncatePreview(trimmed));
 
   const chatLink = `/chat?roomId=${roomId}`;
   const { data: sender } = await supabase.from("users").select("full_name").eq("id", user.id).single();
@@ -491,7 +363,6 @@ export async function sendImageMessage(
     return { ok: false, error: "상대방이 채팅을 종료하여 더 이상 메시지를 보낼 수 없습니다." };
   }
 
-  const now = new Date().toISOString();
   const { data: message, error: msgError } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: user.id, content: `${IMAGE_MSG_PREFIX}${imageUrl}` })
@@ -499,7 +370,7 @@ export async function sendImageMessage(
     .single();
   if (msgError) return { ok: false, error: msgError.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "사진", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "사진");
 
   const chatLink = `/chat?roomId=${roomId}`;
   const { data: sender } = await supabase.from("users").select("full_name").eq("id", user.id).single();
@@ -541,7 +412,6 @@ export async function sendSystemMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
 
-  const now = new Date().toISOString();
   const { data: message, error } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: user.id, content: `${SYSTEM_MSG_PREFIX}${content}` })
@@ -549,7 +419,7 @@ export async function sendSystemMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: content, last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, content);
 
   return { ok: true, data: message };
 }
@@ -573,7 +443,6 @@ export async function sendPaymentRequestMessage(
 
   if (!data.amount || data.amount <= 0) return { ok: false, error: "요청 금액은 0원보다 커야 합니다." };
 
-  const now = new Date().toISOString();
   const { data: room } = await supabase
     .from("chat_rooms")
     .select("id, owner_id, owner_left, sitter_left, sitters!inner(id, user_id)")
@@ -634,7 +503,7 @@ export async function sendPaymentRequestMessage(
     return { ok: false, error: error.message };
   }
 
-  await supabase.from("chat_rooms").update({ last_message: "결제 요청", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "결제 요청");
 
   const recipientId = user.id === room.owner_id ? sitter.user_id : room.owner_id;
   if (isRecipientActive(room, recipientId)) {
@@ -660,7 +529,6 @@ export async function sendPaymentCompleteMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
 
-  const now = new Date().toISOString();
   const content = `${PAYMENT_COMPLETE_PREFIX}${JSON.stringify(data)}`;
   const { data: message, error } = await supabase
     .from("messages")
@@ -669,7 +537,7 @@ export async function sendPaymentCompleteMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "결제 완료", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "결제 완료");
 
   return { ok: true, data: message };
 }
@@ -700,7 +568,6 @@ export async function sendAutoPaymentRequestMessage(
   if (room.owner_id !== user.id) return { ok: false, error: "보호자만 이 작업을 할 수 있습니다." };
 
   const sitter = room.sitters as unknown as { user_id: string };
-  const now = new Date().toISOString();
   const content = `${PAYMENT_REQUEST_PREFIX}${JSON.stringify(data)}`;
 
   // 의도적으로 sitter를 발신자로 지정 — 보호자 화면에 "받은 요청"으로 렌더링되도록 함
@@ -711,7 +578,7 @@ export async function sendAutoPaymentRequestMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "결제 요청", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "결제 요청");
 
   if (isRecipientActive(room, user.id)) {
     await createNotification(supabase, {
@@ -736,7 +603,6 @@ export async function sendApplicationSelectedMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
 
-  const now = new Date().toISOString();
   const content = `${APPLICATION_SELECTED_PREFIX}${JSON.stringify(data)}`;
   const { data: message, error } = await supabase
     .from("messages")
@@ -745,7 +611,7 @@ export async function sendApplicationSelectedMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "선택 확정", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "선택 확정");
 
   return { ok: true, data: message };
 }
@@ -759,7 +625,6 @@ export async function sendApplicationRejectedMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
 
-  const now = new Date().toISOString();
   const { data: message, error } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: user.id, content: APPLICATION_REJECTED_PREFIX })
@@ -767,7 +632,7 @@ export async function sendApplicationRejectedMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "지원 거절", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "지원 거절");
 
   return { ok: true, data: message };
 }
@@ -781,7 +646,6 @@ export async function sendReservationCanceledMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
 
-  const now = new Date().toISOString();
   const { data: message, error } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: user.id, content: RESERVATION_CANCELED_PREFIX })
@@ -789,7 +653,7 @@ export async function sendReservationCanceledMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "예약 취소", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "예약 취소");
 
   return { ok: true, data: message };
 }
@@ -835,7 +699,6 @@ export async function sendServiceCompleteMessage(
   const endDatetime = reservation?.end_datetime ?? undefined;
   const totalPrice = reservation?.total_price ?? undefined;
 
-  const now = new Date().toISOString();
   const content = `${SERVICE_COMPLETE_PREFIX}${JSON.stringify({ reservationId, serviceTitle, petName, startDatetime, endDatetime, totalPrice })}`;
   const { data: message, error } = await supabase
     .from("messages")
@@ -844,7 +707,7 @@ export async function sendServiceCompleteMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "서비스 완료", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "서비스 완료");
 
   if (isRecipientActive(room, room.owner_id)) {
     await createNotification(supabase, {
@@ -900,7 +763,6 @@ export async function sendServiceStartMessage(
   const endDatetime = reservation?.end_datetime ?? undefined;
   const totalPrice = reservation?.total_price ?? undefined;
 
-  const now = new Date().toISOString();
   const content = `${SERVICE_START_PREFIX}${JSON.stringify({ reservationId, serviceTitle, petName, startDatetime, endDatetime, totalPrice })}`;
   const { data: message, error } = await supabase
     .from("messages")
@@ -909,7 +771,7 @@ export async function sendServiceStartMessage(
     .single();
   if (error) return { ok: false, error: error.message };
 
-  await supabase.from("chat_rooms").update({ last_message: "서비스 시작", last_message_at: now }).eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "서비스 시작");
 
   if (isRecipientActive(room, room.owner_id)) {
     await createNotification(supabase, {
@@ -1031,10 +893,7 @@ export async function sendReservationEditMessage(
     .single();
   if (msgError) return { ok: false, error: msgError.message };
 
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: "예약 수정 요청", last_message_at: new Date().toISOString() })
-    .eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, "예약 수정 요청");
 
   const recipientId = user.id === room.owner_id ? sitter.user_id : room.owner_id;
   if (isRecipientActive(room, recipientId)) {
@@ -1140,10 +999,7 @@ export async function sendReservationEditResponseMessage(
   if (msgError) return { ok: false, error: msgError.message };
 
   const lastMsg = payload.accepted ? "예약 수정 승인" : "예약 수정 거절";
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: lastMsg, last_message_at: new Date().toISOString() })
-    .eq("id", roomId);
+  await touchRoomPreview(supabase, roomId, lastMsg);
 
   const recipientId = user.id === room.owner_id ? sitter.user_id : room.owner_id;
   if (isRecipientActive(room, recipientId)) {

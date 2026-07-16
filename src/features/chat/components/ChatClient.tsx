@@ -568,8 +568,7 @@ function ChatPageContent({
         }
 
         // updateApplication이 이미 정확한 방(request_id 기준)을 direct로 전환하고
-        // 그 id를 돌려주므로, 느슨한 owner+sitter 재조회(findOrCreateRoom)로
-        // 무관한 방을 잘못 집어올 위험 없이 그 id를 그대로 쓴다.
+        // 그 id를 돌려주므로 그대로 쓴다(별도 재조회 없음).
         const newRoomId = result.data.roomId;
         if (newRoomId) {
           broadcastReservationAccepted(newRoomId);

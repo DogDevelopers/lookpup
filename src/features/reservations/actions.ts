@@ -3,7 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createNotification } from "@/lib/notifications";
-import { RESERVATION_STATUS } from "@/lib/constants";
+import {
+  touchRoomPreview,
+  findRoomByReservation,
+  findDirectRoomByParties,
+  findReservationFlowRoom,
+  upsertReservationRequestRoom,
+  flipReservationRequestToDirect,
+} from "@/lib/chat-rooms";
+import { RESERVATION_STATUS, ROOM_TYPE } from "@/lib/constants";
 import {
   RESERVATION_REQUEST_PREFIX,
   RESERVATION_ACCEPTED_PREFIX,
@@ -417,15 +425,7 @@ export async function cancelReservationAndNotify(
   } = await supabase.auth.getUser();
   if (!user) return result;
 
-  const { data: roomsByReservation } = await supabase
-    .from("chat_rooms")
-    .select("id")
-    .eq("reservation_id", id)
-    .eq("room_type", "direct")
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  let room = roomsByReservation?.[0] ?? null;
+  let room = await findRoomByReservation(supabase, id, { roomType: ROOM_TYPE.DIRECT });
   if (!room) {
     const { data: reservation } = await supabase
       .from("reservations")
@@ -433,30 +433,18 @@ export async function cancelReservationAndNotify(
       .eq("id", id)
       .single();
     if (reservation) {
-      const { data: fallbackRooms } = await supabase
-        .from("chat_rooms")
-        .select("id")
-        .eq("owner_id", reservation.owner_id)
-        .eq("sitter_id", reservation.sitter_id)
-        .eq("room_type", "direct")
-        .order("created_at", { ascending: false })
-        .limit(1);
-      room = fallbackRooms?.[0] ?? null;
+      room = await findDirectRoomByParties(supabase, reservation.owner_id, reservation.sitter_id);
     }
   }
 
   if (!room) return result;
 
-  const now = new Date().toISOString();
   await supabase.from("messages").insert({
     room_id: room.id,
     sender_id: user.id,
     content: RESERVATION_CANCELED_PREFIX,
   });
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: "예약 취소", last_message_at: now })
-    .eq("id", room.id);
+  await touchRoomPreview(supabase, room.id, "예약 취소");
 
   return { ok: true, data: { id, chatRoomId: room.id } };
 }
@@ -672,24 +660,9 @@ export async function ownerConfirmServiceComplete(
     .eq("id", reservation.sitter_id)
     .single();
 
-  const { data: roomsByReservation } = await supabase
-    .from("chat_rooms")
-    .select("id")
-    .eq("reservation_id", reservationId)
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  let room = roomsByReservation?.[0] ?? null;
+  let room = await findRoomByReservation(supabase, reservationId);
   if (!room) {
-    const { data: fallbackRooms } = await supabase
-      .from("chat_rooms")
-      .select("id")
-      .eq("owner_id", reservation.owner_id)
-      .eq("sitter_id", reservation.sitter_id)
-      .eq("room_type", "direct")
-      .order("created_at", { ascending: false })
-      .limit(1);
-    room = fallbackRooms?.[0] ?? null;
+    room = await findDirectRoomByParties(supabase, reservation.owner_id, reservation.sitter_id);
   }
 
   let completionMessage: unknown = null;
@@ -731,10 +704,7 @@ export async function ownerConfirmServiceComplete(
     }
     completionMessage = insertedMessage;
 
-    await supabase
-      .from("chat_rooms")
-      .update({ last_message: "서비스 완료 확정", last_message_at: now })
-      .eq("id", room.id);
+    await touchRoomPreview(supabase, room.id, "서비스 완료 확정");
   }
 
   if (sitterProfile?.user_id) {
@@ -790,18 +760,10 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
   }
 
-  // room_type을 "direct"/"reservation_request"로 좁혀서, 아직 수락되지 않은
-  // 구인글 지원 방("request")은 재사용 대상에서 제외한다 — 그 방은 별개의
-  // 지원 스레드이므로 무관한 예약 요청이 가로채면 안 된다.
-  const { data: existingRooms } = await supabase
-    .from("chat_rooms")
-    .select("id, reservations(status)")
-    .eq("owner_id", user.id)
-    .eq("sitter_id", input.sitter_id)
-    .in("room_type", ["direct", "reservation_request"])
-    .order("created_at", { ascending: false })
-    .limit(1);
-  const existingRoom = existingRooms?.[0] ?? null;
+  // 구인글 지원 방("request")은 findReservationFlowRoom이 재사용 대상에서
+  // 이미 제외한다 — 그 방은 별개의 지원 스레드이므로 무관한 예약 요청이
+  // 가로채면 안 된다.
+  const existingRoom = await findReservationFlowRoom(supabase, user.id, input.sitter_id);
 
   const activeStatuses: string[] = [
     RESERVATION_STATUS.PENDING,
@@ -809,8 +771,7 @@ export async function createPetsitterReservationRequest(
     RESERVATION_STATUS.PAID,
     RESERVATION_STATUS.IN_PROGRESS,
   ];
-  const reservationStatus = (existingRoom?.reservations as unknown as { status: string } | null)?.status;
-  if (existingRoom && reservationStatus && activeStatuses.includes(reservationStatus)) {
+  if (existingRoom?.reservationStatus && activeStatuses.includes(existingRoom.reservationStatus)) {
     return { ok: false, error: "이미 해당 펫시터에게 예약 요청을 보냈습니다." };
   }
 
@@ -863,32 +824,14 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "예약 요청 생성에 실패했습니다." };
   }
 
-  // 기존 방을 재사용할 때는 이전 소유 흐름(구인글 지원 등)의 흔적을 지운다 —
-  // 안 지우면 채팅목록에 이번 예약과 무관한 옛 구인글 제목이 표시된다.
-  const { data: room, error: roomError } = existingRoom
-    ? await supabase
-        .from("chat_rooms")
-        .update({
-          room_type: "reservation_request",
-          reservation_id: reservation.id,
-          request_id: null,
-          application_id: null,
-        })
-        .eq("id", existingRoom.id)
-        .select("id")
-        .single()
-    : await supabase
-        .from("chat_rooms")
-        .insert({
-          room_type: "reservation_request",
-          owner_id: user.id,
-          sitter_id: input.sitter_id,
-          reservation_id: reservation.id,
-        })
-        .select("id")
-        .single();
+  const room = await upsertReservationRequestRoom(supabase, {
+    existingRoomId: existingRoom?.id ?? null,
+    ownerId: user.id,
+    sitterId: input.sitter_id,
+    reservationId: reservation.id,
+  });
 
-  if (roomError || !room) {
+  if (!room) {
     await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
     await supabase.from("reservations").delete().eq("id", reservation.id);
     return { ok: false, error: "예약 요청 생성에 실패했습니다." };
@@ -899,7 +842,6 @@ export async function createPetsitterReservationRequest(
 
   const serviceTitle = service.title || SERVICE_TYPE_LABEL[service.service_type ?? ""] || "펫시팅 서비스";
 
-  const msgNow = new Date().toISOString();
   const msgContent = `${RESERVATION_REQUEST_PREFIX}${JSON.stringify({
     reservationId: reservation.id,
     serviceTitle,
@@ -910,10 +852,7 @@ export async function createPetsitterReservationRequest(
   })}`;
 
   await supabase.from("messages").insert({ room_id: room.id, sender_id: user.id, content: msgContent });
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: "예약 요청", last_message_at: msgNow })
-    .eq("id", room.id);
+  await touchRoomPreview(supabase, room.id, "예약 요청");
 
   const { data: sitterProfile } = await supabase
     .from("sitters")
@@ -962,12 +901,7 @@ export async function acceptReservationRequest(
     return { ok: false, error: "대기 중인 예약만 수락할 수 있습니다." };
   }
 
-  const { data: room } = await supabase
-    .from("chat_rooms")
-    .select("id")
-    .eq("reservation_id", reservationId)
-    .eq("room_type", "reservation_request")
-    .maybeSingle();
+  const room = await findRoomByReservation(supabase, reservationId, { roomType: ROOM_TYPE.RESERVATION_REQUEST });
 
   if (!room) return { ok: false, error: "채팅방을 찾을 수 없습니다." };
 
@@ -980,7 +914,7 @@ export async function acceptReservationRequest(
 
   if (reservationError) return { ok: false, error: "예약 수락에 실패했습니다." };
 
-  await supabase.from("chat_rooms").update({ room_type: "direct" }).eq("id", room.id);
+  await flipReservationRequestToDirect(supabase, room.id);
   const directRoomId = room.id;
 
   const msgContent = `${RESERVATION_ACCEPTED_PREFIX}${JSON.stringify({
@@ -991,10 +925,7 @@ export async function acceptReservationRequest(
   })}`;
 
   await supabase.from("messages").insert({ room_id: directRoomId, sender_id: user.id, content: msgContent });
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: "예약 확정", last_message_at: now })
-    .eq("id", directRoomId);
+  await touchRoomPreview(supabase, directRoomId, "예약 확정");
 
   if (reservation.total_price && reservation.total_price > 0) {
     const { data: service } = reservation.service_id
@@ -1013,10 +944,7 @@ export async function acceptReservationRequest(
     })}`;
 
     await supabase.from("messages").insert({ room_id: directRoomId, sender_id: user.id, content: paymentContent });
-    await supabase
-      .from("chat_rooms")
-      .update({ last_message: "결제 요청", last_message_at: now })
-      .eq("id", directRoomId);
+    await touchRoomPreview(supabase, directRoomId, "결제 요청");
   }
 
   await createNotification(supabase, {
@@ -1058,12 +986,7 @@ export async function rejectReservationRequest(
     return { ok: false, error: "대기 중인 예약만 거절할 수 있습니다." };
   }
 
-  const { data: room } = await supabase
-    .from("chat_rooms")
-    .select("id")
-    .eq("reservation_id", reservationId)
-    .eq("room_type", "reservation_request")
-    .maybeSingle();
+  const room = await findRoomByReservation(supabase, reservationId, { roomType: ROOM_TYPE.RESERVATION_REQUEST });
 
   if (!room) return { ok: false, error: "채팅방을 찾을 수 없습니다." };
 
@@ -1084,10 +1007,7 @@ export async function rejectReservationRequest(
   // room_type은 "reservation_request"로 유지한다 — "direct"로 바꾸면
   // use-chat-rooms.ts의 수락 감지 리스너(room_type이 direct로 바뀌는 걸
   // "수락됨"으로 해석)가 거절도 수락으로 오인해서 상대방을 잘못 이동시킨다.
-  await supabase
-    .from("chat_rooms")
-    .update({ last_message: "예약 거절", last_message_at: now })
-    .eq("id", room.id);
+  await touchRoomPreview(supabase, room.id, "예약 거절");
 
   await createNotification(supabase, {
     userId: reservation.owner_id,

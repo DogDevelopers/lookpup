@@ -74,3 +74,11 @@ export const EXTRA_CHARGE_STATUS = {
 
 export type ExtraChargeStatus =
   (typeof EXTRA_CHARGE_STATUS)[keyof typeof EXTRA_CHARGE_STATUS];
+
+export const ROOM_TYPE = {
+  REQUEST: "request",
+  DIRECT: "direct",
+  RESERVATION_REQUEST: "reservation_request",
+} as const;
+
+export type RoomType = (typeof ROOM_TYPE)[keyof typeof ROOM_TYPE];
