@@ -31,6 +31,7 @@ export interface MyPet {
   weight: number | null;
   neutered: boolean;
   caution: string | null;
+  imageUrl: string | null;
 }
 
 function normalizeAnimalType(type: string): AnimalType {
@@ -85,10 +86,15 @@ function DeleteModal({
 
           <div className="w-full flex items-center gap-3 p-4 bg-orange-300/10 rounded-xl mb-6">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 overflow-hidden"
               style={{ background: `linear-gradient(135deg, ${visual.bgFrom}, ${visual.bgTo})` }}
             >
-              {visual.emoji}
+              {pet.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+              ) : (
+                visual.emoji
+              )}
             </div>
             <div className="text-left">
               <p className="font-semibold text-stone-900">{pet.name}</p>
@@ -288,10 +294,15 @@ function EditModal({
             <div className="flex flex-col items-center mb-6">
               <div className="relative">
                 <div
-                  className="w-25 h-25 rounded-full flex items-center justify-center text-5xl"
+                  className="w-25 h-25 rounded-full flex items-center justify-center text-5xl overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${visual.bgFrom}, ${visual.bgTo})` }}
                 >
-                  {visual.emoji}
+                  {pet.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                  ) : (
+                    visual.emoji
+                  )}
                 </div>
                 <button
                   onClick={() => toast.error("사진 업로드는 아직 준비 중이에요.")}
@@ -462,7 +473,12 @@ function PetCard({
         className="relative h-45 flex items-center justify-center"
         style={{ background: `linear-gradient(135deg, ${ANIMAL_VISUAL[animalType].bgFrom}, ${ANIMAL_VISUAL[animalType].bgTo})` }}
       >
-        <span className="text-6xl leading-none">{ANIMAL_VISUAL[animalType].emoji}</span>
+        {pet.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={pet.imageUrl} alt={pet.name} className="absolute inset-0 w-full h-full object-cover" />
+        ) : (
+          <span className="text-6xl leading-none">{ANIMAL_VISUAL[animalType].emoji}</span>
+        )}
         <div className="absolute top-3 left-3 bg-white/90 px-2.5 py-1 rounded-full border border-orange-300/20">
           <span className="text-xs font-semibold text-[var(--color-orange-300)]">
             {ANIMAL_TYPE_LABEL[animalType]}
@@ -549,7 +565,12 @@ function PetCardMobile({
           className="w-24 h-24 rounded-xl overflow-hidden flex items-center justify-center text-4xl"
           style={{ background: `linear-gradient(135deg, ${ANIMAL_VISUAL[animalType].bgFrom}, ${ANIMAL_VISUAL[animalType].bgTo})` }}
         >
-          {ANIMAL_VISUAL[animalType].emoji}
+          {pet.imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+          ) : (
+            ANIMAL_VISUAL[animalType].emoji
+          )}
         </div>
         {isSelectionMode && (
           <div
