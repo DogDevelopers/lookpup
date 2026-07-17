@@ -41,6 +41,7 @@ type RequestListRow = {
   start_datetime: string | null;
   end_datetime: string | null;
   created_at: string;
+  status: string;
 };
 
 function toPostListItem(row: RequestListRow): PostListItem {
@@ -55,15 +56,18 @@ function toPostListItem(row: RequestListRow): PostListItem {
     period: formatPeriod(row.start_datetime, row.end_datetime),
     price: row.budget ? `${row.budget.toLocaleString()}원` : "협의 가능",
     createdAt: formatRelativeTime(row.created_at),
+    status: row.status,
   };
 }
 
+// 모집 완료(matched) 구인글은 검색이나 게시글 관리에서는 계속 보여야 해서 쿼리에서 제외하지 않고
+// 목록 화면(BoardListClient)에서 검색어가 없을 때만 걸러낸다.
 export async function getRequestList(): Promise<PostListItem[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("requests")
     .select(
-      "id, title, content, request_type, location, budget, start_datetime, end_datetime, created_at",
+      "id, title, content, request_type, location, budget, start_datetime, end_datetime, created_at, status",
     )
     .neq("status", REQUEST_STATUS.CANCELED)
     .order("created_at", { ascending: false });

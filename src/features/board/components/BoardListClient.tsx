@@ -116,7 +116,9 @@ export default function BoardListClient({
       searchQuery === "" ||
       p.title.includes(searchQuery) ||
       p.desc.includes(searchQuery);
-    return matchCategory && matchSearch;
+    // 모집 완료(matched) 글은 구인게시판 목록에는 숨기되, 검색 중일 때는 계속 찾을 수 있어야 함
+    const visible = searchQuery !== "" || p.status !== "matched";
+    return matchCategory && matchSearch && visible;
   });
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
