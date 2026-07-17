@@ -96,7 +96,14 @@ export function SimpleTimePicker({
     setMinute(value.getMinutes());
   }
 
+  const isFirstRender = useRef(true);
   useEffect(() => {
+    // 마운트 시 value로부터 파생된 초기 hour/minute을 그대로 onChange에 흘려보내면
+    // 사용자가 시간을 고르지 않았는데도 부모 상태가 채워져 버려서(예: 00:00) 첫 렌더는 건너뜀
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     onChange(
       buildTime({
         use12HourFormat,
