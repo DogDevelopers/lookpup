@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMySitterProfile } from "@/features/sitter-register/actions";
@@ -98,16 +99,18 @@ export default async function MyProfilePage() {
   }));
 
   return (
-    <MyProfileClient
-      user={myProfileUser}
-      sitter={sitterSummary}
-      bookings={bookings}
-      works={works}
-      pets={myPets}
-      posts={posts}
-      writtenReviews={writtenReviews}
-      receivedReviews={receivedReviews}
-      earnings={earnings}
-    />
+    <Suspense>
+      <MyProfileClient
+        user={myProfileUser}
+        sitter={sitterSummary}
+        bookings={bookings}
+        works={works}
+        pets={myPets}
+        posts={posts}
+        writtenReviews={writtenReviews}
+        receivedReviews={receivedReviews}
+        earnings={earnings}
+      />
+    </Suspense>
   );
 }
