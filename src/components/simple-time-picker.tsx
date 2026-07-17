@@ -96,28 +96,6 @@ export function SimpleTimePicker({
     setMinute(value.getMinutes());
   }
 
-  const isFirstRender = useRef(true);
-  useEffect(() => {
-    // 마운트 시 value로부터 파생된 초기 hour/minute을 그대로 onChange에 흘려보내면
-    // 사용자가 시간을 고르지 않았는데도 부모 상태가 채워져 버려서(예: 00:00) 첫 렌더는 건너뜀
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    onChange(
-      buildTime({
-        use12HourFormat,
-        value,
-        formatStr,
-        hour,
-        minute,
-        ampm,
-      }),
-    );
-    // value/onChange를 deps에 넣으면 무한 루프·매 렌더 재호출이 생겨 의도적으로 제외
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hour, minute, ampm, formatStr, use12HourFormat]);
-
   const _hourIn24h = useMemo(() => {
     return use12HourFormat ? (hour % 12) + ampm * 12 : hour;
   }, [hour, use12HourFormat, ampm]);
@@ -188,6 +166,7 @@ export function SimpleTimePicker({
   }, [open]);
   const onHourChange = useCallback(
     (v: SimpleTimeOption) => {
+      let newMinute = minute;
       if (min) {
         const newTime = buildTime({
           use12HourFormat,
@@ -197,9 +176,7 @@ export function SimpleTimePicker({
           minute,
           ampm,
         });
-        if (newTime < min) {
-          setMinute(min.getMinutes());
-        }
+        if (newTime < min) newMinute = min.getMinutes();
       }
       if (max) {
         const newTime = buildTime({
@@ -207,25 +184,49 @@ export function SimpleTimePicker({
           value,
           formatStr,
           hour: v.value,
-          minute,
+          minute: newMinute,
           ampm,
         });
-        if (newTime > max) {
-          setMinute(max.getMinutes());
-        }
+        if (newTime > max) newMinute = max.getMinutes();
       }
       setHour(v.value);
+      setMinute(newMinute);
+      onChange(
+        buildTime({
+          use12HourFormat,
+          value,
+          formatStr,
+          hour: v.value,
+          minute: newMinute,
+          ampm,
+        }),
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setHour, use12HourFormat, value, formatStr, minute, ampm],
+    [setHour, use12HourFormat, value, formatStr, minute, ampm, onChange],
   );
 
-  const onMinuteChange = useCallback((v: SimpleTimeOption) => {
-    setMinute(v.value);
-  }, []);
+  const onMinuteChange = useCallback(
+    (v: SimpleTimeOption) => {
+      setMinute(v.value);
+      onChange(
+        buildTime({
+          use12HourFormat,
+          value,
+          formatStr,
+          hour,
+          minute: v.value,
+          ampm,
+        }),
+      );
+    },
+    [use12HourFormat, value, formatStr, hour, ampm, onChange],
+  );
 
   const onAmpmChange = useCallback(
     (v: SimpleTimeOption) => {
+      let newHour = hour;
+      let newMinute = minute;
       if (min) {
         const newTime = buildTime({
           use12HourFormat,
@@ -237,8 +238,8 @@ export function SimpleTimePicker({
         });
         if (newTime < min) {
           const minH = min.getHours() % 12;
-          setHour(minH === 0 ? 12 : minH);
-          setMinute(min.getMinutes());
+          newHour = minH === 0 ? 12 : minH;
+          newMinute = min.getMinutes();
         }
       }
       if (max) {
@@ -246,19 +247,31 @@ export function SimpleTimePicker({
           use12HourFormat,
           value,
           formatStr,
-          hour,
-          minute,
+          hour: newHour,
+          minute: newMinute,
           ampm: v.value,
         });
         if (newTime > max) {
           const maxH = max.getHours() % 12;
-          setHour(maxH === 0 ? 12 : maxH);
-          setMinute(max.getMinutes());
+          newHour = maxH === 0 ? 12 : maxH;
+          newMinute = max.getMinutes();
         }
       }
+      setHour(newHour);
+      setMinute(newMinute);
       setAmpm(v.value);
+      onChange(
+        buildTime({
+          use12HourFormat,
+          value,
+          formatStr,
+          hour: newHour,
+          minute: newMinute,
+          ampm: v.value,
+        }),
+      );
     },
-    [setAmpm, use12HourFormat, value, formatStr, hour, minute, min, max],
+    [setAmpm, use12HourFormat, value, formatStr, hour, minute, min, max, onChange],
   );
 
   const display = useMemo(() => {
