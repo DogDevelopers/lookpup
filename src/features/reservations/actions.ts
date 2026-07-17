@@ -7,8 +7,7 @@ import {
   touchRoomPreview,
   findRoomByReservation,
   findDirectRoomByParties,
-  findReservationFlowRoom,
-  upsertReservationRequestRoom,
+  createReservationRequestRoom,
   flipReservationRequestToDirect,
 } from "@/lib/chat-rooms";
 import { RESERVATION_STATUS, ROOM_TYPE } from "@/lib/constants";
@@ -760,18 +759,23 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
   }
 
-  // 구인글 지원 방("request")은 findReservationFlowRoom이 재사용 대상에서
-  // 이미 제외한다 — 그 방은 별개의 지원 스레드이므로 무관한 예약 요청이
-  // 가로채면 안 된다.
-  const existingRoom = await findReservationFlowRoom(supabase, user.id, input.sitter_id);
-
+  // 같은 시터에게 이미 진행 중인 예약이 있으면 새 예약 요청을 막는다
+  // (방 재사용 여부와 무관한 별개의 중복 방지 규칙).
   const activeStatuses: string[] = [
     RESERVATION_STATUS.PENDING,
     RESERVATION_STATUS.ACCEPTED,
     RESERVATION_STATUS.PAID,
     RESERVATION_STATUS.IN_PROGRESS,
   ];
-  if (existingRoom?.reservationStatus && activeStatuses.includes(existingRoom.reservationStatus)) {
+  const { data: activeReservation } = await supabase
+    .from("reservations")
+    .select("id")
+    .eq("owner_id", user.id)
+    .eq("sitter_id", input.sitter_id)
+    .in("status", activeStatuses)
+    .limit(1)
+    .maybeSingle();
+  if (activeReservation) {
     return { ok: false, error: "이미 해당 펫시터에게 예약 요청을 보냈습니다." };
   }
 
@@ -824,8 +828,7 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "예약 요청 생성에 실패했습니다." };
   }
 
-  const room = await upsertReservationRequestRoom(supabase, {
-    existingRoomId: existingRoom?.id ?? null,
+  const room = await createReservationRequestRoom(supabase, {
     ownerId: user.id,
     sitterId: input.sitter_id,
     reservationId: reservation.id,
