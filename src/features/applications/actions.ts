@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { findRequestRoom, findOrCreateRequestRoom, promoteApplicationRoomToDirect } from "@/lib/chat-rooms";
 import { APPLICATION_STATUS } from "@/lib/constants";
 import type { ApplicationRequestDetails } from "@/features/applications/types";
 
@@ -70,30 +71,13 @@ export async function createApplication(
 
   if (error || !application) return { ok: false, error: "지원에 실패했습니다." };
 
-  const { data: existingRoom } = await supabase
-    .from("chat_rooms")
-    .select("id")
-    .eq("request_id", requestId)
-    .eq("sitter_id", sitter.id)
-    .maybeSingle();
-
-  let roomId = existingRoom?.id ?? null;
-  if (!existingRoom) {
-    const { data: newRoom, error: roomError } = await supabase
-      .from("chat_rooms")
-      .insert({
-        room_type: "request",
-        owner_id: requestRow.owner_id,
-        sitter_id: sitter.id,
-        request_id: requestId,
-      })
-      .select("id")
-      .single();
-    if (roomError || !newRoom) {
-      return { ok: false, error: "채팅방 개설에 실패했습니다." };
-    }
-    roomId = newRoom.id;
-  }
+  const room = await findOrCreateRequestRoom(supabase, {
+    requestId,
+    sitterId: sitter.id,
+    ownerId: requestRow.owner_id,
+  });
+  if (!room) return { ok: false, error: "채팅방 개설에 실패했습니다." };
+  const roomId = room.id;
 
   const { data: sitterUser } = await supabase
     .from("users")
@@ -274,41 +258,39 @@ export async function updateApplication(
     reservationId = reservation.id;
 
     if (requestRow.pet_id) {
-      await supabase
+      const { error: itemsError } = await supabase
         .from("reservation_items")
         .insert({ reservation_id: reservation.id, pet_id: requestRow.pet_id });
+      if (itemsError) {
+        await supabase.from("reservations").delete().eq("id", reservation.id);
+        return { ok: false, error: "예약 생성에 실패했습니다." };
+      }
     }
 
-    const { data: existingRoom } = await supabase
-      .from("chat_rooms")
-      .select("id")
-      .eq("request_id", requestRow.id)
-      .eq("sitter_id", application.sitter_id)
-      .maybeSingle();
-
-    if (!existingRoom) {
-      const { data: newRoom } = await supabase
-        .from("chat_rooms")
-        .insert({
-          room_type: "direct",
-          owner_id: requestRow.owner_id,
-          sitter_id: application.sitter_id,
-          request_id: requestRow.id,
-          reservation_id: reservation.id,
-          application_id: id,
-        })
-        .select("id")
-        .single();
-      roomId = newRoom?.id ?? null;
-    } else {
-      await supabase
-        .from("chat_rooms")
-        .update({ room_type: "direct", reservation_id: reservation.id, application_id: id })
-        .eq("id", existingRoom.id);
-      roomId = existingRoom.id;
+    const room = await promoteApplicationRoomToDirect(supabase, {
+      requestId: requestRow.id,
+      sitterId: application.sitter_id,
+      ownerId: requestRow.owner_id,
+      reservationId: reservation.id,
+      applicationId: id,
+    });
+    if (!room) {
+      await supabase.from("reservation_items").delete().eq("reservation_id", reservation.id);
+      await supabase.from("reservations").delete().eq("id", reservation.id);
+      return { ok: false, error: "채팅방 생성/전환에 실패했습니다." };
     }
+    roomId = room.id;
 
-    await supabase.from("requests").update({ status: "matched" }).eq("id", requestRow.id);
+    // 이 시점부터는 chat_rooms.reservation_id가 이 예약을 참조하므로,
+    // 이후 실패는 reservation_items/reservations를 롤백(삭제)할 수 없다
+    // (FK 제약 위반). 에러만 반환하고 이미 만들어진 예약·채팅방은 남겨둔다.
+    const { error: requestUpdateError } = await supabase
+      .from("requests")
+      .update({ status: "matched" })
+      .eq("id", requestRow.id);
+    if (requestUpdateError) {
+      return { ok: false, error: "구인글 상태 갱신에 실패했습니다." };
+    }
   }
 
   const { data, error } = await supabase
@@ -329,12 +311,7 @@ export async function updateApplication(
 
     if (applicantSitter?.user_id) {
       if (!roomId) {
-        const { data: chatRoom } = await supabase
-          .from("chat_rooms")
-          .select("id")
-          .eq("request_id", application.request_id)
-          .eq("sitter_id", application.sitter_id)
-          .maybeSingle();
+        const chatRoom = await findRequestRoom(supabase, application.request_id, application.sitter_id);
         roomId = chatRoom?.id ?? null;
       }
       const chatLink = roomId ? `/chat?roomId=${roomId}` : undefined;
