@@ -102,7 +102,6 @@ export default function BoardDetailClient({
   const [showApplyModal, setShowApplyModal] = useState(false);
   const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [applyError, setApplyError] = useState<string | null>(null);
   const [applying, setApplying] = useState(false);
   const [post, setPost] = useState<RequestDetail | null>(initialPost ?? null);
   const otherPosts = initialOtherPosts ?? null;
@@ -110,7 +109,6 @@ export default function BoardDetailClient({
   const handleApply = async () => {
     if (!post?.id) return;
     setApplying(true);
-    setApplyError(null);
 
     const result = await createApplication(post.id, {
       message: null,
@@ -119,7 +117,8 @@ export default function BoardDetailClient({
 
     setApplying(false);
     if (!result.ok) {
-      setApplyError(result.error);
+      setShowApplyModal(false);
+      setErrorMessage(result.error);
       return;
     }
     setShowApplyModal(false);
@@ -161,7 +160,6 @@ export default function BoardDetailClient({
       setErrorMessage("승인 대기 중이거나 반려된 펫시터는 지원할 수 없습니다.");
       return;
     }
-    setApplyError(null);
     setShowApplyModal(true);
   };
 
@@ -316,11 +314,6 @@ export default function BoardDetailClient({
                           지원하기
                         </button>
                       </div>
-                    )}
-                    {applyError && (
-                      <p className="sm:col-span-2 text-sm text-red-500 text-center">
-                        {applyError}
-                      </p>
                     )}
                   </div>
                 </div>
@@ -538,7 +531,11 @@ export default function BoardDetailClient({
       <CustomModal
         open={!!errorMessage}
         type="error"
-        title="오류가 발생했습니다."
+        title={
+          errorMessage === "이미 지원한 구인글입니다."
+            ? "이미 지원하였던 게시글이에요"
+            : "오류가 발생했습니다."
+        }
         description={errorMessage ?? undefined}
         confirmText="확인"
         onConfirm={() => setErrorMessage(null)}
