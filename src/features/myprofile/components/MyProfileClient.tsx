@@ -39,6 +39,7 @@ import MyPetsClient, {
 } from "@/features/pet-register/components/MyPetsClient";
 import MyPostsClient from "@/features/board/components/MyPostsClient";
 import EarningsClient from "@/features/earnings/components/EarningsClient";
+import EarningsSummaryCard from "@/features/earnings/components/EarningsSummaryCard";
 import type {
   MyProfileUser,
   MyProfileSitterSummary,
@@ -483,12 +484,18 @@ export default function MyProfileClient({
         );
       default:
         return (
-          <SitterProfileView
-            name={name}
-            profileImage={user.profileImage}
-            location={location}
-            sitter={sitter}
-          />
+          <div className="space-y-4">
+            <SitterProfileView
+              name={name}
+              profileImage={user.profileImage}
+              location={location}
+              sitter={sitter}
+            />
+            <EarningsSummaryCard
+              data={earnings}
+              onViewDetail={() => setSelectedMenu("earnings")}
+            />
+          </div>
         );
     }
   })();
