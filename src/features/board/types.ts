@@ -28,6 +28,7 @@ export type PostListItem = {
   period: string;
   price: string;
   createdAt: string;
+  status: string;
 };
 
 export type PostData = {
