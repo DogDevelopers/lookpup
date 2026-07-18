@@ -64,7 +64,7 @@ export default async function MyProfilePage() {
       isSitter ? getMySitterReservations() : Promise.resolve([]),
       supabase
         .from("pets")
-        .select("id, name, animal_type, breed, age, gender, weight, neutered, caution")
+        .select("id, name, animal_type, breed, age, gender, weight, neutered, caution, image_url")
         .eq("owner_id", user.id)
         .is("deleted_at", null)
         .order("created_at", { ascending: false }),
@@ -95,6 +95,7 @@ export default async function MyProfilePage() {
     weight: row.weight != null ? Number(row.weight) : null,
     neutered: row.neutered,
     caution: row.caution,
+    imageUrl: row.image_url,
   }));
 
   return (
