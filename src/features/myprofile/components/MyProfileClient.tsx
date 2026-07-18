@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   ChevronRight,
   Dog,
@@ -399,8 +400,24 @@ export default function MyProfileClient({
 }) {
   const isSitter = user.role === "both" || user.role === "admin";
 
-  const [role, setRole] = useState<Role>("owner");
-  const [selectedMenu, setSelectedMenu] = useState("pets");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const role: Role = isSitter && searchParams.get("role") === "sitter" ? "sitter" : "owner";
+  const defaultMenu = role === "owner" ? "pets" : "profile";
+  const selectedMenu = searchParams.get("menu") || defaultMenu;
+
+  const navigate = (nextRole: Role, nextMenu: string) => {
+    const params = new URLSearchParams();
+    if (nextRole === "sitter") params.set("role", "sitter");
+    if (nextMenu !== (nextRole === "owner" ? "pets" : "profile")) {
+      params.set("menu", nextMenu);
+    }
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
+
   const [locationData, setLocationData] = useState<LocationData | null>(
     user.address && user.latitude != null && user.longitude != null
       ? {
@@ -418,13 +435,12 @@ export default function MyProfileClient({
   const menuItems = role === "owner" ? OWNER_MENU : SITTER_MENU;
 
   const handleRoleChange = (next: Role) => {
-    setRole(next);
-    setSelectedMenu(next === "owner" ? "pets" : "profile");
+    navigate(next, next === "owner" ? "pets" : "profile");
   };
 
   const handleMenuClick = (item: MenuItem) => {
     if (item.kind === "view") {
-      setSelectedMenu(item.id);
+      navigate(role, item.id);
     }
   };
 
@@ -479,7 +495,7 @@ export default function MyProfileClient({
           <EarningsClient
             data={earnings}
             embedded
-            onViewReservations={() => setSelectedMenu("works")}
+            onViewReservations={() => navigate(role, "works")}
           />
         );
       default:
