@@ -4,7 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/features/auth/actions";
 import type { HeaderUser } from "@/components/layout/types";
 
-// TODO: wire Header's notifications props once features/notifications is ported.
 // Footer is intentionally NOT rendered here — some routes (e.g. petsitters
 // search) are full-height app-like views without a footer. Pages that want
 // a footer render <Footer /> themselves at the end of their content.

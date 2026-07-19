@@ -16,6 +16,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { getNotificationIcon } from "@/lib/notification-icons";
 import type { HeaderNotification, HeaderUser } from "./types";
 
 function relativeTime(iso: string) {
@@ -120,15 +121,17 @@ export default function HeaderAuth({
                 <p className="text-xs">새로운 알림이 없습니다</p>
               </div>
             ) : (
-              notifications.map((notif, i) => (
+              notifications.map((notif, i) => {
+                const { icon, iconBg } = getNotificationIcon(notif.type, 14);
+                return (
                 <button
                   key={notif.id}
                   type="button"
                   onClick={() => onNotificationClick?.(notif)}
                   className={`w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-orange-50/50 transition-colors ${i < notifications.length - 1 ? "border-b border-orange-100" : ""} ${notif.isRead ? "opacity-70" : ""}`}
                 >
-                  <div className="w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                    <Bell size={14} className="text-orange-500" />
+                  <div className={`w-8 h-8 ${iconBg} rounded-lg flex items-center justify-center shrink-0 mt-0.5`}>
+                    {icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p
@@ -147,7 +150,8 @@ export default function HeaderAuth({
                     <span className="w-1.5 h-1.5 bg-orange-500 rounded-full shrink-0 mt-1.5" />
                   )}
                 </button>
-              ))
+                );
+              })
             )}
           </div>
           <div className="border-t border-orange-100">
