@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ChevronLeft, Bell } from "lucide-react";
 import LoadingPage from "@/components/common/LoadingPage";
 import Footer from "@/components/layout/Footer";
+import { useNotifications } from "@/features/notifications/hooks/use-notifications";
 import { NotificationItem } from "./NotificationItem";
-import type { NotificationRow } from "../types";
 
 function formatRelativeTime(dateStr: string | null): string {
   if (!dateStr) return "";
@@ -34,20 +34,9 @@ function isToday(dateStr: string | null): boolean {
   );
 }
 
-interface NotificationsClientProps {
-  // TODO: features/notifications/queries.ts로 실데이터 조회 + 실시간 구독(NotificationsRealtimeSync) 연동.
-  notifications?: NotificationRow[];
-  isLoading?: boolean;
-  onMarkAllRead?: () => void;
-  onNotificationRead?: (id: string) => void;
-}
+export default function NotificationsClient() {
+  const { notifications, isLoading, markRead, markAllRead } = useNotifications(50);
 
-export default function NotificationsClient({
-  notifications = [],
-  isLoading = false,
-  onMarkAllRead,
-  onNotificationRead,
-}: NotificationsClientProps) {
   const todayList = notifications.filter((n) => isToday(n.updatedAt ?? n.createdAt));
   const prevList = notifications.filter((n) => !isToday(n.updatedAt ?? n.createdAt));
   const hasUnread = notifications.some((n) => !n.isRead);
@@ -72,7 +61,7 @@ export default function NotificationsClient({
           {hasUnread && (
             <button
               type="button"
-              onClick={() => onMarkAllRead?.()}
+              onClick={() => markAllRead()}
               className="text-orange-500 text-sm font-medium hover:text-orange-600 transition-colors"
             >
               모두 읽음 처리
@@ -110,7 +99,7 @@ export default function NotificationsClient({
                   isRead={n.isRead}
                   linkUrl={n.linkUrl}
                   last={i === todayList.length - 1}
-                  onRead={onNotificationRead}
+                  onRead={markRead}
                 />
               ))}
             </div>
@@ -132,7 +121,7 @@ export default function NotificationsClient({
                   isRead={n.isRead}
                   linkUrl={n.linkUrl}
                   last={i === prevList.length - 1}
-                  onRead={onNotificationRead}
+                  onRead={markRead}
                 />
               ))}
             </div>

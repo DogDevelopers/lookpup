@@ -33,3 +33,8 @@ export const paymentKeys = {
   activeBySitter: (sitterId: string) =>
     [...paymentKeys.all, "activeBySitter", sitterId] as const,
 };
+
+export const notificationKeys = {
+  all: ["notifications"] as const,
+  list: (limit: number) => [...notificationKeys.all, "list", limit] as const,
+};

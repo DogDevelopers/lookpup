@@ -1,8 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import NavLink from "./NavLink";
 import HeaderAuth from "./HeaderAuth";
 import HeaderMobileMenu from "./HeaderMobileMenu";
+import { useNotifications } from "@/features/notifications/hooks/use-notifications";
 import type { HeaderNotification, HeaderUser } from "./types";
 
 const NAV_ITEMS = [
@@ -14,24 +18,28 @@ const NAV_ITEMS = [
 interface HeaderProps {
   user?: HeaderUser | null;
   isLoading?: boolean;
-  unreadCount?: number;
-  notifications?: HeaderNotification[];
-  onNotificationsOpen?: () => void;
-  onMarkAllNotificationsRead?: () => void;
-  onNotificationClick?: (notification: HeaderNotification) => void;
   onLogout?: () => void;
 }
 
-export default function Header({
-  user = null,
-  isLoading = false,
-  unreadCount = 0,
-  notifications = [],
-  onNotificationsOpen,
-  onMarkAllNotificationsRead,
-  onNotificationClick,
-  onLogout,
-}: HeaderProps) {
+export default function Header({ user = null, isLoading = false, onLogout }: HeaderProps) {
+  const router = useRouter();
+  const { notifications, unreadCount, markRead, markAllRead } = useNotifications(5);
+
+  const headerNotifications: HeaderNotification[] = notifications.map((n) => ({
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    content: n.content,
+    isRead: n.isRead,
+    linkUrl: n.linkUrl,
+    createdAt: n.createdAt ?? n.updatedAt ?? "",
+  }));
+
+  function handleNotificationClick(notification: HeaderNotification) {
+    if (!notification.isRead) markRead(notification.id);
+    if (notification.linkUrl) router.push(notification.linkUrl);
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-orange-100 shadow-[0px_1px_8px_0px_rgba(232,116,42,0.08)]">
       {/* 데스크톱 헤더 */}
@@ -59,10 +67,9 @@ export default function Header({
             user={user}
             isLoading={isLoading}
             unreadCount={unreadCount}
-            notifications={notifications}
-            onNotificationsOpen={onNotificationsOpen}
-            onMarkAllNotificationsRead={onMarkAllNotificationsRead}
-            onNotificationClick={onNotificationClick}
+            notifications={headerNotifications}
+            onMarkAllNotificationsRead={markAllRead}
+            onNotificationClick={handleNotificationClick}
             onLogout={onLogout}
           />
         </div>

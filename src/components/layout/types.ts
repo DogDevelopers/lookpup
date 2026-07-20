@@ -8,6 +8,7 @@ export interface HeaderUser {
 
 export interface HeaderNotification {
   id: string;
+  type: string;
   title: string;
   content: string;
   isRead: boolean;

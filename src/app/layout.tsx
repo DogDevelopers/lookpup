@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+import NotificationToaster from "@/features/notifications/components/NotificationToaster";
 
 const pretendard = localFont({
   src: [
@@ -33,6 +34,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
+        <NotificationToaster />
         <Toaster />
       </body>
     </html>

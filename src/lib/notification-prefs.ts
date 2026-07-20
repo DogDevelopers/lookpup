@@ -15,6 +15,21 @@ const DEFAULT_PREFS: NotificationPrefs = {
   marketing: false,
 };
 
+type NotificationCategory = keyof NotificationPrefs;
+
+const TYPE_TO_CATEGORY: Partial<Record<string, NotificationCategory>> = {
+  application: "reservation",
+  application_selected: "reservation",
+  application_rejected: "reservation",
+  reservation: "reservation",
+  care_record: "reservation",
+  message: "chat",
+};
+
+export function getNotificationCategory(type: string): NotificationCategory | null {
+  return TYPE_TO_CATEGORY[type] ?? null;
+}
+
 export function loadNotificationPrefs(): NotificationPrefs {
   if (typeof window === "undefined") return DEFAULT_PREFS;
 
