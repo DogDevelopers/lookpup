@@ -7,7 +7,7 @@ import { DateRange } from "react-day-picker";
 import { isSameDay, format } from "date-fns";
 import { ko } from "date-fns/locale";
 import RangePicker from "@/components/ui/RangePicker";
-import { getReservationsByRoom } from "@/features/chat/actions";
+import { getReservationsByRoom } from "@/features/chat/actions/room-actions";
 
 type ReservationItem = {
   id: string;

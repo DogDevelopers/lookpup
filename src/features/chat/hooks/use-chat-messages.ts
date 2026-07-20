@@ -5,9 +5,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { chatKeys } from "@/lib/query-keys";
-import { getChatMessages } from "@/features/chat/actions";
-import type { ChatMessageRow } from "@/features/chat/types";
+import { getChatMessages } from "@/features/chat/actions/room-actions";
 import type {
+  ChatMessageRow,
   Message,
   PaymentData,
   ApplicationData,
@@ -16,7 +16,7 @@ import type {
   ReservationAcceptedData,
   ReservationEditPayload,
   ReservationEditResponsePayload,
-} from "@/features/chat/components/chat_components";
+} from "@/features/chat/types";
 import {
   SYSTEM_MSG_PREFIX,
   IMAGE_MSG_PREFIX,
