@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getChatRoomsData } from "@/features/chat/actions";
+import { getChatRoomsData } from "@/features/chat/actions/room-actions";
 import ChatClient from "@/features/chat/components/ChatClient";
 import { Spinner } from "@/components/ui/spinner";
 

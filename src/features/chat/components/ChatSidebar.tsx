@@ -4,14 +4,16 @@ import { memo, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  ChatRoomItem,
-  ApplicantPostGroup,
-  ReservationRequestCard,
   type ChatRoom,
   type Applicant,
   type ReservationRequest,
   type Badge,
-} from "./chat_components";
+} from "@/features/chat/types";
+import {
+  ChatRoomItem,
+  ApplicantPostGroup,
+  ReservationRequestCard,
+} from "./sidebar-items";
 import type { Post } from "../hooks/use-chat-rooms";
 
 interface ChatSidebarProps {

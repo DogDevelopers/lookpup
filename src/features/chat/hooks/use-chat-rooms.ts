@@ -6,13 +6,13 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
 import { chatKeys } from "@/lib/query-keys";
 import { APPLICATION_STATUS } from "@/lib/constants";
-import { getChatRoomsData, leaveRoom } from "@/features/chat/actions";
-import type { RoomApiItem } from "@/features/chat/types";
+import { getChatRoomsData, leaveRoom } from "@/features/chat/actions/room-actions";
 import type {
+  RoomApiItem,
   ChatRoom,
   Applicant,
   ReservationRequest,
-} from "@/features/chat/components/chat_components";
+} from "@/features/chat/types";
 import {
   SYSTEM_MSG_PREFIX,
   IMAGE_MSG_PREFIX,

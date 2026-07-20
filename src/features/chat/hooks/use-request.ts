@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { Applicant } from "@/features/chat/components/chat_components";
+import type { Applicant } from "@/features/chat/types";
 import { APPLICATION_STATUS } from "@/lib/constants";
 
 export function useRequest(applicants: Applicant[]) {
