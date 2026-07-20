@@ -10,7 +10,7 @@ import {
   CHAT_MESSAGE_MAX_LENGTH,
   truncatePreview,
 } from "@/lib/chat-message-prefixes";
-import { isRecipientActive, type ActionResult } from "./shared";
+import { isRecipientActive, getAuthorizedChatRoom, type ActionResult } from "./shared";
 
 export async function sendMessage(
   roomId: string,
@@ -160,6 +160,9 @@ export async function sendSystemMessage(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
 
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
+
   const { data: message, error } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: user.id, content: `${SYSTEM_MSG_PREFIX}${content}` })
@@ -180,6 +183,9 @@ export async function sendReservationCanceledMessage(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
+
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
 
   const { data: message, error } = await supabase
     .from("messages")

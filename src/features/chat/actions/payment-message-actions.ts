@@ -5,7 +5,7 @@ import { createNotification } from "@/lib/notifications";
 import { touchRoomPreview } from "@/lib/chat-rooms";
 import { EXTRA_CHARGE_STATUS } from "@/lib/constants";
 import { PAYMENT_REQUEST_PREFIX, PAYMENT_COMPLETE_PREFIX } from "@/lib/chat-message-prefixes";
-import { isRecipientActive, type ActionResult } from "./shared";
+import { isRecipientActive, getAuthorizedChatRoom, type ActionResult } from "./shared";
 
 export async function sendPaymentRequestMessage(
   roomId: string,
@@ -111,6 +111,9 @@ export async function sendPaymentCompleteMessage(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
+
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
 
   const content = `${PAYMENT_COMPLETE_PREFIX}${JSON.stringify(data)}`;
   const { data: message, error } = await supabase

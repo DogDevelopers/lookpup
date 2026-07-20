@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { touchRoomPreview } from "@/lib/chat-rooms";
 import { APPLICATION_SELECTED_PREFIX, APPLICATION_REJECTED_PREFIX } from "@/lib/chat-message-prefixes";
-import type { ActionResult } from "./shared";
+import { getAuthorizedChatRoom, type ActionResult } from "./shared";
 
 export async function sendApplicationSelectedMessage(
   roomId: string,
@@ -14,6 +14,9 @@ export async function sendApplicationSelectedMessage(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
+
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
 
   const content = `${APPLICATION_SELECTED_PREFIX}${JSON.stringify(data)}`;
   const { data: message, error } = await supabase
@@ -36,6 +39,9 @@ export async function sendApplicationRejectedMessage(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "로그인이 필요합니다." };
+
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
 
   const { data: message, error } = await supabase
     .from("messages")
