@@ -30,24 +30,3 @@ export async function createReport(input: ReportCreateInput): Promise<ActionResu
   if (error) return { ok: false, error: "신고 접수에 실패했습니다." };
   return { ok: true };
 }
-
-export interface ReportableUser {
-  id: string;
-  full_name: string | null;
-  profile_image: string | null;
-  role: string | null;
-}
-
-export async function searchReportableUsers(query: string): Promise<ReportableUser[]> {
-  const trimmed = query.trim();
-  if (trimmed.length < 1) return [];
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
-
-  const { data } = await supabase.rpc("search_reportable_users", { p_query: trimmed });
-  return (data ?? []) as ReportableUser[];
-}

@@ -11,6 +11,7 @@ import {
   Send,
   Pencil,
   Trash2,
+  Flag,
 } from "lucide-react";
 import Footer from "@/components/layout/Footer";
 import Avatar from "@/components/ui/Avatar";
@@ -19,6 +20,7 @@ import { CustomModal } from "@/components/common/CustomModal";
 import BackButton from "@/components/common/BackButton";
 import KakaoMap from "@/components/common/KakaoMap";
 import { ImageGallery } from "@/components/common/ImageGallery";
+import { ReportDialog } from "@/features/report/components/ReportDialog";
 import { splitConditions } from "../utils";
 import { closeRequest, deleteRequest } from "../actions";
 import { createApplication } from "@/features/applications/actions";
@@ -104,6 +106,7 @@ export default function BoardDetailClient({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [applying, setApplying] = useState(false);
   const [post, setPost] = useState<RequestDetail | null>(initialPost ?? null);
+  const [reportOpen, setReportOpen] = useState(false);
   const otherPosts = initialOtherPosts ?? null;
 
   const handleApply = async () => {
@@ -259,6 +262,15 @@ export default function BoardDetailClient({
                           <Trash2 size={14} />
                         </button>
                       </div>
+                    )}
+                    {!isAuthor && isLoggedIn && (
+                      <button
+                        onClick={() => setReportOpen(true)}
+                        aria-label="게시글 신고"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-orange-100 text-stone-400 hover:text-red-500 hover:bg-red-50 transition-colors shrink-0 mt-1"
+                      >
+                        <Flag size={14} />
+                      </button>
                     )}
                   </div>
 
@@ -555,6 +567,14 @@ export default function BoardDetailClient({
           onConfirm={confirmDelete}
         />
       )}
+
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        targetType="request"
+        targetId={post.id}
+        targetLabel={post.title}
+      />
     </>
   );
 }

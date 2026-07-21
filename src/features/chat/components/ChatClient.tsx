@@ -13,6 +13,8 @@ import { ChatSidebar } from "./ChatSidebar";
 import { ChatWindow } from "./ChatWindow";
 import { CustomModal } from "@/components/common/CustomModal";
 import { ProfilePopup } from "./ChatWindowHeader";
+import { ReportDialog } from "@/features/report/components/ReportDialog";
+import type { ReportCreateInput } from "@/features/report/schema";
 import {
   canLeaveDirectRoom,
   canLeaveReservationRequest,
@@ -577,43 +579,41 @@ function ChatPageContent({
     return "구인글 채팅 · 지원자";
   }, [activeTab, selectedRoom, selectedReservationRequest, confirmedIds, selectedApplicant, selectedApplicantId, rejectedIds]);
 
-  const getReportUrl = useCallback(() => {
+  const [reportTarget, setReportTarget] = useState<{
+    targetType: ReportCreateInput["target_type"];
+    targetId: string;
+    targetLabel?: string;
+  } | null>(null);
+
+  const handleReport = useCallback(() => {
     let targetId = "";
     let targetName = "";
-    let targetImage: string | null = null;
     let role = "펫시터";
 
     if (activeTab === "one_on_one") {
       const isUserSitter = selectedRoom?.sitterId === userId;
       targetId = isUserSitter ? (selectedRoom?.ownerId ?? "") : (selectedRoom?.sitterId ?? "");
       targetName = selectedRoom?.name ?? "";
-      targetImage = selectedRoom?.profileImage ?? null;
       role = isUserSitter ? "보호자" : "펫시터";
     } else if (activeTab === "reservations") {
       const isUserOwner = selectedReservationRequest?.ownerId === userId;
       targetId = isUserOwner ? (selectedReservationRequest?.sitterId ?? "") : (selectedReservationRequest?.ownerId ?? "");
       targetName = selectedReservationRequest?.name ?? "";
-      targetImage = selectedReservationRequest?.profileImage ?? null;
       role = isUserOwner ? "펫시터" : "보호자";
     } else {
       const isUserSitter = selectedApplicant?.sitterId === userId;
       targetId = isUserSitter ? (selectedApplicant?.ownerId ?? "") : (selectedApplicant?.sitterId ?? "");
       targetName = isUserSitter ? "" : (selectedApplicant?.name ?? "");
-      targetImage = isUserSitter ? null : (selectedApplicant?.profileImage ?? null);
       role = isUserSitter ? "보호자" : "펫시터";
     }
 
-    const service = getHeaderSub();
-    const params = new URLSearchParams();
-    if (targetId) params.set("targetId", targetId);
-    if (targetName) params.set("targetName", targetName);
-    params.set("role", role);
-    if (service) params.set("service", service);
-    if (targetImage) params.set("targetImage", targetImage);
-    return `/myprofile/report?${params.toString()}`;
-  }, [activeTab, selectedRoom, selectedReservationRequest, selectedApplicant, userId, getHeaderSub]);
+    if (!targetId) return;
+    setReportTarget({ targetType: role === "펫시터" ? "sitter" : "user", targetId, targetLabel: targetName || undefined });
+  }, [activeTab, selectedRoom, selectedReservationRequest, selectedApplicant, userId]);
 
-  const handleReport = useCallback(() => router.push(getReportUrl()), [router, getReportUrl]);
+  const handleReportMessage = useCallback((messageId: string) => {
+    setReportTarget({ targetType: "message", targetId: messageId });
+  }, []);
 
   const roomName = activeTab === "one_on_one" ? (selectedRoom?.name ?? "") : activeTab === "reservations" ? (selectedReservationRequest?.name ?? "") : (selectedApplicant?.name ?? "");
   const roomInitial = activeTab === "one_on_one" ? (selectedRoom?.initial ?? "") : activeTab === "reservations" ? (selectedReservationRequest?.initial ?? "") : (selectedApplicant?.initial ?? "");
@@ -727,6 +727,7 @@ function ChatPageContent({
     onLeaveChat: leaveChat,
     onWriteReview: handleWriteReview,
     onReport: handleReport,
+    onReportMessage: handleReportMessage,
     onNavigateToPost: handleNavigateToPost,
     onSetInput: setInput,
     onSend: handleSend,
@@ -846,6 +847,18 @@ function ChatPageContent({
 
       {activeRoomId && (
         <ReservationEditModal open={reservationEditOpen} roomId={activeRoomId} onClose={closeReservationEdit} onSubmit={handleReservationEditSubmit} />
+      )}
+
+      {reportTarget && (
+        <ReportDialog
+          open={reportTarget !== null}
+          onOpenChange={(open) => {
+            if (!open) setReportTarget(null);
+          }}
+          targetType={reportTarget.targetType}
+          targetId={reportTarget.targetId}
+          targetLabel={reportTarget.targetLabel}
+        />
       )}
     </div>
   );
