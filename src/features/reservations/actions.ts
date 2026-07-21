@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { createNotification } from "@/lib/notifications";
 import {
   touchRoomPreview,
@@ -50,13 +51,9 @@ export async function cancelReservation(
   reason?: string,
 ): Promise<CancelReservationResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -354,10 +351,9 @@ export async function updateReservation(
   input: { status: UpdateStatus; cancel_reason?: string | null },
 ): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -622,10 +618,9 @@ export async function ownerConfirmServiceComplete(
   reservationId: string,
 ): Promise<ActionResult<{ id: string; completionMessage: unknown }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -740,10 +735,9 @@ export async function createPetsitterReservationRequest(
   input: ReservationRequestInput,
 ): Promise<ActionResult<{ reservation_id: string; room_id: string }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   if (!input.pet_ids.length) return { ok: false, error: "반려동물을 선택해주세요." };
 
@@ -880,10 +874,9 @@ export async function acceptReservationRequest(
   reservationId: string,
 ): Promise<ActionResult<{ room_id: string }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -965,10 +958,9 @@ export async function rejectReservationRequest(
   reservationId: string,
 ): Promise<ActionResult<{ message: unknown }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -1142,10 +1134,9 @@ export async function updateReservationDetails(
   input: { start_datetime: string; end_datetime: string; memo?: string | null },
 ): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   if (new Date(input.end_datetime) <= new Date(input.start_datetime)) {
     return { ok: false, error: "종료일은 시작일 이후여야 합니다." };
@@ -1199,10 +1190,9 @@ export async function sitterStartService(
   reservationId: string,
 ): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")

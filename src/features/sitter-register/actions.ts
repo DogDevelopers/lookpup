@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { fuzzCoordinate, syncLocationAcrossProfiles } from "@/lib/geo";
 import { SERVICES } from "@/lib/sitter-options";
 import {
@@ -23,13 +24,9 @@ export async function createSitter(input: CreateSitterInput): Promise<ActionResu
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: profile } = await supabase
     .from("users")
@@ -215,13 +212,9 @@ export async function updateSitterProfile(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: sitter } = await supabase
     .from("sitters")

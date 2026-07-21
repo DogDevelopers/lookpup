@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { uploadImage } from "@/lib/upload-image";
 import { petRegisterSchema, petUpdateSchema, type PetUpdateInput } from "@/features/pet-register/schema";
 import type { PetRegisterFormValues } from "@/features/pet-register/types";
@@ -17,13 +18,9 @@ export async function createPet(input: PetRegisterFormValues): Promise<ActionRes
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { count } = await supabase
     .from("pets")
@@ -74,13 +71,9 @@ export async function updatePet(id: string, input: PetUpdateInput): Promise<Acti
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: pet } = await supabase
     .from("pets")
@@ -118,13 +111,9 @@ export async function updatePet(id: string, input: PetUpdateInput): Promise<Acti
 
 export async function deletePet(id: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: pet } = await supabase
     .from("pets")

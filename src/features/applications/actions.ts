@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { findRequestRoom, findOrCreateRequestRoom, promoteApplicationRoomToDirect } from "@/lib/chat-rooms";
 import { APPLICATION_STATUS } from "@/lib/constants";
 import type { ApplicationRequestDetails } from "@/features/applications/types";
@@ -14,10 +15,9 @@ export async function createApplication(
   input: { message?: string | null; proposed_price?: number | null },
 ): Promise<CreateApplicationResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   if (input.proposed_price != null && input.proposed_price < 1000) {
     return { ok: false, error: "제안 금액은 1,000원 이상이어야 합니다." };
@@ -179,10 +179,9 @@ export async function updateApplication(
   },
 ): Promise<UpdateApplicationResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: application } = await supabase
     .from("applications")
@@ -350,10 +349,8 @@ export async function updateApplicationByRoom(
   },
 ): Promise<UpdateApplicationResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
 
   const { data: room } = await supabase
     .from("chat_rooms")

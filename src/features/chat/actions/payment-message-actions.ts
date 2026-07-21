@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { createNotification } from "@/lib/notifications";
 import { touchRoomPreview } from "@/lib/chat-rooms";
 import { EXTRA_CHARGE_STATUS } from "@/lib/constants";
@@ -19,10 +20,9 @@ export async function sendPaymentRequestMessage(
   reservationId?: string,
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   if (!data.amount || data.amount <= 0) return { ok: false, error: "요청 금액은 0원보다 커야 합니다." };
 
@@ -107,10 +107,9 @@ export async function sendPaymentCompleteMessage(
   data: { amount: number; paymentRequestMessageId?: string },
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
   if (!authResult.ok) return authResult;
@@ -139,10 +138,9 @@ export async function sendAutoPaymentRequestMessage(
   },
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: room } = await supabase
     .from("chat_rooms")

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import type { NotificationRow } from "./types";
 
 type ActionResult<T = undefined> = T extends undefined
@@ -66,10 +67,9 @@ export async function getNotifications(
 
 export async function markNotificationRead(id: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: notification } = await supabase
     .from("notifications")
@@ -91,10 +91,9 @@ export async function markNotificationRead(id: string): Promise<ActionResult> {
 
 export async function markAllNotificationsRead(): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { error } = await supabase
     .from("notifications")

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { createNotification } from "@/lib/notifications";
 import { touchRoomPreview } from "@/lib/chat-rooms";
 import { RESERVATION_EDIT_PREFIX, RESERVATION_EDIT_RESPONSE_PREFIX } from "@/lib/chat-message-prefixes";
@@ -15,10 +16,9 @@ export async function sendReservationEditMessage(
   },
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: room } = await supabase
     .from("chat_rooms")
@@ -61,10 +61,9 @@ export async function sendReservationEditResponseMessage(
   payload: { originalMessageId: string; accepted: boolean },
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: room } = await supabase
     .from("chat_rooms")

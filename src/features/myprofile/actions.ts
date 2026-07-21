@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { fuzzCoordinate, syncLocationAcrossProfiles } from "@/lib/geo";
 import {
   bankAccountSchema,
@@ -19,13 +20,9 @@ export async function upsertBankAccount(input: BankAccountInput): Promise<Action
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { error } = await supabase.from("bank_accounts").upsert(
     {
@@ -52,13 +49,9 @@ export async function updateOwnerLocation(input: OwnerLocationInput): Promise<Ac
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { error } = await supabase
     .from("users")
@@ -93,13 +86,9 @@ export async function updateOwnerLocation(input: OwnerLocationInput): Promise<Ac
 
 export async function deleteBankAccount(): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { error } = await supabase.from("bank_accounts").delete().eq("user_id", user.id);
 
