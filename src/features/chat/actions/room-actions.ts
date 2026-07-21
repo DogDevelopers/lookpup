@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { RESERVATION_STATUS } from "@/lib/constants";
 import type { RoomApiItem, ChatMessagesPage, ReservationByRoomItem } from "@/features/chat/types";
 import type { ActionResult } from "./shared";
@@ -289,10 +290,9 @@ export async function getReservationsByRoom(
 
 export async function leaveRoom(roomId: string): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: room } = await supabase
     .from("chat_rooms")
@@ -332,10 +332,9 @@ export async function leaveRoom(roomId: string): Promise<ActionResult<{ id: stri
 
 export async function markRoomRead(roomId: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: room } = await supabase
     .from("chat_rooms")

@@ -1,19 +1,22 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { touchRoomPreview } from "@/lib/chat-rooms";
 import { APPLICATION_SELECTED_PREFIX, APPLICATION_REJECTED_PREFIX } from "@/lib/chat-message-prefixes";
-import type { ActionResult } from "./shared";
+import { getAuthorizedChatRoom, type ActionResult } from "./shared";
 
 export async function sendApplicationSelectedMessage(
   roomId: string,
   data: { postTitle: string; postId: string; sitterId: string },
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
+
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
 
   const content = `${APPLICATION_SELECTED_PREFIX}${JSON.stringify(data)}`;
   const { data: message, error } = await supabase
@@ -32,10 +35,12 @@ export async function sendApplicationRejectedMessage(
   roomId: string,
 ): Promise<ActionResult<{ id: string; room_id: string; sender_id: string; content: string; created_at: string | null }>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
+
+  const authResult = await getAuthorizedChatRoom(supabase, roomId, user.id);
+  if (!authResult.ok) return authResult;
 
   const { data: message, error } = await supabase
     .from("messages")

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { reviewCreateSchema, type ReviewCreateInput } from "@/features/reviews/schema";
 import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
 
@@ -28,10 +29,9 @@ export async function createReview(input: ReviewCreateInput): Promise<ActionResu
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -80,10 +80,9 @@ export async function createReview(input: ReviewCreateInput): Promise<ActionResu
 
 export async function deleteReview(id: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: review } = await supabase.from("reviews").select("id, owner_id, sitter_id").eq("id", id).maybeSingle();
   if (!review) return { ok: false, error: "후기를 찾을 수 없습니다." };

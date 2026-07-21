@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { createNotification } from "@/lib/notifications";
 import { RESERVATION_STATUS } from "@/lib/constants";
 import type { Database } from "@/types/database.types";
@@ -16,10 +17,9 @@ export async function createCareRecord(
   payload: CareRecordPayload,
 ): Promise<ActionResult<CareRecord>> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   if (!payload.reservationId) {
     return { ok: false, error: "예약 정보가 필요합니다." };

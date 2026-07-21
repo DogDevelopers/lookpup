@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { getServerEnv } from "@/lib/env";
 import { WITHDRAW_REASON_VALUES } from "@/lib/constants";
 import {
@@ -46,13 +47,9 @@ export async function confirmIdentityVerification(
   identityVerificationId: string,
 ): Promise<ConfirmIdentityVerificationResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: existing } = await supabase
     .from("users")
@@ -114,13 +111,9 @@ type RestoreUserResult = { ok: true } | { ok: false; error: string };
 
 export async function restoreUser(): Promise<RestoreUserResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: profile } = await supabase
     .from("users")
@@ -155,13 +148,9 @@ export async function deleteUser(reason: string, detail?: string): Promise<Delet
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { ok: false, error: "로그인이 필요합니다." };
-  }
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   // TODO: 예약 백엔드 이식 후, paid/in_progress 상태의 활성 예약이 있으면 탈퇴를 차단하는 체크 추가.
   const { error } = await supabase

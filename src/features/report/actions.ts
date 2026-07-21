@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { reportCreateSchema, type ReportCreateInput } from "@/features/report/schema";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
@@ -12,10 +13,9 @@ export async function createReport(input: ReportCreateInput): Promise<ActionResu
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { error } = await supabase.from("reports").insert({
     reporter_id: user.id,

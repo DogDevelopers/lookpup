@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { REQUEST_STATUS } from "@/lib/constants";
 import { requestSchema } from "./schema";
 
@@ -9,38 +10,20 @@ type ActionResult<T = undefined> =
   | { ok: true; data: T }
   | { ok: false; error: string };
 
-async function getAuthedUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("id, suspended_until")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (!profile) return null;
-  if (profile.suspended_until && new Date(profile.suspended_until) > new Date()) {
-    return null;
-  }
-  return { supabase, userId: profile.id };
-}
-
 export async function createRequest(input: unknown): Promise<ActionResult<{ id: string }>> {
-  const auth = await getAuthedUser();
-  if (!auth) return { ok: false, error: "로그인이 필요합니다." };
+  const supabase = await createClient();
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const userId = auth.user.id;
 
   const parsed = requestSchema.safeParse(input);
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
   }
 
-  const { data, error } = await auth.supabase
+  const { data, error } = await supabase
     .from("requests")
-    .insert({ ...parsed.data, owner_id: auth.userId })
+    .insert({ ...parsed.data, owner_id: userId })
     .select("id")
     .single();
 
@@ -54,15 +37,17 @@ export async function updateRequest(
   id: string,
   input: unknown,
 ): Promise<ActionResult> {
-  const auth = await getAuthedUser();
-  if (!auth) return { ok: false, error: "로그인이 필요합니다." };
+  const supabase = await createClient();
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const userId = auth.user.id;
 
-  const { data: existing } = await auth.supabase
+  const { data: existing } = await supabase
     .from("requests")
     .select("owner_id, status")
     .eq("id", id)
     .maybeSingle();
-  if (!existing || existing.owner_id !== auth.userId) {
+  if (!existing || existing.owner_id !== userId) {
     return { ok: false, error: "수정 권한이 없습니다." };
   }
   if (existing.status === REQUEST_STATUS.MATCHED) {
@@ -74,7 +59,7 @@ export async function updateRequest(
     return { ok: false, error: parsed.error.issues[0]?.message ?? "입력값을 확인해주세요." };
   }
 
-  const { error } = await auth.supabase
+  const { error } = await supabase
     .from("requests")
     .update(parsed.data)
     .eq("id", id);
@@ -87,19 +72,21 @@ export async function updateRequest(
 }
 
 export async function closeRequest(id: string): Promise<ActionResult> {
-  const auth = await getAuthedUser();
-  if (!auth) return { ok: false, error: "로그인이 필요합니다." };
+  const supabase = await createClient();
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const userId = auth.user.id;
 
-  const { data: existing } = await auth.supabase
+  const { data: existing } = await supabase
     .from("requests")
     .select("owner_id")
     .eq("id", id)
     .maybeSingle();
-  if (!existing || existing.owner_id !== auth.userId) {
+  if (!existing || existing.owner_id !== userId) {
     return { ok: false, error: "권한이 없습니다." };
   }
 
-  const { error } = await auth.supabase
+  const { error } = await supabase
     .from("requests")
     .update({ status: REQUEST_STATUS.MATCHED })
     .eq("id", id);
@@ -111,19 +98,21 @@ export async function closeRequest(id: string): Promise<ActionResult> {
 }
 
 export async function deleteRequest(id: string): Promise<ActionResult> {
-  const auth = await getAuthedUser();
-  if (!auth) return { ok: false, error: "로그인이 필요합니다." };
+  const supabase = await createClient();
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const userId = auth.user.id;
 
-  const { data: existing } = await auth.supabase
+  const { data: existing } = await supabase
     .from("requests")
     .select("owner_id")
     .eq("id", id)
     .maybeSingle();
-  if (!existing || existing.owner_id !== auth.userId) {
+  if (!existing || existing.owner_id !== userId) {
     return { ok: false, error: "삭제 권한이 없습니다." };
   }
 
-  const { error } = await auth.supabase.from("requests").delete().eq("id", id);
+  const { error } = await supabase.from("requests").delete().eq("id", id);
   if (error) return { ok: false, error: "게시글 삭제에 실패했습니다." };
 
   revalidatePath("/board");

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { requireActiveUser } from "@/lib/auth-guard";
 import { getServerEnv } from "@/lib/env";
 import { RESERVATION_STATUS, EXTRA_CHARGE_STATUS, PAYMENT_STATUS } from "@/lib/constants";
 
@@ -52,10 +53,9 @@ export async function createPayment(
   payMethod: PayMethod,
 ): Promise<CreatePaymentResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: reservation } = await supabase
     .from("reservations")
@@ -118,10 +118,9 @@ export async function createExtraPayment(
   payMethod: PayMethod = "CARD",
 ): Promise<CreateExtraPaymentResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: pendingCharge } = await supabase
     .from("extra_charges")
@@ -195,10 +194,9 @@ export async function createExtraPayment(
 
 export async function cancelPendingPayment(paymentId: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: payment } = await supabase
     .from("payments")
@@ -221,10 +219,9 @@ export async function cancelPendingPayment(paymentId: string): Promise<ActionRes
 
 export async function verifyAndConfirmPayment(paymentId: string): Promise<ActionResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: payment } = await supabase
     .from("payments")
@@ -282,10 +279,9 @@ export async function verifyAndConfirmPayment(paymentId: string): Promise<Action
 
 export async function cancelPayment(paymentId: string, reason: string): Promise<CancelPaymentResult> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "로그인이 필요합니다." };
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
 
   const { data: payment } = await supabase
     .from("payments")
