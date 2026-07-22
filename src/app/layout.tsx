@@ -32,7 +32,7 @@ export default function RootLayout({
       className={`${pretendard.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="h-full flex flex-col">
         <Providers>{children}</Providers>
         <NotificationToaster />
         <Toaster />
