@@ -19,6 +19,7 @@ export interface Report {
   reporter_id: string;
   target_type: string;
   target_id: string;
+  target_name: string | null;
   reason: string;
   content: string | null;
   status: string;
