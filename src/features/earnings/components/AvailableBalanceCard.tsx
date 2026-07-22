@@ -64,7 +64,7 @@ export default function AvailableBalanceCard({
           </button>
         ) : (
           <Link
-            href="/myprofile/settings?tab=bank"
+            href="/myprofile/sitter-edit"
             className="h-11 w-full rounded-xl bg-orange-500 text-white text-sm font-semibold flex items-center justify-center transition-colors hover:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 focus-visible:ring-offset-2"
           >
             정산 계좌 등록

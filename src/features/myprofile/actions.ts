@@ -4,43 +4,9 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { fuzzCoordinate, syncLocationAcrossProfiles } from "@/lib/geo";
-import {
-  bankAccountSchema,
-  ownerLocationSchema,
-  type BankAccountInput,
-  type OwnerLocationInput,
-} from "@/features/myprofile/schema";
+import { ownerLocationSchema, type OwnerLocationInput } from "@/features/myprofile/schema";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
-
-export async function upsertBankAccount(input: BankAccountInput): Promise<ActionResult> {
-  const parsed = bankAccountSchema.safeParse(input);
-  if (!parsed.success) {
-    return { ok: false, error: "입력값을 확인해주세요." };
-  }
-
-  const supabase = await createClient();
-  const auth = await requireActiveUser(supabase);
-  if (!auth.ok) return auth;
-  const { user } = auth;
-
-  const { error } = await supabase.from("bank_accounts").upsert(
-    {
-      user_id: user.id,
-      bank_name: parsed.data.bankName,
-      account_number: parsed.data.accountNumber,
-      account_holder: parsed.data.accountHolder,
-    },
-    { onConflict: "user_id" },
-  );
-
-  if (error) {
-    return { ok: false, error: "계좌 정보를 저장하지 못했습니다." };
-  }
-
-  revalidatePath("/myprofile/settings");
-  return { ok: true };
-}
 
 export async function updateOwnerLocation(input: OwnerLocationInput): Promise<ActionResult> {
   const parsed = ownerLocationSchema.safeParse(input);
@@ -81,21 +47,5 @@ export async function updateOwnerLocation(input: OwnerLocationInput): Promise<Ac
 
   revalidatePath("/myprofile");
   revalidatePath("/myprofile/sitter-profile");
-  return { ok: true };
-}
-
-export async function deleteBankAccount(): Promise<ActionResult> {
-  const supabase = await createClient();
-  const auth = await requireActiveUser(supabase);
-  if (!auth.ok) return auth;
-  const { user } = auth;
-
-  const { error } = await supabase.from("bank_accounts").delete().eq("user_id", user.id);
-
-  if (error) {
-    return { ok: false, error: "계좌 정보를 삭제하지 못했습니다." };
-  }
-
-  revalidatePath("/myprofile/settings");
   return { ok: true };
 }

@@ -21,9 +21,3 @@ export interface MyProfileSitterSummary {
   career: string | null;
   services: string[];
 }
-
-export interface BankAccount {
-  bankName: string;
-  accountNumber: string;
-  accountHolder: string;
-}

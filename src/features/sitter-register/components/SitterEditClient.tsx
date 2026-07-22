@@ -4,7 +4,7 @@ import { useState, useRef, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, X, Eye, Camera, MapPin, Check } from "lucide-react";
+import { Plus, X, Eye, Camera, MapPin, Check, Building2, Pencil } from "lucide-react";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import { CustomModal } from "@/components/common/CustomModal";
@@ -17,6 +17,8 @@ import { CAREER_OPTIONS } from "@/features/sitter-register/constants";
 import { updateSitterProfile, type SitterServiceRow } from "@/features/sitter-register/actions";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import type { SitterDetail } from "@/features/petsitters/types";
+import BankAccountModal from "@/components/common/BankAccountModal";
+import type { BankAccount } from "@/lib/bank-account/schema";
 
 const SERVICE_OPTIONS = SERVICES.map((s) => s.title);
 
@@ -106,9 +108,11 @@ function ServiceRow({ item, onChange }: { item: ServiceItem; onChange: (updated:
 export default function SitterEditClient({
   sitter,
   initialServices,
+  initialBankAccount,
 }: {
   sitter: SitterDetail;
   initialServices: SitterServiceRow[];
+  initialBankAccount: BankAccount | null;
 }) {
   const router = useRouter();
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -116,6 +120,9 @@ export default function SitterEditClient({
   const [errorMessage, setErrorMessage] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("소개");
   const [isPending, startTransition] = useTransition();
+
+  const [bankAccount, setBankAccount] = useState(initialBankAccount);
+  const [showBankModal, setShowBankModal] = useState(false);
 
   const [bio, setBio] = useState(sitter.introduction ?? "");
   const [career, setCareer] = useState(sitter.career ?? CAREER_OPTIONS[0].value);
@@ -400,6 +407,30 @@ export default function SitterEditClient({
           <p className="mt-2 text-xs text-gray-400">* 보호자 프로필 사진과 동일한 사진으로 적용됩니다.</p>
         </div>
 
+        <div className="px-5 pb-5">
+          <SectionCard className="p-4 gap-0 flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-orange-50 flex items-center justify-center shrink-0">
+                <Building2 size={16} className="text-orange-500" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-stone-900">정산 계좌</p>
+                <p className="text-xs text-gray-500">
+                  {bankAccount ? `${bankAccount.bankName} ${bankAccount.accountNumber.slice(-4)}` : "등록된 계좌가 없습니다"}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowBankModal(true)}
+              className="flex items-center gap-1 text-xs font-medium text-orange-500 shrink-0"
+            >
+              {bankAccount ? <Pencil size={13} /> : <Plus size={13} />}
+              {bankAccount ? "수정" : "등록"}
+            </button>
+          </SectionCard>
+        </div>
+
         <div className="bg-orange-50 border-b border-orange-100 px-5 sticky top-0 z-10">
           <div className="flex gap-6">
             {TABS.map((tab) => (
@@ -476,6 +507,23 @@ export default function SitterEditClient({
                   ))}
                 </select>
               </div>
+
+              <div className="w-full bg-orange-50 rounded-xl p-4 mt-3 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-500 mb-1">정산 계좌</p>
+                  <p className="text-sm font-bold text-stone-900 truncate">
+                    {bankAccount ? `${bankAccount.bankName} ${bankAccount.accountNumber.slice(-4)}` : "등록된 계좌가 없습니다"}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowBankModal(true)}
+                  className="flex items-center gap-1 text-xs font-medium text-orange-500 shrink-0 hover:opacity-80 transition-opacity"
+                >
+                  {bankAccount ? <Pencil size={13} /> : <Plus size={13} />}
+                  {bankAccount ? "수정" : "등록"}
+                </button>
+              </div>
             </SectionCard>
 
             <div className="flex-1 min-w-0">
@@ -546,6 +594,13 @@ export default function SitterEditClient({
         confirmText="확인"
         onConfirm={() => setShowErrorModal(false)}
         onClose={() => setShowErrorModal(false)}
+      />
+
+      <BankAccountModal
+        open={showBankModal}
+        initialBankAccount={bankAccount}
+        onClose={() => setShowBankModal(false)}
+        onSaved={setBankAccount}
       />
     </>
   );

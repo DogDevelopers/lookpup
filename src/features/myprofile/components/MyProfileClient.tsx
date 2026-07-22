@@ -494,7 +494,7 @@ export default function MyProfileClient({
             />
             <EarningsSummaryCard
               data={earnings}
-              onViewDetail={() => setSelectedMenu("earnings")}
+              onViewDetail={() => navigate("sitter", "earnings")}
             />
           </div>
         );
