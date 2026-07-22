@@ -14,7 +14,6 @@ import {
   HelpCircle,
   Star,
   Wallet,
-  AlertTriangle,
   BookOpen,
   User,
   UserX,
@@ -90,13 +89,6 @@ const OWNER_MENU: MenuItem[] = [
     href: "/terms",
   },
   {
-    id: "report",
-    icon: AlertTriangle,
-    label: "신고하기",
-    kind: "link",
-    href: "/myprofile/report",
-  },
-  {
     id: "withdraw",
     icon: UserX,
     label: "회원 탈퇴",
@@ -123,13 +115,6 @@ const SITTER_MENU: MenuItem[] = [
     label: "이용약관",
     kind: "link",
     href: "/terms",
-  },
-  {
-    id: "report",
-    icon: AlertTriangle,
-    label: "신고하기",
-    kind: "link",
-    href: "/myprofile/report",
   },
   {
     id: "withdraw",

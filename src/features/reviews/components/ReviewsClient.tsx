@@ -8,6 +8,7 @@ import { CustomModal } from "@/components/common/CustomModal";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
 import { ImageGallery } from "@/components/common/ImageGallery";
+import { ReportDialog } from "@/features/report/components/ReportDialog";
 import { deleteReview } from "@/features/reviews/actions";
 import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
 
@@ -149,56 +150,68 @@ function WrittenReviewCard({
 }
 
 function ReceivedReviewCard({ review }: { review: ReceivedReview }) {
+  const [reportOpen, setReportOpen] = useState(false);
+
   return (
-    <SectionCard className="overflow-hidden p-0 gap-0">
-      <div className="flex items-start justify-between px-5 pt-5 pb-4">
-        <div className="flex items-center gap-3">
-          <Avatar initial={review.owner_full_name?.charAt(0) ?? "?"} src={review.owner_profile_image} />
-          <div>
-            <p className="font-semibold text-stone-900 text-sm">{review.owner_full_name}</p>
-            <p className="text-xs text-stone-400 mt-0.5">
-              {new Date(review.created_at).toLocaleDateString("ko-KR")}
-            </p>
-          </div>
-        </div>
-        <RatingBlock rating={review.rating} accent="orange" />
-      </div>
-
-      {Object.keys(review.detail_ratings).length > 0 && (
-        <div className="px-5 pb-4 border-t border-orange-100 pt-3 space-y-2">
-          {Object.entries(review.detail_ratings).map(([label, val]) => (
-            <div key={label} className="flex items-center justify-between">
-              <span className="text-xs text-stone-500">{label}</span>
-              <MiniStarRating value={val} accent="orange" />
+    <>
+      <SectionCard className="overflow-hidden p-0 gap-0">
+        <div className="flex items-start justify-between px-5 pt-5 pb-4">
+          <div className="flex items-center gap-3">
+            <Avatar initial={review.owner_full_name?.charAt(0) ?? "?"} src={review.owner_profile_image} />
+            <div>
+              <p className="font-semibold text-stone-900 text-sm">{review.owner_full_name}</p>
+              <p className="text-xs text-stone-400 mt-0.5">
+                {new Date(review.created_at).toLocaleDateString("ko-KR")}
+              </p>
             </div>
-          ))}
+          </div>
+          <RatingBlock rating={review.rating} accent="orange" />
         </div>
-      )}
 
-      <div className="px-5 pt-4 pb-5 border-t border-orange-100 space-y-3">
-        {review.image_urls.length > 0 && <ImageGallery urls={review.image_urls} />}
-        <p className="text-sm text-stone-900 leading-relaxed">{review.content}</p>
-      </div>
+        {Object.keys(review.detail_ratings).length > 0 && (
+          <div className="px-5 pb-4 border-t border-orange-100 pt-3 space-y-2">
+            {Object.entries(review.detail_ratings).map(([label, val]) => (
+              <div key={label} className="flex items-center justify-between">
+                <span className="text-xs text-stone-500">{label}</span>
+                <MiniStarRating value={val} accent="orange" />
+              </div>
+            ))}
+          </div>
+        )}
 
-      <div className="px-5 py-3 border-t border-orange-100 mt-4 flex items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-1.5">
-          {review.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2.5 py-1 bg-orange-50 text-orange-500 text-xs font-medium rounded-full border border-orange-200"
-            >
-              {tag}
-            </span>
-          ))}
+        <div className="px-5 pt-4 pb-5 border-t border-orange-100 space-y-3">
+          {review.image_urls.length > 0 && <ImageGallery urls={review.image_urls} />}
+          <p className="text-sm text-stone-900 leading-relaxed">{review.content}</p>
         </div>
-        <Link
-          href={`/myprofile/report?targetId=${review.owner_id}&targetName=${encodeURIComponent(review.owner_full_name)}${review.owner_profile_image ? `&targetImage=${encodeURIComponent(review.owner_profile_image)}` : ""}`}
-          className="flex items-center gap-1 text-xs text-stone-400 hover:text-red-400 transition-colors shrink-0"
-        >
-          <Flag size={12} /> 신고
-        </Link>
-      </div>
-    </SectionCard>
+
+        <div className="px-5 py-3 border-t border-orange-100 mt-4 flex items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1.5">
+            {review.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2.5 py-1 bg-orange-50 text-orange-500 text-xs font-medium rounded-full border border-orange-200"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+          <button
+            onClick={() => setReportOpen(true)}
+            className="flex items-center gap-1 text-xs text-stone-400 hover:text-red-400 transition-colors shrink-0"
+          >
+            <Flag size={12} /> 신고
+          </button>
+        </div>
+      </SectionCard>
+
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        targetType="user"
+        targetId={review.owner_id}
+        targetLabel={review.owner_full_name}
+      />
+    </>
   );
 }
 

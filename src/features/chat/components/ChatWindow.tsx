@@ -62,6 +62,7 @@ export interface ChatWindowProps {
   onGoToProfile: () => void;
   onLeaveChat: () => void;
   onReport: () => void;
+  onReportMessage: (messageId: string) => void;
   onNavigateToPost: (postId: string) => void;
   onGoToChat: () => void;
 
@@ -142,6 +143,7 @@ function ChatWindowImpl({
   onGoToProfile,
   onLeaveChat,
   onReport,
+  onReportMessage,
   onNavigateToPost,
   onGoToChat,
   onSetInput,
@@ -241,6 +243,7 @@ function ChatWindowImpl({
       onReservationEditReject={onReservationEditReject}
       onWriteReview={onWriteReview}
       onLeaveChat={onLeaveChat}
+      onReportMessage={onReportMessage}
     />
   );
 

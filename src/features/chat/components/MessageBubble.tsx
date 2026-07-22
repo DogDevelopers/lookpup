@@ -3,7 +3,7 @@
 import { useState, memo } from "react";
 import Image from "next/image";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
-import { X } from "lucide-react";
+import { Flag, X } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import type { Message, ReservationEditActionState } from "@/features/chat/types";
 import {
@@ -109,6 +109,7 @@ type MessageBubbleProps = {
   reservationEditAction?: ReservationEditActionState;
   onWriteReview?: (reservationId: string) => void;
   onLeaveChat?: () => void;
+  onReportMessage?: () => void;
 };
 
 function MessageBubbleImpl({
@@ -131,6 +132,7 @@ function MessageBubbleImpl({
   reservationEditAction,
   onWriteReview,
   onLeaveChat,
+  onReportMessage,
 }: MessageBubbleProps) {
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
@@ -478,7 +480,7 @@ function MessageBubbleImpl({
   }
   if (msg.from === "other") {
     return (
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3 group">
         <Avatar initial={senderInitial} src={senderProfileImage} size="sm" />
         <div>
           {msg.imageUrl ? (
@@ -505,7 +507,18 @@ function MessageBubbleImpl({
               <p className="text-white text-sm leading-6">{msg.text}</p>
             </div>
           )}
-          <p className="text-stone-500 text-xs mt-1 pl-3">{msg.time}</p>
+          <div className="flex items-center gap-2 mt-1 pl-3">
+            <p className="text-stone-500 text-xs">{msg.time}</p>
+            {onReportMessage && (
+              <button
+                onClick={onReportMessage}
+                aria-label="메시지 신고"
+                className="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-red-500 transition-opacity cursor-pointer"
+              >
+                <Flag size={12} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

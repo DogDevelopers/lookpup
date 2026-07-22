@@ -41,6 +41,7 @@ interface MessageListProps {
   onReservationEditReject: (messageId: string) => void;
   onWriteReview: (reservationId: string) => void;
   onLeaveChat: () => void;
+  onReportMessage: (messageId: string) => void;
 }
 
 function MessageListImpl({
@@ -67,6 +68,7 @@ function MessageListImpl({
   onReservationEditReject,
   onWriteReview,
   onLeaveChat,
+  onReportMessage,
 }: MessageListProps) {
   const dedupedMessages = useMemo(() => {
     const seen = new Set<string>();
@@ -175,6 +177,9 @@ function MessageListImpl({
             reservationEditAction={reservationEditAction}
             onWriteReview={onWriteReview}
             onLeaveChat={onLeaveChat}
+            onReportMessage={
+              msg.from === "other" ? () => onReportMessage(msg.id) : undefined
+            }
           />
         );
       })}
