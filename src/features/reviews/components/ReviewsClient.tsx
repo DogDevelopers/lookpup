@@ -242,7 +242,7 @@ export default function ReviewsClient({
   const a = ACCENT[accent];
 
   return (
-    <div className={embedded ? "" : "min-h-screen bg-orange-50"}>
+    <div className={embedded ? "" : "min-h-screen bg-white"}>
       {!embedded && (
         <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
           <div className="h-14 px-5 flex items-center gap-3">

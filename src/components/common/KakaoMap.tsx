@@ -126,6 +126,22 @@ export default function KakaoMap({
     }
   }, [center]);
 
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      const map = mapRef.current;
+      if (!map) return;
+      const currentCenter = map.getCenter();
+      map.relayout();
+      map.setCenter(currentCenter);
+    });
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
+
   function initMap() {
     if (!containerRef.current || !window.kakao?.maps || mapRef.current) return;
 

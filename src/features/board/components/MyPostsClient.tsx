@@ -368,7 +368,7 @@ export default function MyPostsClient({
       className={
         embedded
           ? "flex flex-col"
-          : "min-h-screen flex flex-col bg-orange-300/10"
+          : "min-h-screen flex flex-col bg-white"
       }
     >
       {!embedded && (

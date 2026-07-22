@@ -135,7 +135,7 @@ export default function BoardDetailClient({
   if (!post) {
     return (
       <>
-        <main className="flex-1 bg-orange-50 min-h-screen">
+        <main className="flex-1 bg-white min-h-screen">
           <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-20 text-center text-stone-400">
             게시글을 찾을 수 없습니다.
           </div>
@@ -188,7 +188,7 @@ export default function BoardDetailClient({
 
   return (
     <>
-      <main className="flex-1 bg-orange-50 min-h-screen">
+      <main className="flex-1 bg-white min-h-screen">
         <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-6 md:py-8">
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-6">
             <div className="flex-1 min-w-0">
@@ -199,8 +199,8 @@ export default function BoardDetailClient({
 
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
             <div className="w-full flex-1 min-w-0 flex flex-col gap-6">
-              <SectionCard className="overflow-hidden p-0 gap-0">
-                <div className="h-64 bg-orange-50">
+              <SectionCard className="overflow-hidden p-0 gap-0 rounded-xl border-orange-100 shadow-none">
+                <div className="h-64 bg-stone-50">
                   {post?.latitude && post?.longitude ? (
                     <KakaoMap
                       markers={[
@@ -331,7 +331,7 @@ export default function BoardDetailClient({
                 </div>
               </SectionCard>
 
-              <SectionCard>
+              <SectionCard className="rounded-xl border-orange-100 shadow-none">
                 <h2 className="text-brown-900 text-xl font-bold">상세 내용</h2>
                 <p className="text-brown-900 text-base leading-7 whitespace-pre-line">
                   {parsed.content}
@@ -342,7 +342,7 @@ export default function BoardDetailClient({
               </SectionCard>
 
               {conditionsText && (
-                <SectionCard>
+                <SectionCard className="rounded-xl border-orange-100 shadow-none">
                   <h2 className="text-brown-900 text-xl font-bold">
                     펫시터 조건
                   </h2>
@@ -353,10 +353,10 @@ export default function BoardDetailClient({
               )}
 
               {post.pets && (
-                <SectionCard>
+                <SectionCard className="rounded-xl border-orange-100 shadow-none">
                   <h2 className="text-brown-900 text-xl font-bold">반려동물</h2>
                   <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 rounded-lg">
+                    <div className="flex items-center gap-2 px-4 py-2.5 bg-stone-50 rounded-lg">
                       <span className="text-sm font-semibold text-brown-900">
                         {post.pets.name}
                       </span>
@@ -369,7 +369,7 @@ export default function BoardDetailClient({
               )}
 
               {post && (
-                <SectionCard>
+                <SectionCard className="rounded-xl border-orange-100 shadow-none">
                   <h2 className="text-brown-900 text-xl font-bold">
                     지원자 {post.applications.length}명
                   </h2>
@@ -382,7 +382,7 @@ export default function BoardDetailClient({
                       {post.applications.map((app) => (
                         <div
                           key={app.id}
-                          className="flex items-center gap-3 p-4 bg-orange-50 rounded-lg"
+                          className="flex items-center gap-3 p-4 bg-stone-50 rounded-lg"
                         >
                           <Avatar
                             initial={app.sitters?.users?.full_name?.[0] ?? "?"}
@@ -416,7 +416,7 @@ export default function BoardDetailClient({
             </div>
 
             <div className="w-full lg:w-96 shrink-0 flex flex-col gap-6 lg:sticky lg:top-20">
-              <SectionCard>
+              <SectionCard className="rounded-xl border-orange-100 shadow-none">
                 <h3 className="text-brown-900 text-lg font-bold">
                   작성자 정보
                 </h3>
@@ -450,7 +450,7 @@ export default function BoardDetailClient({
                 </div>
               </SectionCard>
 
-              <SectionCard>
+              <SectionCard className="rounded-xl border-orange-100 shadow-none">
                 <div className="flex items-center justify-between">
                   <h3 className="text-brown-900 text-lg font-bold">
                     {post.users?.full_name ?? "작성자"}님의 다른 게시물
@@ -485,7 +485,7 @@ export default function BoardDetailClient({
                       }))
                       .map((p) => (
                         <Link key={p.id} href={`/board/${p.id}`}>
-                          <div className="p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors cursor-pointer">
+                          <div className="p-3 bg-stone-50 rounded-lg hover:bg-orange-50 transition-colors cursor-pointer">
                             <div className="flex items-start justify-between mb-1">
                               <p className="text-brown-900 text-sm font-medium flex-1 truncate pr-2">
                                 {p.title}

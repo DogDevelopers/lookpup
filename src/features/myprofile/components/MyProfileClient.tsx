@@ -10,7 +10,6 @@ import {
   Calendar,
   ClipboardList,
   FileText,
-  Settings,
   HelpCircle,
   Star,
   Wallet,
@@ -75,13 +74,6 @@ const OWNER_MENU: MenuItem[] = [
   { id: "reviews", icon: BookOpen, label: "작성한 후기", kind: "view" },
   { id: "posts", icon: FileText, label: "게시글 관리", kind: "view" },
   {
-    id: "settings",
-    icon: Settings,
-    label: "설정",
-    kind: "link",
-    href: "/myprofile/settings",
-  },
-  {
     id: "terms",
     icon: HelpCircle,
     label: "이용약관",
@@ -102,13 +94,6 @@ const SITTER_MENU: MenuItem[] = [
   { id: "works", icon: ClipboardList, label: "예약 관리", kind: "view" },
   { id: "reviews", icon: BookOpen, label: "받은 후기", kind: "view" },
   { id: "earnings", icon: Wallet, label: "수익 관리", kind: "view" },
-  {
-    id: "settings",
-    icon: Settings,
-    label: "설정",
-    kind: "link",
-    href: "/myprofile/settings",
-  },
   {
     id: "terms",
     icon: HelpCircle,

@@ -112,13 +112,13 @@ export default function SitterDetailClient({
 
   return (
     <>
-      <div className="hidden md:block bg-orange-50">
+      <div className="hidden md:block bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-10 pt-12">
           <BackButton href={backHref} label={backLabel} className="mb-6" />
         </div>
       </div>
 
-      <div className="bg-orange-50">
+      <div className="bg-white">
         <div className="md:max-w-7xl md:mx-auto md:px-10 md:pb-12">
           <div className="md:flex md:gap-8 md:items-start">
             <div className="md:w-85.25 md:shrink-0">

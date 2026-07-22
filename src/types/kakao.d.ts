@@ -21,8 +21,10 @@ declare namespace kakao.maps {
   class Map {
     constructor(container: HTMLElement, options: MapOptions);
     setCenter(latlng: LatLng): void;
+    getCenter(): LatLng;
     setLevel(level: number): void;
     panTo(latlng: LatLng): void;
+    relayout(): void;
   }
 
   interface MarkerImageOptions {

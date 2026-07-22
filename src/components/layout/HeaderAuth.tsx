@@ -8,6 +8,7 @@ import {
   ChevronRight,
   LogOut,
   MessageSquare,
+  Settings,
   ShieldCheck,
   User,
 } from "lucide-react";
@@ -204,6 +205,13 @@ export default function HeaderAuth({
           >
             <MessageSquare size={16} className="text-orange-500 shrink-0" strokeWidth={1.8} />
             채팅
+          </Link>
+          <Link
+            href="/myprofile/settings"
+            className="w-full px-3 py-2.5 flex items-center gap-3 text-sm text-stone-900 rounded-lg hover:bg-orange-50 transition-colors"
+          >
+            <Settings size={16} className="text-orange-500 shrink-0" strokeWidth={1.8} />
+            설정
           </Link>
           {user.role === "admin" && (
             <Link

@@ -333,7 +333,7 @@ export default function BoardWriteClient({
 
   return (
     <>
-      <main className="flex-1 bg-orange-50 min-h-screen pb-28">
+      <main className="flex-1 bg-white min-h-screen pb-28">
         <div className="max-w-205 mx-auto px-4 sm:px-6 pt-10">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
@@ -378,12 +378,12 @@ export default function BoardWriteClient({
           </div>
 
           <div className="flex flex-col gap-6 pt-8">
-            <div className="bg-white rounded-2xl border border-orange-100 p-7">
+            <div className="bg-white rounded-xl border border-orange-100 p-7">
               <h2 className="text-lg font-semibold text-brown-900">
                 어떤 돌봄이 필요하신가요?
               </h2>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
                 {SERVICE_TYPES.map(({ label, icon: Icon, value }) => {
                   const selected = form.service_type === value;
                   return (
@@ -393,17 +393,17 @@ export default function BoardWriteClient({
                       onClick={() =>
                         setForm((prev) => ({ ...prev, service_type: value }))
                       }
-                      className={`flex flex-col items-center justify-center gap-2 h-25 rounded-xl border transition-all ${
+                      className={`flex flex-col items-center justify-center gap-1.5 h-18 rounded-xl border transition-all ${
                         selected
                           ? "border-[var(--color-orange-500)] bg-orange-50"
                           : "border-orange-100 bg-white hover:border-[var(--color-orange-500)]/50"
                       }`}
                     >
                       <Icon
-                        className={`w-5.5 h-5.5 ${selected ? "text-[var(--color-orange-500)]" : "text-brown-900"}`}
+                        className={`w-4.5 h-4.5 ${selected ? "text-[var(--color-orange-500)]" : "text-brown-900"}`}
                       />
                       <span
-                        className={`text-sm font-medium ${selected ? "text-[var(--color-orange-500)]" : "text-brown-900"}`}
+                        className={`text-xs font-medium ${selected ? "text-[var(--color-orange-500)]" : "text-brown-900"}`}
                       >
                         {label}
                       </span>
@@ -471,12 +471,12 @@ export default function BoardWriteClient({
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-orange-100 p-4 sm:p-7">
+            <div className="bg-white rounded-xl border border-orange-100 p-4 sm:p-7">
               <h2 className="text-lg font-semibold text-brown-900">
                 날짜 · 시간
               </h2>
 
-              <div className="mt-5 p-3 sm:p-5 bg-orange-50 rounded-2xl border border-orange-100">
+              <div className="mt-5 p-3 sm:p-5 bg-orange-50 rounded-xl border border-orange-100">
                 <RangePicker
                   value={
                     { from: form.startDate, to: form.endDate } as DateRange
@@ -519,7 +519,7 @@ export default function BoardWriteClient({
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-orange-100 p-7">
+            <div className="bg-white rounded-xl border border-orange-100 p-7">
               <h2 className="text-lg font-semibold text-brown-900">
                 돌봄 장소
               </h2>
@@ -685,7 +685,7 @@ export default function BoardWriteClient({
               )}
             </div>
 
-            <div className="bg-white rounded-2xl border border-orange-100 p-7">
+            <div className="bg-white rounded-xl border border-orange-100 p-7">
               <h2 className="text-xl font-bold text-brown-900 mb-1">
                 함께할 반려동물을 선택해주세요
               </h2>
@@ -701,7 +701,7 @@ export default function BoardWriteClient({
                       key={pet.id}
                       type="button"
                       onClick={() => togglePet(pet.id)}
-                      className={`relative rounded-2xl border-2 overflow-hidden transition-all ${
+                      className={`relative rounded-xl border-2 overflow-hidden transition-all ${
                         isSelected
                           ? "border-[var(--color-orange-500)]"
                           : "border-orange-100 hover:border-[var(--color-orange-500)]/50"
@@ -741,7 +741,7 @@ export default function BoardWriteClient({
 
                 <Link
                   href="/pet-register"
-                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-orange-100 hover:border-[var(--color-orange-500)]/50 transition-colors text-stone-400 hover:text-[var(--color-orange-500)] min-h-35"
+                  className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-100 hover:border-[var(--color-orange-500)]/50 transition-colors text-stone-400 hover:text-[var(--color-orange-500)] min-h-35"
                 >
                   <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center">
                     <Plus className="w-5 h-5" />
@@ -751,7 +751,7 @@ export default function BoardWriteClient({
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-orange-100 p-7">
+            <div className="bg-white rounded-xl border border-orange-100 p-7">
               <div className="flex flex-col gap-2 mb-6">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-bold text-brown-900">
@@ -853,7 +853,7 @@ export default function BoardWriteClient({
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl border border-orange-100 p-7">
+            <div className="bg-white rounded-xl border border-orange-100 p-7">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <label className="text-sm font-bold text-brown-900 flex items-center gap-2">

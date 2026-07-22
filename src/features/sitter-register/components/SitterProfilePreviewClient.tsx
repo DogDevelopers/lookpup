@@ -208,7 +208,7 @@ export default function SitterProfilePreviewClient({ sitter }: { sitter: SitterD
         </div>
       </div>
 
-      <main className="hidden md:flex flex-1 bg-orange-50 min-h-screen">
+      <main className="hidden md:flex flex-1 bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-10 py-12 w-full">
           <button
             onClick={() => router.back()}

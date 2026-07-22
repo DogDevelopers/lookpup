@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import { calculateDistanceKm } from "@/lib/distance";
+import { SERVICES } from "@/lib/sitter-options";
 import { parseArea } from "../utils";
 import { usePetsitterLocation } from "../hooks/usePetsitterLocation";
 import { useAreaSearch } from "../hooks/useAreaSearch";
@@ -13,12 +15,9 @@ import PetsitterSearchBar, { type PetsitterFilter } from "./PetsitterSearchBar";
 import PetsitterListPanel from "./PetsitterListPanel";
 import type { SitterRow } from "../types";
 
-const SERVICE_TYPE_MAP: Record<string, string> = {
-  walk: "산책",
-  care: "방문돌봄",
-  pickup: "픽업",
-  foster: "위탁돌봄",
-};
+const SERVICE_TYPE_MAP: Record<string, string> = Object.fromEntries(
+  SERVICES.map((s) => [s.id, s.title])
+);
 
 interface PetsitterSearchClientProps {
   initialSitters?: SitterRow[];
@@ -39,6 +38,7 @@ export default function PetsitterSearchClient({
   const hasAreaFilter = !!(urlDistrict || urlDong);
 
   const [activeFilter, setActiveFilter] = useState<PetsitterFilter>("전체");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const sitters = initialSitters.map((row) => {
     const name = row.display_name ?? "시터";
@@ -127,8 +127,8 @@ export default function PetsitterSearchClient({
         <LocationConsentModal onDismiss={dismissLocationModal} onConfirm={requestLocation} />
       )}
 
-      <div className="bg-orange-50 overflow-hidden h-[calc(100vh-64px)]">
-        <div className="flex flex-col md:flex-row h-full">
+      <div className="bg-white overflow-hidden h-[calc(100vh-64px)]">
+        <div className="relative flex flex-col md:flex-row h-full">
           <PetsitterMapPanel
             markers={filtered.map(({ lat, lng, id, name, district, neighborhood, distanceKm }) => ({
               lat,
@@ -142,12 +142,35 @@ export default function PetsitterSearchClient({
             center={basePosition}
             basePosition={basePosition}
             selectedMarkerId={selectedSitterId}
-            onMarkerClick={setSelectedSitterId}
+            onMarkerClick={(id) => {
+              setSelectedSitterId(id);
+              setSidebarOpen(true);
+            }}
             locationLoading={locationLoading}
             locationError={locationError}
+            sidebarOpen={sidebarOpen}
+            onToggleSidebar={() => setSidebarOpen(true)}
+            onRequestLocation={requestLocation}
           />
 
-          <div className="flex-1 md:flex-none w-full md:w-[520px] bg-white flex flex-col overflow-hidden">
+          {sidebarOpen && (
+            <button
+              onClick={() => setSidebarOpen(false)}
+              aria-label="펫시터 목록 접기"
+              className="hidden md:flex absolute top-2 right-[520px] z-20 w-8 h-14 rounded-l-xl rounded-r-none bg-white shadow-[-2px_2px_8px_rgba(0,0,0,0.08)] items-center justify-center hover:bg-orange-50 transition-colors"
+            >
+              <ChevronRight className="w-5 h-5 text-orange-500 rotate-180" />
+            </button>
+          )}
+
+          <div
+            className={`w-full bg-white flex flex-col overflow-hidden transition-all duration-200 ${
+              sidebarOpen
+                ? "flex-1 md:flex-none md:w-[520px]"
+                : "flex-1 md:flex-none md:w-0 md:opacity-0 md:pointer-events-none"
+            }`}
+          >
+
             <PetsitterSearchBar
               areaQuery={areaQuery}
               onAreaQueryChange={setAreaQuery}
@@ -156,7 +179,6 @@ export default function PetsitterSearchClient({
               areaSuggestions={areaSuggestions}
               onSelectSuggestion={selectAreaSuggestion}
               onClearAreaFilter={clearAreaFilter}
-              onRequestLocation={requestLocation}
               activeFilter={activeFilter}
               onFilterChange={setActiveFilter}
               hasAreaFilter={hasAreaFilter}

@@ -747,7 +747,7 @@ function ChatPageContent({
   };
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden h-[calc(100vh-64px)] bg-orange-50">
+    <div className="flex flex-col flex-1 overflow-hidden h-[calc(100vh-64px)] bg-white">
       <input ref={photoInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelect} />
 
       <div className="md:hidden flex flex-col flex-1 overflow-hidden">

@@ -70,7 +70,7 @@ export default function PetRegisterClient() {
   });
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-white">
       <main className="flex justify-center py-8 px-4">
         <div className="w-full max-w-[800px]">
           <div className="flex items-center gap-3 mb-6">
