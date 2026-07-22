@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { calculateDistanceKm } from "@/lib/distance";
+import { SERVICES } from "@/lib/sitter-options";
 import { parseArea } from "../utils";
 import { usePetsitterLocation } from "../hooks/usePetsitterLocation";
 import { useAreaSearch } from "../hooks/useAreaSearch";
@@ -13,12 +14,9 @@ import PetsitterSearchBar, { type PetsitterFilter } from "./PetsitterSearchBar";
 import PetsitterListPanel from "./PetsitterListPanel";
 import type { SitterRow } from "../types";
 
-const SERVICE_TYPE_MAP: Record<string, string> = {
-  walk: "산책",
-  care: "방문돌봄",
-  pickup: "픽업",
-  foster: "위탁돌봄",
-};
+const SERVICE_TYPE_MAP: Record<string, string> = Object.fromEntries(
+  SERVICES.map((s) => [s.id, s.title])
+);
 
 interface PetsitterSearchClientProps {
   initialSitters?: SitterRow[];
