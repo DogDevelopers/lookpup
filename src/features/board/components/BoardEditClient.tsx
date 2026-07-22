@@ -203,7 +203,7 @@ export default function BoardEditClient({
   if (isMatched) {
     return (
       <>
-        <main className="flex-1 bg-orange-50 min-h-screen flex items-center justify-center">
+        <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
           <div className="text-center flex flex-col items-center gap-4">
             <p className="text-brown-900 text-lg font-semibold">
               예약 완료된 게시글은 수정할 수 없습니다.
@@ -229,7 +229,7 @@ export default function BoardEditClient({
 
   return (
     <>
-      <main className="flex-1 bg-orange-50 min-h-screen pb-10">
+      <main className="flex-1 bg-white min-h-screen pb-10">
         <div className="max-w-205 mx-auto px-4 sm:px-6 pt-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">

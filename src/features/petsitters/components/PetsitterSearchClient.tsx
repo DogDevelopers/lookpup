@@ -125,7 +125,7 @@ export default function PetsitterSearchClient({
         <LocationConsentModal onDismiss={dismissLocationModal} onConfirm={requestLocation} />
       )}
 
-      <div className="bg-orange-50 overflow-hidden h-[calc(100vh-64px)]">
+      <div className="bg-white overflow-hidden h-[calc(100vh-64px)]">
         <div className="flex flex-col md:flex-row h-full">
           <PetsitterMapPanel
             markers={filtered.map(({ lat, lng, id, name, district, neighborhood, distanceKm }) => ({

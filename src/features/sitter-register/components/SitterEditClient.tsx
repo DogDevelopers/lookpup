@@ -449,7 +449,7 @@ export default function SitterEditClient({
         <div className="flex-1 px-5 py-5 pb-28">{renderTabContent()}</div>
       </div>
 
-      <main className="hidden md:block bg-orange-50 min-h-screen">
+      <main className="hidden md:block bg-white min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-10 py-12">
           <div className="flex items-center gap-3 mb-8">
             <DesktopBackButton />

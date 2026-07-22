@@ -70,7 +70,7 @@ export default function SitterRegisterClient() {
         className="h-1 rounded-none bg-orange-100 [&>div]:bg-orange-500 [&>div]:transition-all [&>div]:duration-500"
       />
 
-      <main className="flex-1 bg-orange-50 min-h-screen pb-28">
+      <main className="flex-1 bg-white min-h-screen pb-28">
         <div className="max-w-205 mx-auto px-6 pt-10">
           <div className="flex items-center gap-3">
             <button

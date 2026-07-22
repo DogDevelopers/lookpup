@@ -60,7 +60,7 @@ export default function SettingsClient({ user }: { user: MyProfileUser }) {
   };
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-white">
       <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
         <div className="h-14 px-5 flex items-center gap-3">
           <MobileBackButton />

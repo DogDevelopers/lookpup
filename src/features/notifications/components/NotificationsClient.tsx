@@ -43,7 +43,7 @@ export default function NotificationsClient() {
 
   return (
     <>
-    <main className="flex-1 bg-orange-50 min-h-screen">
+    <main className="flex-1 bg-white min-h-screen">
       <div className="max-w-[720px] mx-auto px-6 pt-12 pb-20">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

@@ -170,7 +170,7 @@ export default function BookingClient({
   if (sitterLoading) {
     return (
       <>
-        <main className="flex-1 bg-orange-50 min-h-screen flex items-center justify-center">
+        <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
           <p className="text-stone-400 text-sm">불러오는 중...</p>
         </main>
         <Footer />
@@ -181,7 +181,7 @@ export default function BookingClient({
   if (!sitter) {
     return (
       <>
-        <main className="flex-1 bg-orange-50 min-h-screen flex items-center justify-center">
+        <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
           <p className="text-stone-400 text-sm">시터 정보를 불러올 수 없습니다.</p>
         </main>
         <Footer />
@@ -191,7 +191,7 @@ export default function BookingClient({
 
   return (
     <>
-      <main className="flex-1 bg-orange-50 min-h-screen pb-28">
+      <main className="flex-1 bg-white min-h-screen pb-28">
         <div className="max-w-205 mx-auto px-4 sm:px-6 pt-10">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
