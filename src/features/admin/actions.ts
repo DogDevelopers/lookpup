@@ -37,6 +37,51 @@ async function resolveUserId(
   return sitter?.user_id ?? null;
 }
 
+async function resolveTargetNames(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  reports: { target_type: string; target_id: string }[],
+): Promise<Map<string, string>> {
+  const idsByType = new Map<string, string[]>();
+  for (const r of reports) {
+    idsByType.set(r.target_type, [...(idsByType.get(r.target_type) ?? []), r.target_id]);
+  }
+
+  const names = new Map<string, string>();
+
+  const userIds = idsByType.get("user") ?? [];
+  if (userIds.length > 0) {
+    const { data } = await supabase.from("users").select("id, full_name").in("id", userIds);
+    (data ?? []).forEach((u) => names.set(u.id, u.full_name ?? "이름 없음"));
+  }
+
+  const sitterIds = idsByType.get("sitter") ?? [];
+  if (sitterIds.length > 0) {
+    const { data } = await supabase.from("sitters").select("id, users(full_name)").in("id", sitterIds);
+    (data ?? []).forEach((s) => {
+      const user = s.users as unknown as { full_name: string | null } | { full_name: string | null }[] | null;
+      names.set(s.id, (Array.isArray(user) ? user[0]?.full_name : user?.full_name) ?? "이름 없음");
+    });
+  }
+
+  const requestIds = idsByType.get("request") ?? [];
+  if (requestIds.length > 0) {
+    const { data } = await supabase.from("requests").select("id, title").in("id", requestIds);
+    (data ?? []).forEach((r) => names.set(r.id, r.title));
+  }
+
+  const messageIds = idsByType.get("message") ?? [];
+  if (messageIds.length > 0) {
+    const { data } = await supabase.from("messages").select("id, sender_id").in("id", messageIds);
+    const senderIds = [...new Set((data ?? []).map((m) => m.sender_id))];
+    const { data: senders } =
+      senderIds.length > 0 ? await supabase.from("users").select("id, full_name").in("id", senderIds) : { data: [] };
+    const senderNames = new Map((senders ?? []).map((u) => [u.id, u.full_name ?? "이름 없음"]));
+    (data ?? []).forEach((m) => names.set(m.id, senderNames.get(m.sender_id) ?? "이름 없음"));
+  }
+
+  return names;
+}
+
 export async function getAdminReports(): Promise<Report[]> {
   const { supabase, userId } = await requireAdmin();
   if (!userId) return [];
@@ -50,7 +95,9 @@ export async function getAdminReports(): Promise<Report[]> {
     )
     .order("created_at", { ascending: false });
 
-  return (data ?? []) as unknown as Report[];
+  const reports = (data ?? []) as unknown as Report[];
+  const names = await resolveTargetNames(supabase, reports);
+  return reports.map((r) => ({ ...r, target_name: names.get(r.target_id) ?? null }));
 }
 
 export async function adminUpdateReport(

@@ -284,6 +284,7 @@ export default function AdminReportsClient({
                           label="대상 유형"
                           value={TARGET_TYPE_LABELS[report.target_type] ?? report.target_type}
                         />
+                        <InfoRow label="대상" value={report.target_name ?? "알 수 없음"} />
                         <InfoRow label="대상 ID" value={report.target_id} mono />
                         {report.content && (
                           <div>

@@ -591,7 +591,7 @@ function ChatPageContent({
     let role = "펫시터";
 
     if (activeTab === "one_on_one") {
-      const isUserSitter = selectedRoom?.sitterId === userId;
+      const isUserSitter = selectedRoom?.ownerId !== null && selectedRoom?.ownerId !== userId;
       targetId = isUserSitter ? (selectedRoom?.ownerId ?? "") : (selectedRoom?.sitterId ?? "");
       targetName = selectedRoom?.name ?? "";
       role = isUserSitter ? "보호자" : "펫시터";
@@ -601,7 +601,7 @@ function ChatPageContent({
       targetName = selectedReservationRequest?.name ?? "";
       role = isUserOwner ? "펫시터" : "보호자";
     } else {
-      const isUserSitter = selectedApplicant?.sitterId === userId;
+      const isUserSitter = selectedApplicant?.ownerId !== null && selectedApplicant?.ownerId !== userId;
       targetId = isUserSitter ? (selectedApplicant?.ownerId ?? "") : (selectedApplicant?.sitterId ?? "");
       targetName = isUserSitter ? "" : (selectedApplicant?.name ?? "");
       role = isUserSitter ? "보호자" : "펫시터";
