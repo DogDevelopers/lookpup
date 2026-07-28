@@ -33,6 +33,9 @@ export async function createPet(input: PetRegisterFormValues): Promise<ActionRes
   }
 
   const { petType, name, breed, age, weight, gender, neutered, notes, photoFile } = parsed.data;
+  if (!petType || !gender) {
+    return { ok: false, error: "입력값을 확인해주세요." };
+  }
 
   let imageUrl: string | null = null;
   if (photoFile) {
