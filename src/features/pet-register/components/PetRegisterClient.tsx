@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Camera, X } from "lucide-react";
 import { DesktopBackButton } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
@@ -87,8 +88,13 @@ export default function PetRegisterClient() {
               <div className="pt-3 flex items-start gap-3 overflow-x-auto">
                 {photoUrl && (
                   <div className="relative shrink-0 w-32 h-32 rounded-2xl overflow-hidden border border-orange-100">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={photoUrl} alt="반려동물 사진" className="w-full h-full object-cover" />
+                    <Image
+                      src={photoUrl}
+                      alt="반려동물 사진"
+                      fill
+                      unoptimized
+                      className="object-cover"
+                    />
                     <button
                       type="button"
                       onClick={handlePhotoRemove}
