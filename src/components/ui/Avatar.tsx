@@ -1,0 +1,138 @@
+import Image from "next/image";
+import type { ReactNode } from "react";
+import { Camera } from "lucide-react";
+
+interface AvatarProps {
+  initial: string;
+  src?: string | null;
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
+  variant?: "default" | "dark" | "orange" | "blue";
+  className?: string;
+  priority?: boolean;
+}
+
+const SIZE: Record<NonNullable<AvatarProps["size"]>, string> = {
+  sm: "w-8 h-8 text-sm",
+  md: "w-10 h-10 text-base",
+  lg: "w-14 h-14 text-xl",
+  xl: "w-16 h-16 text-2xl",
+  "2xl": "w-24 h-24 text-xl",
+};
+
+const SIZE_PX: Record<NonNullable<AvatarProps["size"]>, number> = {
+  sm: 32,
+  md: 40,
+  lg: 56,
+  xl: 64,
+  "2xl": 96,
+};
+
+const VARIANT: Record<NonNullable<AvatarProps["variant"]>, { container: string; text: string }> = {
+  default: { container: "bg-orange-100 border-2 border-orange-100", text: "text-[var(--color-orange-500)]" },
+  dark: { container: "bg-orange-100", text: "text-[var(--color-orange-500)]" },
+  orange: { container: "bg-orange-50 border border-orange-100", text: "text-orange-500" },
+  blue: { container: "bg-sky-200", text: "text-white" },
+};
+
+interface AvatarMobileProps {
+  initial: string;
+  src?: string | null;
+  className?: string;
+}
+
+export function AvatarMobile({ initial, src, className = "" }: AvatarMobileProps) {
+  return (
+    <div
+      className={`relative w-16 h-16 bg-white/30 rounded-full border-2 border-white flex items-center justify-center shrink-0 overflow-hidden ${className}`}
+    >
+      {src ? (
+        <Image src={src} alt={initial || "사용자 프로필"} fill className="object-cover" sizes="64px" />
+      ) : (
+        <span className="text-white text-2xl font-semibold">{initial}</span>
+      )}
+    </div>
+  );
+}
+
+interface AvatarWithCameraProps {
+  initial: string;
+  src?: string | null;
+  variant?: AvatarProps["variant"];
+  onCameraClick?: () => void;
+  className?: string;
+}
+
+export function AvatarWithCamera({
+  initial,
+  src,
+  variant = "default",
+  onCameraClick,
+  className = "",
+}: AvatarWithCameraProps) {
+  return (
+    <div className={`relative ${className}`}>
+      <Avatar initial={initial} src={src} size="2xl" variant={variant} />
+      {onCameraClick && (
+        <button
+          type="button"
+          onClick={onCameraClick}
+          aria-label="프로필 사진 변경"
+          className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-white border border-orange-100 shadow-sm flex items-center justify-center hover:bg-orange-50 transition-colors"
+        >
+          <Camera size={14} className="text-orange-500" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+interface AvatarReportProps {
+  initial: string;
+  src?: string | null;
+  badge: ReactNode;
+  className?: string;
+}
+
+export function AvatarReport({
+  initial,
+  src,
+  badge,
+  className = "",
+}: AvatarReportProps) {
+  return (
+    <div className={`relative shrink-0 ${className}`}>
+      <Avatar initial={initial} src={src} size="lg" variant="blue" />
+      <div className="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-[var(--color-orange-500)] flex items-center justify-center">
+        {badge}
+      </div>
+    </div>
+  );
+}
+
+export default function Avatar({
+  initial,
+  src,
+  size = "md",
+  variant = "default",
+  className = "",
+  priority = false,
+}: AvatarProps) {
+  return (
+    <div
+      className={`relative ${SIZE[size]} ${VARIANT[variant].container} rounded-full flex items-center justify-center shrink-0 overflow-hidden ${className}`}
+    >
+      {src ? (
+        <Image
+          src={src}
+          alt={initial || "사용자 프로필"}
+          fill
+          className="object-cover"
+          sizes={`${SIZE_PX[size]}px`}
+          priority={priority}
+        />
+      ) : (
+        <span className={`${VARIANT[variant].text} font-semibold`}>{initial}</span>
+      )}
+    </div>
+  );
+}
