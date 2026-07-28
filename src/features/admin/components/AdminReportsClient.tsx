@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import {
@@ -226,10 +227,11 @@ export default function AdminReportsClient({
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     {reporter?.profile_image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={reporter.profile_image}
                         alt={reporter.full_name ?? ""}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full object-cover shrink-0"
                       />
                     ) : (
@@ -300,10 +302,11 @@ export default function AdminReportsClient({
                             <div className="flex flex-wrap gap-2">
                               {report.image_urls.map((url, i) => (
                                 <a key={`${url}-${i}`} href={url} target="_blank" rel="noopener noreferrer">
-                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                  <img
+                                  <Image
                                     src={url}
                                     alt={`증거 ${i + 1}`}
+                                    width={80}
+                                    height={80}
                                     className="w-20 h-20 object-cover rounded-xl border border-stone-100 hover:opacity-80 transition-opacity"
                                   />
                                 </a>

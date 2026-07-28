@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { DateRange } from "react-day-picker";
 import {
@@ -513,11 +514,12 @@ export default function BoardEditClient({
                           {pet.type}
                         </span>
                         {pet.image_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={pet.image_url}
                             alt={pet.name}
-                            className="w-full h-full object-cover"
+                            fill
+                            sizes="(max-width: 640px) 50vw, 33vw"
+                            className="object-cover"
                           />
                         ) : (
                           <span className="text-5xl">{pet.emoji}</span>
@@ -589,11 +591,12 @@ export default function BoardEditClient({
                 <div className="flex items-center gap-2 flex-wrap">
                   {form.image_urls.map((url) => (
                     <div key={url} className="relative w-20 h-20 shrink-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
+                      <Image
                         src={url}
                         alt=""
-                        className="w-full h-full rounded-xl object-cover"
+                        fill
+                        sizes="80px"
+                        className="rounded-xl object-cover"
                       />
                       <button
                         type="button"
