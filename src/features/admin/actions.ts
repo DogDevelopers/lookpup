@@ -10,6 +10,7 @@ import type {
   SitterApplication,
   SitterStatus,
 } from "@/features/admin/types";
+import type { TablesUpdate } from "@/types/database.types";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -153,7 +154,7 @@ export async function adminUpdateReservationStatus(
   if (!userId) return { ok: false, error: "권한이 없습니다." };
 
   const now = new Date().toISOString();
-  const updates: Record<string, unknown> = { status };
+  const updates: TablesUpdate<"reservations"> = { status };
   if (status === "accepted") updates.accepted_at = now;
   else if (status === "in_progress") updates.started_at = now;
   else if (status === "completed") updates.completed_at = now;
