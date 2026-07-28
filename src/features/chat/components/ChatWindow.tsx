@@ -7,6 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   type Message,
   type Badge,
+  type Tab,
   type ReservationEditActionState,
 } from "@/features/chat/types";
 import { ChatWindowHeader } from "./ChatWindowHeader";
@@ -26,7 +27,7 @@ export interface ChatWindowProps {
   roomProfileImage: string | null;
   headerSub: string;
   headerBadge: Badge;
-  activeTab: "one_on_one" | "reservations" | "applicants";
+  activeTab: Tab;
   selectedApplicantPostId: string | undefined;
 
   messages: Message[];

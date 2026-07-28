@@ -257,10 +257,12 @@ function ApplicantPostGroupImpl({
   if (applicants.length === 0) return null;
 
   return (
-    <div>
+    <div className="rounded-2xl border border-orange-100 bg-white shadow-sm">
       <button
         onClick={onToggle}
-        className="w-full px-5 py-3 bg-orange-50 border-b border-orange-100 flex items-center justify-between hover:bg-orange-100 transition-colors shrink-0"
+        className={`w-full px-5 py-3 bg-orange-50 flex items-center justify-between hover:bg-orange-100 transition-colors shrink-0 sticky top-0 z-10 rounded-t-2xl ${
+          isCollapsed ? "rounded-b-2xl" : "border-b border-orange-100"
+        }`}
       >
         <div className="text-left flex-1 min-w-0 mr-2">
           <p className="text-sm font-medium text-stone-900 truncate">
@@ -275,25 +277,28 @@ function ApplicantPostGroupImpl({
           className={`text-stone-400 shrink-0 transition-transform duration-200 ${isCollapsed ? "-rotate-90" : ""}`}
         />
       </button>
-      {!isCollapsed &&
-        applicants.map((applicant) => (
-          <ApplicantCard
-            key={applicant.id}
-            applicant={applicant}
-            badge={getApplicantBadge(applicant.id)}
-            isRejected={rejectedIds.has(applicant.id)}
-            isConfirmed={confirmedId === applicant.id}
-            isSelected={selectedApplicantId === applicant.id}
-            isOwner={isOwner}
-            confirmedId={confirmedId}
-            editMode={editMode}
-            onDelete={onDelete}
-            onReject={onReject}
-            onConfirm={onConfirm}
-            onSelect={onSelect}
-            onAvatarClick={onAvatarClick}
-          />
-        ))}
+      {!isCollapsed && (
+        <div className="[&>*:last-child]:rounded-b-2xl [&>*:last-child]:border-b-0">
+          {applicants.map((applicant) => (
+            <ApplicantCard
+              key={applicant.id}
+              applicant={applicant}
+              badge={getApplicantBadge(applicant.id)}
+              isRejected={rejectedIds.has(applicant.id)}
+              isConfirmed={confirmedId === applicant.id}
+              isSelected={selectedApplicantId === applicant.id}
+              isOwner={isOwner}
+              confirmedId={confirmedId}
+              editMode={editMode}
+              onDelete={onDelete}
+              onReject={onReject}
+              onConfirm={onConfirm}
+              onSelect={onSelect}
+              onAvatarClick={onAvatarClick}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

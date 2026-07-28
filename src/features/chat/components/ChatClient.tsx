@@ -42,7 +42,7 @@ import {
   sendSystemMessage,
 } from "@/features/chat/actions/message-actions";
 import { markRoomRead } from "@/features/chat/actions/room-actions";
-import type { RoomApiItem, ChatMessageRow, Tab, Badge, Message } from "@/features/chat/types";
+import type { RoomApiItem, ChatMessageRow, Tab, SelectedKind, Badge, Message } from "@/features/chat/types";
 import { createCareRecord, getInProgressReservationByOwnerAndSitter } from "@/features/care-records/actions";
 import { RESERVATION_STATUS, APPLICATION_STATUS } from "@/lib/constants";
 
@@ -107,12 +107,17 @@ function ChatPageContent({
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [careRecordOpen, setCareRecordOpen] = useState(false);
 
-  const activeRoomId =
+  const selectedKind: SelectedKind =
     activeTab === "one_on_one"
-      ? selectedRoomId
-      : activeTab === "reservations"
-        ? selectedReservationRequestId
-        : selectedApplicantId;
+      ? (selectedRoomId ? "room" : null)
+      : selectedReservationRequestId
+        ? "reservation"
+        : selectedApplicantId
+          ? "applicant"
+          : null;
+
+  const activeRoomId =
+    activeTab === "one_on_one" ? selectedRoomId : (selectedReservationRequestId ?? selectedApplicantId);
 
   const {
     rooms,
@@ -155,7 +160,7 @@ function ChatPageContent({
   } = useRoomDelete({
     rooms,
     reservationRequests,
-    activeTab,
+    selectedKind,
     selectedRoomId,
     selectedApplicantId,
     selectedReservationRequestId,
@@ -364,7 +369,7 @@ function ChatPageContent({
     const applicant = applicants.find((a) => a.id === initialRoomId);
     if (applicant) {
       hasAutoSelected.current = true;
-      setActiveTab("applicants");
+      setActiveTab(applicant.ownerId === userId ? "owner" : "sitter");
       setSelectedApplicantId(applicant.id);
       setMobileChatView("room");
       return;
@@ -372,7 +377,7 @@ function ChatPageContent({
     const rr = reservationRequests.find((r) => r.id === initialRoomId);
     if (rr) {
       hasAutoSelected.current = true;
-      setActiveTab("reservations");
+      setActiveTab(rr.ownerId === userId ? "owner" : "sitter");
       setSelectedReservationRequestId(rr.id);
       setMobileChatView("room");
       return;
@@ -381,7 +386,7 @@ function ChatPageContent({
       hasRetried.current = true;
       refresh();
     }
-  }, [initialRoomId, rooms, applicants, reservationRequests, loading, refresh]);
+  }, [initialRoomId, rooms, applicants, reservationRequests, loading, refresh, userId]);
 
   useEffect(() => {
     if (!acceptedDirectRoomId) return;
@@ -528,25 +533,47 @@ function ChatPageContent({
   const handleRejectSelectedApplicant = useCallback(() => handleRejectApplicant(selectedApplicantId!), [handleRejectApplicant, selectedApplicantId]);
   const handleConfirmSelectedApplicant = useCallback(() => handleConfirmClick(selectedApplicantId!), [handleConfirmClick, selectedApplicantId]);
 
-  const handleMobileTabChange = useCallback((tab: Tab) => {
+  const changeTab = useCallback((tab: Tab) => {
     setActiveTab(tab);
-    setMobileChatView("list");
+    setSelectedReservationRequestId(null);
+    setSelectedApplicantId(null);
   }, []);
+  const handleMobileTabChange = useCallback(
+    (tab: Tab) => {
+      changeTab(tab);
+      setMobileChatView("list");
+    },
+    [changeTab],
+  );
   const handleMobileRoomSelect = useCallback((id: string) => {
     setSelectedRoomId(id);
     setMobileChatView("room");
   }, []);
-  const handleMobileApplicantSelect = useCallback((id: string) => {
+  const handleApplicantSelect = useCallback((id: string) => {
+    setSelectedReservationRequestId(null);
     setSelectedApplicantId(id);
-    setMobileChatView("room");
   }, []);
-  const handleMobileReservationSelect = useCallback((id: string) => {
+  const handleReservationSelect = useCallback((id: string) => {
+    setSelectedApplicantId(null);
     setSelectedReservationRequestId(id);
-    setMobileChatView("room");
   }, []);
+  const handleMobileApplicantSelect = useCallback(
+    (id: string) => {
+      handleApplicantSelect(id);
+      setMobileChatView("room");
+    },
+    [handleApplicantSelect],
+  );
+  const handleMobileReservationSelect = useCallback(
+    (id: string) => {
+      handleReservationSelect(id);
+      setMobileChatView("room");
+    },
+    [handleReservationSelect],
+  );
   const handleBackToList = useCallback(() => setMobileChatView("list"), []);
 
-  const activeItem = activeTab === "one_on_one" ? selectedRoom : activeTab === "reservations" ? selectedReservationRequest : selectedApplicant;
+  const activeItem = selectedKind === "room" ? selectedRoom : selectedKind === "reservation" ? selectedReservationRequest : selectedApplicant;
 
   const handleGoToProfile = useCallback(() => {
     if (!activeItem || !userId || activeItem.ownerId !== userId) return;
@@ -554,8 +581,8 @@ function ChatPageContent({
   }, [activeItem, activeRoomId, userId, router]);
 
   function getHeaderBadge(): Badge {
-    if (activeTab === "one_on_one") return { label: "진행중", className: "bg-orange-50 text-orange-500" };
-    if (activeTab === "reservations") {
+    if (selectedKind === "room") return { label: "진행중", className: "bg-orange-50 text-orange-500" };
+    if (selectedKind === "reservation") {
       const status = selectedReservationRequest?.reservationStatus;
       if (status === RESERVATION_STATUS.CANCELED) return { label: "거절됨", className: "bg-stone-100 text-stone-500" };
       if (status === RESERVATION_STATUS.ACCEPTED) return { label: "확정됨", className: "bg-green-50 text-green-600" };
@@ -567,8 +594,8 @@ function ChatPageContent({
   }
 
   const getHeaderSub = useCallback(() => {
-    if (activeTab === "one_on_one") return selectedRoom?.sub ?? "";
-    if (activeTab === "reservations") {
+    if (selectedKind === "room") return selectedRoom?.sub ?? "";
+    if (selectedKind === "reservation") {
       const status = selectedReservationRequest?.reservationStatus;
       if (status === RESERVATION_STATUS.ACCEPTED) return "예약 요청 · 확정됨";
       if (status === RESERVATION_STATUS.CANCELED) return "예약 요청 · 거절됨";
@@ -577,7 +604,7 @@ function ChatPageContent({
     if (confirmedIds.get(selectedApplicant?.postId ?? "") === selectedApplicantId) return "구인글 채팅 · 선택됨";
     if (selectedApplicantId !== null && rejectedIds.has(selectedApplicantId)) return "구인글 채팅 · 거절됨";
     return "구인글 채팅 · 지원자";
-  }, [activeTab, selectedRoom, selectedReservationRequest, confirmedIds, selectedApplicant, selectedApplicantId, rejectedIds]);
+  }, [selectedKind, selectedRoom, selectedReservationRequest, confirmedIds, selectedApplicant, selectedApplicantId, rejectedIds]);
 
   const [reportTarget, setReportTarget] = useState<{
     targetType: ReportCreateInput["target_type"];
@@ -590,12 +617,12 @@ function ChatPageContent({
     let targetName = "";
     let role = "펫시터";
 
-    if (activeTab === "one_on_one") {
+    if (selectedKind === "room") {
       const isUserSitter = selectedRoom?.ownerId !== null && selectedRoom?.ownerId !== userId;
       targetId = isUserSitter ? (selectedRoom?.ownerId ?? "") : (selectedRoom?.sitterId ?? "");
       targetName = selectedRoom?.name ?? "";
       role = isUserSitter ? "보호자" : "펫시터";
-    } else if (activeTab === "reservations") {
+    } else if (selectedKind === "reservation") {
       const isUserOwner = selectedReservationRequest?.ownerId === userId;
       targetId = isUserOwner ? (selectedReservationRequest?.sitterId ?? "") : (selectedReservationRequest?.ownerId ?? "");
       targetName = selectedReservationRequest?.name ?? "";
@@ -609,42 +636,42 @@ function ChatPageContent({
 
     if (!targetId) return;
     setReportTarget({ targetType: role === "펫시터" ? "sitter" : "user", targetId, targetLabel: targetName || undefined });
-  }, [activeTab, selectedRoom, selectedReservationRequest, selectedApplicant, userId]);
+  }, [selectedKind, selectedRoom, selectedReservationRequest, selectedApplicant, userId]);
 
   const handleReportMessage = useCallback((messageId: string) => {
     setReportTarget({ targetType: "message", targetId: messageId });
   }, []);
 
-  const roomName = activeTab === "one_on_one" ? (selectedRoom?.name ?? "") : activeTab === "reservations" ? (selectedReservationRequest?.name ?? "") : (selectedApplicant?.name ?? "");
-  const roomInitial = activeTab === "one_on_one" ? (selectedRoom?.initial ?? "") : activeTab === "reservations" ? (selectedReservationRequest?.initial ?? "") : (selectedApplicant?.initial ?? "");
+  const roomName = selectedKind === "room" ? (selectedRoom?.name ?? "") : selectedKind === "reservation" ? (selectedReservationRequest?.name ?? "") : (selectedApplicant?.name ?? "");
+  const roomInitial = selectedKind === "room" ? (selectedRoom?.initial ?? "") : selectedKind === "reservation" ? (selectedReservationRequest?.initial ?? "") : (selectedApplicant?.initial ?? "");
   const roomProfileImage =
-    activeTab === "one_on_one" ? (selectedRoom?.profileImage ?? null) : activeTab === "reservations" ? (selectedReservationRequest?.profileImage ?? null) : (selectedApplicant?.profileImage ?? null);
+    selectedKind === "room" ? (selectedRoom?.profileImage ?? null) : selectedKind === "reservation" ? (selectedReservationRequest?.profileImage ?? null) : (selectedApplicant?.profileImage ?? null);
   const headerBadge = getHeaderBadge();
   const headerSub = getHeaderSub();
 
-  const isCurrentUserSitter = userId !== null && activeTab === "one_on_one" && selectedRoom !== undefined && selectedRoom.ownerId !== null && selectedRoom.ownerId !== userId;
+  const isCurrentUserSitter = userId !== null && selectedKind === "room" && selectedRoom !== undefined && selectedRoom.ownerId !== null && selectedRoom.ownerId !== userId;
 
   const canStartService = !(selectedRoom?.reservationStatus && ["in_progress", "completed", "canceled"].includes(selectedRoom.reservationStatus));
 
   const isOwnerOfSelectedRoom = selectedApplicant?.ownerId !== null && selectedApplicant?.ownerId === userId;
 
   const showApplicantActions =
-    activeTab === "applicants" &&
+    selectedKind === "applicant" &&
     selectedApplicantId !== null &&
     isOwnerOfSelectedRoom &&
     !rejectedIds.has(selectedApplicantId) &&
     confirmedIds.get(selectedApplicant?.postId ?? "") !== selectedApplicantId &&
     !confirmedIds.has(selectedApplicant?.postId ?? "");
 
-  const isRejectedApplicant = activeTab === "applicants" && !isOwnerOfSelectedRoom && selectedApplicantId !== null && rejectedIds.has(selectedApplicantId);
+  const isRejectedApplicant = selectedKind === "applicant" && !isOwnerOfSelectedRoom && selectedApplicantId !== null && rejectedIds.has(selectedApplicantId);
 
   const isRecipientLeft =
-    activeTab === "one_on_one" ? !!selectedRoom?.recipientLeft : activeTab === "applicants" ? !!selectedApplicant?.recipientLeft : activeTab === "reservations" ? !!selectedReservationRequest?.recipientLeft : false;
+    selectedKind === "room" ? !!selectedRoom?.recipientLeft : selectedKind === "applicant" ? !!selectedApplicant?.recipientLeft : selectedKind === "reservation" ? !!selectedReservationRequest?.recipientLeft : false;
 
   const canLeaveActiveRoom =
-    activeTab === "one_on_one"
+    selectedKind === "room"
       ? !selectedRoom || canLeaveDirectRoom(selectedRoom)
-      : activeTab === "reservations"
+      : selectedKind === "reservation"
         ? !selectedReservationRequest || canLeaveReservationRequest(selectedReservationRequest)
         : true;
 
@@ -656,6 +683,15 @@ function ChatPageContent({
     [reservationRequests, searchQuery],
   );
 
+  const totalSitterCount = useMemo(
+    () => reservationRequests.filter((rr) => rr.ownerId !== userId).length + applicants.filter((a) => a.ownerId !== userId).length,
+    [reservationRequests, applicants, userId],
+  );
+  const totalOwnerCount = useMemo(
+    () => reservationRequests.filter((rr) => rr.ownerId === userId).length + applicants.filter((a) => a.ownerId === userId).length,
+    [reservationRequests, applicants, userId],
+  );
+
   const sharedSidebarProps = {
     activeTab,
     searchQuery,
@@ -665,10 +701,9 @@ function ChatPageContent({
     filteredRooms,
     filteredApplicants,
     filteredPosts,
+    reservationRequests,
     filteredReservationRequests,
     totalRoomCount: rooms.length,
-    totalApplicantCount: applicants.length,
-    totalReservationCount: reservationRequests.length,
     applicants,
     selectedRoomId,
     selectedApplicantId,
@@ -759,14 +794,14 @@ function ChatPageContent({
       </div>
 
       <div className="hidden md:flex flex-1 bg-white overflow-hidden">
-        <ChatSidebar {...sharedSidebarProps} className="w-96 bg-white border-r border-orange-100 flex flex-col shrink-0" onTabChange={setActiveTab} onRoomSelect={setSelectedRoomId} onApplicantSelect={setSelectedApplicantId} onReservationSelect={setSelectedReservationRequestId} />
+        <ChatSidebar {...sharedSidebarProps} className="w-96 bg-white border-r border-orange-100 flex flex-col shrink-0" onTabChange={changeTab} onRoomSelect={setSelectedRoomId} onApplicantSelect={handleApplicantSelect} onReservationSelect={handleReservationSelect} />
         <ChatWindow
           {...sharedChatWindowProps}
           isMobile={false}
           loading={loading}
           error={error}
-          isEmpty={(activeTab === "one_on_one" && rooms.length === 0) || (activeTab === "applicants" && applicants.length === 0) || (activeTab === "reservations" && reservationRequests.length === 0)}
-          hasSelection={!((activeTab === "one_on_one" && selectedRoomId === null) || (activeTab === "applicants" && selectedApplicantId === null) || (activeTab === "reservations" && selectedReservationRequestId === null))}
+          isEmpty={(activeTab === "one_on_one" && rooms.length === 0) || (activeTab === "sitter" && totalSitterCount === 0) || (activeTab === "owner" && totalOwnerCount === 0)}
+          hasSelection={activeRoomId !== null}
           onBack={() => {}}
           onGoToProfile={handleGoToProfile}
           onGoToChat={handleGoToChatDesktop}
@@ -868,7 +903,7 @@ export default function ChatClient({ initialRoomsData }: { initialRoomsData?: Ro
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const roomId = searchParams.get("roomId");
-  const initialTab: Tab = tab === "reservations" || tab === "applicants" ? tab : "one_on_one";
+  const initialTab: Tab = tab === "sitter" || tab === "owner" ? tab : "one_on_one";
 
   return <ChatPageContent initialTab={initialTab} initialRoomId={roomId} initialRoomsData={initialRoomsData} />;
 }
