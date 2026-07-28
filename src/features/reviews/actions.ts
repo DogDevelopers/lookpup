@@ -112,7 +112,8 @@ export async function getMyWrittenReviews(): Promise<WrittenReview[]> {
     .from("reviews")
     .select("id, rating, content, image_urls, tags, detail_ratings, created_at, sitters(users(full_name, profile_image))")
     .eq("owner_id", user.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   return (data ?? []).map((row) => {
     const sitter = row.sitters as unknown as {
@@ -163,7 +164,8 @@ export async function getReceivedReviews(): Promise<ReceivedReview[]> {
     .from("reviews")
     .select("id, owner_id, rating, content, image_urls, tags, detail_ratings, created_at, users(full_name, profile_image)")
     .eq("sitter_id", sitter.id)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   return (data ?? []).map((row) => {
     const owner = row.users as unknown as { full_name: string | null; profile_image: string | null } | null;
