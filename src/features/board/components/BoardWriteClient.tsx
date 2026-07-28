@@ -333,6 +333,7 @@ export default function BoardWriteClient({
 
   return (
     <>
+      <div className="flex flex-col">
       <main className="flex-1 bg-white min-h-screen pb-28">
         <div className="max-w-205 mx-auto px-4 sm:px-6 pt-10">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -917,6 +918,7 @@ export default function BoardWriteClient({
             {isSubmitting ? "등록 중..." : "게시하기"}
           </button>
         </div>
+      </div>
       </div>
 
       <Footer />
