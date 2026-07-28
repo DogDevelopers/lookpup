@@ -257,11 +257,11 @@ function ApplicantPostGroupImpl({
   if (applicants.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-orange-100 bg-white shadow-sm">
+    <div className="rounded-2xl border border-orange-100 bg-white shadow-sm overflow-hidden">
       <button
         onClick={onToggle}
-        className={`w-full px-5 py-3 bg-orange-50 flex items-center justify-between hover:bg-orange-100 transition-colors shrink-0 sticky top-0 z-10 rounded-t-2xl ${
-          isCollapsed ? "rounded-b-2xl" : "border-b border-orange-100"
+        className={`w-full px-5 py-3 bg-orange-50 flex items-center justify-between hover:bg-orange-100 transition-colors shrink-0 sticky top-0 z-10 ${
+          isCollapsed ? "" : "border-b border-orange-100"
         }`}
       >
         <div className="text-left flex-1 min-w-0 mr-2">
@@ -278,7 +278,7 @@ function ApplicantPostGroupImpl({
         />
       </button>
       {!isCollapsed && (
-        <div className="[&>*:last-child]:rounded-b-2xl [&>*:last-child]:border-b-0">
+        <div className="[&>*:last-child]:border-b-0">
           {applicants.map((applicant) => (
             <ApplicantCard
               key={applicant.id}

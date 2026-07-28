@@ -186,7 +186,7 @@ function ChatSidebarImpl({
     return (
       <div>
         <p className="px-2 pb-2 text-xs font-medium text-stone-400">예약 요청 {list.length}건</p>
-        <div className="rounded-2xl border border-orange-100 bg-white shadow-sm [&>*:first-child]:rounded-t-2xl [&>*:last-child]:rounded-b-2xl [&>*:last-child]:border-b-0">
+        <div className="rounded-2xl border border-orange-100 bg-white shadow-sm overflow-hidden [&>*:last-child]:border-b-0">
           {list.map((rr) => (
             <ReservationRequestCard
               key={rr.id}
