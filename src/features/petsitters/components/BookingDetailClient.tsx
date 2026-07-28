@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
+import Footer from "@/components/layout/Footer";
 import { cancelReservation } from "@/features/reservations/actions";
 import type { ReservationDetail, ReservationUiStatus } from "@/features/reservations/types";
 
@@ -280,6 +281,8 @@ export default function BookingDetailClient({ booking: initialBooking }: { booki
           )}
         </div>
       </main>
+
+      <Footer />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import { AvatarWithCamera } from "@/components/ui/Avatar";
+import Footer from "@/components/layout/Footer";
 import {
   loadNotificationPrefs,
   saveNotificationPrefs,
@@ -202,6 +203,8 @@ export default function SettingsClient({ user }: { user: MyProfileUser }) {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

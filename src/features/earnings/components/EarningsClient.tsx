@@ -5,6 +5,7 @@ import EarningsSummary from "@/features/earnings/components/EarningsSummary";
 import EarningsStatsChart from "@/features/earnings/components/EarningsStatsChart";
 import SettlementHistory from "@/features/earnings/components/SettlementHistory";
 import type { EarningsData } from "@/features/earnings/types";
+import Footer from "@/components/layout/Footer";
 
 export default function EarningsClient({
   data,
@@ -49,6 +50,8 @@ export default function EarningsClient({
           <SettlementHistory rows={data.rows} onViewReservations={onViewReservations} />
         </div>
       </main>
+
+      {!embedded && <Footer />}
     </div>
   );
 }

@@ -280,6 +280,7 @@ export default function SitterDetailClient({
       </div>
 
       <Footer />
+      <div className="h-20 md:hidden" />
     </>
   );
 }
