@@ -3,11 +3,15 @@ import PetsitterSearchClient from "@/features/petsitters/components/PetsitterSea
 import { getSitterList } from "@/features/petsitters/queries";
 import { Spinner } from "@/components/ui/spinner";
 
-export default async function PetsittersPage() {
+async function PetsitterSearch() {
   const sitters = await getSitterList();
+  return <PetsitterSearchClient initialSitters={sitters} />;
+}
+
+export default function PetsittersPage() {
   return (
     <Suspense fallback={<Spinner className="size-6 mx-auto mt-20" />}>
-      <PetsitterSearchClient initialSitters={sitters} />
+      <PetsitterSearch />
     </Suspense>
   );
 }
