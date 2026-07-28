@@ -22,6 +22,7 @@ import {
 } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
 import SectionCard from "@/components/common/SectionCard";
+import Footer from "@/components/layout/Footer";
 import { deleteRequest, closeRequest } from "@/features/board/actions";
 import { SERVICE_TYPES } from "@/features/board/constants";
 import type { MyRequestRow } from "@/features/board/types";
@@ -486,6 +487,8 @@ export default function MyPostsClient({
         cancelText="취소"
         type="danger"
       />
+
+      {!embedded && <Footer />}
     </div>
   );
 }

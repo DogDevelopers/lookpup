@@ -286,6 +286,7 @@ export default function SitterProfilePreviewClient({ sitter }: { sitter: SitterD
       </main>
 
       <Footer />
+      <div className="h-16 md:hidden" />
     </>
   );
 }

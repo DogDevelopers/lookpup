@@ -8,6 +8,7 @@ import { CustomModal } from "@/components/common/CustomModal";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
 import { ImageGallery } from "@/components/common/ImageGallery";
+import Footer from "@/components/layout/Footer";
 import { ReportDialog } from "@/features/report/components/ReportDialog";
 import { deleteReview } from "@/features/reviews/actions";
 import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
@@ -322,6 +323,8 @@ export default function ReviewsClient({
           </div>
         )}
       </main>
+
+      {!embedded && <Footer />}
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
+import Footer from "@/components/layout/Footer";
 import { updatePet, deletePet } from "@/features/pet-register/actions";
 
 type AnimalType = "dog" | "cat" | "other";
@@ -885,6 +886,8 @@ export default function MyPetsClient({
         onClose={() => setErrorModal(null)}
         showCloseButton={false}
       />
+
+      {!embedded && <Footer />}
     </div>
   );
 }
