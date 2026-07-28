@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -19,9 +20,10 @@ import {
 } from "../schema";
 import type { BookedRange, Pet, SitterBookingInfo } from "../types";
 import StepDateSelect from "./StepDateSelect";
-import StepPetService from "./StepPetService";
-import StepNotes from "./StepNotes";
-import StepConfirm from "./StepConfirm";
+
+const StepPetService = dynamic(() => import("./StepPetService"));
+const StepNotes = dynamic(() => import("./StepNotes"));
+const StepConfirm = dynamic(() => import("./StepConfirm"));
 
 const STEP_LABELS = ["날짜 선택", "반려동물·서비스", "특이사항", "완료"];
 const TOTAL_STEPS = 4;
@@ -62,7 +64,11 @@ export default function BookingClient({
   const step1Form = useForm<Step1Values>({
     resolver: zodResolver(step1Schema),
     mode: "onChange",
-    defaultValues: { dateRange: dateRange ?? { from: undefined, to: undefined }, startTime: "", endTime: "" },
+    defaultValues: {
+      dateRange: dateRange ?? { from: undefined, to: undefined },
+      startTime: "",
+      endTime: "",
+    },
   });
 
   const step2Form = useForm<Step2Values>({
@@ -79,7 +85,8 @@ export default function BookingClient({
   // eslint-disable-next-line react-hooks/incompatible-library
   const startTime = step1Form.watch("startTime") ?? "";
   const endTime = step1Form.watch("endTime") ?? "";
-  const selectedService = (step2Form.watch("selectedService") || null) as ServiceKey | null;
+  const selectedService = (step2Form.watch("selectedService") ||
+    null) as ServiceKey | null;
 
   async function handleNext() {
     if (step === 1) {
@@ -182,7 +189,9 @@ export default function BookingClient({
     return (
       <>
         <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
-          <p className="text-stone-400 text-sm">시터 정보를 불러올 수 없습니다.</p>
+          <p className="text-stone-400 text-sm">
+            시터 정보를 불러올 수 없습니다.
+          </p>
         </main>
         <Footer />
       </>
@@ -260,7 +269,11 @@ export default function BookingClient({
             )}
             {step === 2 && (
               <FormProvider {...step2Form}>
-                <StepPetService pets={pets} sitterServices={sitter.services} sitter={sitter} />
+                <StepPetService
+                  pets={pets}
+                  sitterServices={sitter.services}
+                  sitter={sitter}
+                />
               </FormProvider>
             )}
             {step === 3 && (
