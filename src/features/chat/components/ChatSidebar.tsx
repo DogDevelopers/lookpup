@@ -4,6 +4,7 @@ import { memo, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  type Tab,
   type ChatRoom,
   type Applicant,
   type ReservationRequest,
@@ -19,7 +20,7 @@ import type { Post } from "../hooks/use-chat-rooms";
 interface ChatSidebarProps {
   className: string;
   isMobile?: boolean;
-  activeTab: "one_on_one" | "reservations" | "applicants";
+  activeTab: Tab;
   searchQuery: string;
   loading: boolean;
   error: string | null;
@@ -27,10 +28,9 @@ interface ChatSidebarProps {
   filteredRooms: ChatRoom[];
   filteredApplicants: Applicant[];
   filteredPosts: Post[];
+  reservationRequests: ReservationRequest[];
   filteredReservationRequests: ReservationRequest[];
   totalRoomCount: number;
-  totalApplicantCount: number;
-  totalReservationCount: number;
   applicants: Applicant[];
   selectedRoomId: string | null;
   selectedApplicantId: string | null;
@@ -39,7 +39,7 @@ interface ChatSidebarProps {
   confirmedIds: Map<string, string>;
   actioningId: string | null;
   getApplicantBadge: (id: string) => Badge | null;
-  onTabChange: (tab: "one_on_one" | "reservations" | "applicants") => void;
+  onTabChange: (tab: Tab) => void;
   onSearchChange: (q: string) => void;
   onRoomSelect: (id: string) => void;
   onApplicantSelect: (id: string) => void;
@@ -66,10 +66,9 @@ function ChatSidebarImpl({
   filteredRooms,
   filteredApplicants,
   filteredPosts,
+  reservationRequests,
   filteredReservationRequests,
   totalRoomCount,
-  totalApplicantCount,
-  totalReservationCount,
   applicants,
   selectedRoomId,
   selectedApplicantId,
@@ -110,28 +109,22 @@ function ChatSidebarImpl({
     });
   }
 
-  const tabBar = (["one_on_one", "reservations", "applicants"] as const).map(
-    (tab) => (
-      <button
-        key={tab}
-        onClick={() => {
-          onTabChange(tab);
-          setEditMode(false);
-        }}
-        className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors ${
-          activeTab === tab
-            ? "border-orange-500 text-orange-500"
-            : "border-transparent text-stone-400"
-        }`}
-      >
-        {tab === "one_on_one"
-          ? "1:1 채팅"
-          : tab === "reservations"
-            ? "예약 목록"
-            : "지원 목록"}
-      </button>
-    ),
-  );
+  const tabBar = (["one_on_one", "sitter", "owner"] as const).map((tab) => (
+    <button
+      key={tab}
+      onClick={() => {
+        onTabChange(tab);
+        setEditMode(false);
+      }}
+      className={`flex-1 py-2 text-sm font-medium border-b-2 transition-colors ${
+        activeTab === tab
+          ? "border-orange-500 text-orange-500"
+          : "border-transparent text-stone-400"
+      }`}
+    >
+      {tab === "one_on_one" ? "1:1 채팅" : tab === "sitter" ? "펫시터" : "보호자"}
+    </button>
+  ));
 
   const filteredApplicantsByPostId = useMemo(() => {
     const map = new Map<string, Applicant[]>();
@@ -151,29 +144,95 @@ function ChatSidebarImpl({
     return map;
   }, [applicants]);
 
-  const applicantList = (
-    <>
-      {filteredPosts.map((post) => (
-        <ApplicantPostGroup
-          key={post.id}
-          post={post}
-          applicants={filteredApplicantsByPostId.get(post.id) ?? []}
-          isCollapsed={collapsedPosts.has(post.id)}
-          isOwner={ownerIdByPostId.get(post.id) === userId}
-          selectedApplicantId={selectedApplicantId}
-          rejectedIds={rejectedIds}
-          confirmedId={confirmedIds.get(post.id) ?? null}
-          editMode={editMode}
-          onToggle={() => togglePostCollapse(post.id)}
-          onDelete={onDeleteApplicant}
-          onReject={onRejectApplicant}
-          onConfirm={onConfirm}
-          onSelect={onApplicantSelect}
-          onAvatarClick={onAvatarClick}
-          getApplicantBadge={getApplicantBadge}
-        />
-      ))}
-    </>
+  function renderApplicantGroups(rolePosts: Post[]) {
+    return (
+      <div className="space-y-3">
+        {rolePosts.map((post) => (
+          <ApplicantPostGroup
+            key={post.id}
+            post={post}
+            applicants={filteredApplicantsByPostId.get(post.id) ?? []}
+            isCollapsed={collapsedPosts.has(post.id)}
+            isOwner={ownerIdByPostId.get(post.id) === userId}
+            selectedApplicantId={selectedApplicantId}
+            rejectedIds={rejectedIds}
+            confirmedId={confirmedIds.get(post.id) ?? null}
+            editMode={editMode}
+            onToggle={() => togglePostCollapse(post.id)}
+            onDelete={onDeleteApplicant}
+            onReject={onRejectApplicant}
+            onConfirm={onConfirm}
+            onSelect={onApplicantSelect}
+            onAvatarClick={onAvatarClick}
+            getApplicantBadge={getApplicantBadge}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  function renderApplicantSection(rolePosts: Post[], label: string) {
+    if (rolePosts.length === 0) return null;
+    return (
+      <div>
+        <p className="px-2 pb-2 text-xs font-medium text-stone-400">{label}</p>
+        {renderApplicantGroups(rolePosts)}
+      </div>
+    );
+  }
+
+  function renderReservationSection(list: ReservationRequest[]) {
+    if (list.length === 0) return null;
+    return (
+      <div>
+        <p className="px-2 pb-2 text-xs font-medium text-stone-400">예약 요청 {list.length}건</p>
+        <div className="rounded-2xl border border-orange-100 bg-white shadow-sm [&>*:first-child]:rounded-t-2xl [&>*:last-child]:rounded-b-2xl [&>*:last-child]:border-b-0">
+          {list.map((rr) => (
+            <ReservationRequestCard
+              key={rr.id}
+              reservationRequest={rr}
+              isSelected={!isMobile && selectedReservationRequestId === rr.id}
+              editMode={editMode}
+              isSitter={rr.ownerId !== userId}
+              actioningId={actioningId}
+              onSelect={onReservationSelect}
+              onReject={onRejectReservation}
+              onAccept={onAcceptReservation}
+              onDelete={onDeleteReservationRequest}
+              onAvatarClick={onReservationAvatarClick}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const sitterReservations = useMemo(() => filteredReservationRequests.filter((rr) => rr.ownerId !== userId), [filteredReservationRequests, userId]);
+  const ownerReservations = useMemo(() => filteredReservationRequests.filter((rr) => rr.ownerId === userId), [filteredReservationRequests, userId]);
+  const sitterPosts = useMemo(() => filteredPosts.filter((p) => ownerIdByPostId.get(p.id) !== userId), [filteredPosts, ownerIdByPostId, userId]);
+  const ownerPosts = useMemo(() => filteredPosts.filter((p) => ownerIdByPostId.get(p.id) === userId), [filteredPosts, ownerIdByPostId, userId]);
+
+  const totalSitterReservations = useMemo(() => reservationRequests.filter((rr) => rr.ownerId !== userId).length, [reservationRequests, userId]);
+  const totalOwnerReservations = useMemo(() => reservationRequests.filter((rr) => rr.ownerId === userId).length, [reservationRequests, userId]);
+  const totalSitterApplicants = useMemo(() => applicants.filter((a) => a.ownerId !== userId).length, [applicants, userId]);
+  const totalOwnerApplicants = useMemo(() => applicants.filter((a) => a.ownerId === userId).length, [applicants, userId]);
+
+  const sitterHasData = totalSitterReservations > 0 || totalSitterApplicants > 0;
+  const ownerHasData = totalOwnerReservations > 0 || totalOwnerApplicants > 0;
+  const sitterHasFilteredResults = sitterReservations.length > 0 || sitterPosts.length > 0;
+  const ownerHasFilteredResults = ownerReservations.length > 0 || ownerPosts.length > 0;
+
+  const sitterContent = (
+    <div className="p-3 space-y-3">
+      {renderReservationSection(sitterReservations)}
+      {renderApplicantSection(sitterPosts, "지원한 공고")}
+    </div>
+  );
+  const ownerContent = (
+    <div className="p-3 space-y-3">
+      {renderReservationSection(ownerReservations)}
+      {renderApplicantSection(ownerPosts, "받은 지원")}
+    </div>
   );
 
   return (
@@ -236,24 +295,24 @@ function ChatSidebarImpl({
             ) : null)}
           {!loading &&
             !error &&
-            activeTab === "applicants" &&
-            (totalApplicantCount === 0 ? (
+            activeTab === "sitter" &&
+            (!sitterHasData ? (
               <p className="text-center text-stone-400 text-sm pt-16">
                 새로운 채팅이 존재하지 않습니다.
               </p>
-            ) : filteredApplicants.length === 0 ? (
+            ) : !sitterHasFilteredResults ? (
               <p className="text-center text-stone-400 text-sm pt-16">
                 검색 결과가 없습니다.
               </p>
             ) : null)}
           {!loading &&
             !error &&
-            activeTab === "reservations" &&
-            (totalReservationCount === 0 ? (
+            activeTab === "owner" &&
+            (!ownerHasData ? (
               <p className="text-center text-stone-400 text-sm pt-16">
-                예약 요청이 없습니다.
+                새로운 채팅이 존재하지 않습니다.
               </p>
-            ) : filteredReservationRequests.length === 0 ? (
+            ) : !ownerHasFilteredResults ? (
               <p className="text-center text-stone-400 text-sm pt-16">
                 검색 결과가 없습니다.
               </p>
@@ -270,23 +329,8 @@ function ChatSidebarImpl({
                 priority={i === 0}
               />
             ))}
-          {activeTab === "reservations" &&
-            filteredReservationRequests.map((rr) => (
-              <ReservationRequestCard
-                key={rr.id}
-                reservationRequest={rr}
-                isSelected={false}
-                editMode={editMode}
-                isSitter={rr.ownerId !== userId}
-                actioningId={actioningId}
-                onSelect={onReservationSelect}
-                onReject={onRejectReservation}
-                onAccept={onAcceptReservation}
-                onDelete={onDeleteReservationRequest}
-                onAvatarClick={onReservationAvatarClick}
-              />
-            ))}
-          {activeTab === "applicants" && applicantList}
+          {activeTab === "sitter" && sitterContent}
+          {activeTab === "owner" && ownerContent}
         </ScrollArea>
       ) : (
         <>
@@ -315,47 +359,33 @@ function ChatSidebarImpl({
               )}
             </ScrollArea>
           )}
-          {activeTab === "reservations" && (
+          {activeTab === "sitter" && (
             <ScrollArea className="flex-1 overflow-hidden">
-              {totalReservationCount === 0 ? (
-                <p className="text-center text-stone-400 text-sm pt-16">
-                  예약 요청이 없습니다.
-                </p>
-              ) : filteredReservationRequests.length === 0 ? (
-                <p className="text-center text-stone-400 text-sm pt-16">
-                  검색 결과가 없습니다.
-                </p>
-              ) : (
-                filteredReservationRequests.map((rr) => (
-                  <ReservationRequestCard
-                    key={rr.id}
-                    reservationRequest={rr}
-                    isSelected={selectedReservationRequestId === rr.id}
-                    editMode={editMode}
-                    isSitter={rr.ownerId !== userId}
-                    actioningId={actioningId}
-                    onSelect={onReservationSelect}
-                    onReject={onRejectReservation}
-                    onAccept={onAcceptReservation}
-                    onDelete={onDeleteReservationRequest}
-                    onAvatarClick={onReservationAvatarClick}
-                  />
-                ))
-              )}
-            </ScrollArea>
-          )}
-          {activeTab === "applicants" && (
-            <ScrollArea className="flex-1 overflow-hidden">
-              {totalApplicantCount === 0 ? (
+              {!sitterHasData ? (
                 <p className="text-center text-stone-400 text-sm pt-16">
                   새로운 채팅이 존재하지 않습니다.
                 </p>
-              ) : filteredApplicants.length === 0 ? (
+              ) : !sitterHasFilteredResults ? (
                 <p className="text-center text-stone-400 text-sm pt-16">
                   검색 결과가 없습니다.
                 </p>
               ) : (
-                applicantList
+                sitterContent
+              )}
+            </ScrollArea>
+          )}
+          {activeTab === "owner" && (
+            <ScrollArea className="flex-1 overflow-hidden">
+              {!ownerHasData ? (
+                <p className="text-center text-stone-400 text-sm pt-16">
+                  새로운 채팅이 존재하지 않습니다.
+                </p>
+              ) : !ownerHasFilteredResults ? (
+                <p className="text-center text-stone-400 text-sm pt-16">
+                  검색 결과가 없습니다.
+                </p>
+              ) : (
+                ownerContent
               )}
             </ScrollArea>
           )}

@@ -5,7 +5,7 @@ import { acceptReservationRequest, rejectReservationRequest, getReservationReque
 import { updateApplicationByRoom, getRequestDetailsForReservation } from "@/features/applications/actions";
 import { toRow, getPaymentDeadline, type RawMessageRow } from "@/features/chat/utils";
 import { RESERVATION_STATUS, APPLICATION_STATUS } from "@/lib/constants";
-import type { ChatMessageRow, Applicant, ReservationRequest } from "@/features/chat/types";
+import type { ChatMessageRow, Applicant, ReservationRequest, Tab } from "@/features/chat/types";
 import type { ReservationDetails } from "../components/ReservationConfirmModal";
 import type { Post } from "./use-chat-rooms";
 
@@ -24,7 +24,7 @@ export function useApprovalActions(params: {
   confirmApplicant: (id: string) => void;
   updateApplicantStatus: (roomId: string, status: string) => void;
   updateReservationRequestStatus: (roomId: string, status: string) => void;
-  setActiveTab: (tab: "one_on_one" | "reservations" | "applicants") => void;
+  setActiveTab: (tab: Tab) => void;
   setSelectedRoomId: (id: string | null) => void;
   setSelectedReservationRequestId: (id: string | null) => void;
   setSelectedApplicantId: (id: string | null) => void;

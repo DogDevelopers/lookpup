@@ -1,4 +1,5 @@
-export type Tab = "one_on_one" | "reservations" | "applicants";
+export type Tab = "one_on_one" | "sitter" | "owner";
+export type SelectedKind = "room" | "reservation" | "applicant" | null;
 
 export interface RoomApiItem {
   id: string;

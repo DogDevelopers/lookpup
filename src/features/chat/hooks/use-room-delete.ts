@@ -1,13 +1,13 @@
 import { useCallback, useState } from "react";
 import { canLeaveDirectRoom, canLeaveReservationRequest } from "@/features/chat/utils";
-import type { Tab, ChatRoom, ReservationRequest } from "@/features/chat/types";
+import type { SelectedKind, ChatRoom, ReservationRequest } from "@/features/chat/types";
 
 type DeleteResult = Promise<{ error?: string }>;
 
 export function useRoomDelete(params: {
   rooms: ChatRoom[];
   reservationRequests: ReservationRequest[];
-  activeTab: Tab;
+  selectedKind: SelectedKind;
   selectedRoomId: string | null;
   selectedApplicantId: string | null;
   selectedReservationRequestId: string | null;
@@ -22,7 +22,7 @@ export function useRoomDelete(params: {
   const {
     rooms,
     reservationRequests,
-    activeTab,
+    selectedKind,
     selectedRoomId,
     selectedApplicantId,
     selectedReservationRequestId,
@@ -118,10 +118,10 @@ export function useRoomDelete(params: {
   const closeDeleteConfirm = useCallback(() => setPendingDelete(null), []);
 
   const leaveChat = useCallback(() => {
-    if (activeTab === "one_on_one" && selectedRoomId !== null) handleDeleteRoom(selectedRoomId);
-    else if (activeTab === "reservations" && selectedReservationRequestId !== null) handleDeleteReservationRequest(selectedReservationRequestId);
-    else if (activeTab === "applicants" && selectedApplicantId !== null) handleDeleteApplicant(selectedApplicantId);
-  }, [activeTab, selectedRoomId, selectedReservationRequestId, selectedApplicantId, handleDeleteRoom, handleDeleteReservationRequest, handleDeleteApplicant]);
+    if (selectedKind === "room" && selectedRoomId !== null) handleDeleteRoom(selectedRoomId);
+    else if (selectedKind === "reservation" && selectedReservationRequestId !== null) handleDeleteReservationRequest(selectedReservationRequestId);
+    else if (selectedKind === "applicant" && selectedApplicantId !== null) handleDeleteApplicant(selectedApplicantId);
+  }, [selectedKind, selectedRoomId, selectedReservationRequestId, selectedApplicantId, handleDeleteRoom, handleDeleteReservationRequest, handleDeleteApplicant]);
 
   return {
     pendingDelete,
