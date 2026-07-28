@@ -2,6 +2,7 @@
 
 import { useFormContext } from "react-hook-form";
 import Link from "next/link";
+import Image from "next/image";
 import { Check } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -97,8 +98,7 @@ export default function StepPetService({
                 }`}
               >
                 {pet.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={pet.image_url} alt={pet.name} className="w-12 h-12 sm:w-16 sm:h-16 rounded-full shrink-0 object-cover" />
+                  <Image src={pet.image_url} alt={pet.name} width={64} height={64} className="w-12 h-12 sm:w-16 sm:h-16 rounded-full shrink-0 object-cover" />
                 ) : (
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-linear-to-br from-stone-100 to-stone-200 rounded-full shrink-0" />
                 )}

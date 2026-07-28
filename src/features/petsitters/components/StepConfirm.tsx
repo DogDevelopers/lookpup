@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Check } from "lucide-react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
@@ -72,10 +73,11 @@ export default function StepConfirm({
         <p className="text-brown-900 text-base font-semibold mb-4">예약 정보</p>
         <div className="flex items-start gap-3 pb-3 border-b border-orange-100 mb-3">
           {sitter.profileImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={sitter.profileImage}
               alt={`${sitter.name} 프로필`}
+              width={40}
+              height={40}
               className="w-10 h-10 rounded-full border border-orange-100 object-cover shrink-0"
             />
           ) : (

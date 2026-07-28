@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import Footer from "@/components/layout/Footer";
 import LoadingPage from "@/components/common/LoadingPage";
 import BackButton from "@/components/common/BackButton";
@@ -163,12 +164,15 @@ export default function SitterDetailClient({
 
               <div className="hidden md:flex flex-col items-center bg-white rounded-2xl shadow-[0px_2px_12px_rgba(232,116,42,0.10)] border border-orange-100 p-5">
                 {sitter?.profile_image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={sitter.profile_image}
-                    alt={`${name} 프로필`}
-                    className="w-full aspect-square rounded-xl object-cover mb-4"
-                  />
+                  <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-4">
+                    <Image
+                      src={sitter.profile_image}
+                      alt={`${name} 프로필`}
+                      fill
+                      sizes="341px"
+                      className="object-cover"
+                    />
+                  </div>
                 ) : (
                   <div className="w-full aspect-square rounded-xl bg-linear-to-br from-stone-100 to-stone-200 mb-4" />
                 )}
