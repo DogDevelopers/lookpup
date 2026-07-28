@@ -2,6 +2,7 @@
 
 import { useState, useRef, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, X, Eye, Camera, MapPin, Check, Building2, Pencil } from "lucide-react";
@@ -305,8 +306,9 @@ export default function SitterEditClient({
                 <div key={idx} className="relative group">
                   {photo ? (
                     <>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={photo} alt={`사진 ${idx + 1}`} className="aspect-square w-full rounded-xl object-cover" />
+                      <div className="relative aspect-square w-full rounded-xl overflow-hidden">
+                        <Image src={photo} alt={`사진 ${idx + 1}`} fill sizes="200px" className="object-cover" />
+                      </div>
                       <button
                         type="button"
                         onClick={() => removePhoto(idx)}

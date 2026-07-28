@@ -1,11 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import EarningsSummary from "@/features/earnings/components/EarningsSummary";
-import EarningsStatsChart from "@/features/earnings/components/EarningsStatsChart";
 import SettlementHistory from "@/features/earnings/components/SettlementHistory";
 import type { EarningsData } from "@/features/earnings/types";
 import Footer from "@/components/layout/Footer";
+
+const EarningsStatsChart = dynamic(
+  () => import("@/features/earnings/components/EarningsStatsChart"),
+  { ssr: false, loading: () => <div className="h-[400px] rounded-2xl border border-gray-200 bg-white animate-pulse" /> },
+);
 
 export default function EarningsClient({
   data,

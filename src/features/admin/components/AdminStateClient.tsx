@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import {
@@ -183,10 +184,11 @@ export default function AdminStateClient({
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     {owner?.profile_image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={owner.profile_image}
                         alt={owner.full_name ?? ""}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full object-cover shrink-0"
                       />
                     ) : (

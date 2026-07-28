@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import StarRow from "@/components/ui/StarRow";
 import { ImageGallery } from "@/components/common/ImageGallery";
 import type { ReviewRow } from "../types";
@@ -66,10 +67,11 @@ export default function SitterReviewTab({
             >
               <div className="flex items-center gap-3 mb-3">
                 {rv.owner?.profile_image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={rv.owner.profile_image}
                     alt={rv.owner.full_name ?? "보호자"}
+                    width={36}
+                    height={36}
                     className="w-9 h-9 rounded-full object-cover shrink-0"
                   />
                 ) : (

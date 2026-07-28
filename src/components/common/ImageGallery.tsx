@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
@@ -75,12 +76,15 @@ export function ImageLightbox({ urls, index, onClose, onIndexChange }: ImageLigh
               )}
             </div>
             {index !== null && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={urls[index]}
-                alt=""
-                className="flex-1 min-w-0 w-full object-contain max-h-[78vh] rounded-2xl"
-              />
+              <div className="relative flex-1 min-w-0 w-full h-[78vh]">
+                <Image
+                  src={urls[index]}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 56rem"
+                  className="object-contain rounded-2xl"
+                />
+              </div>
             )}
             <div className="shrink-0 w-10">
               {hasManyImages && index !== null && index < urls.length - 1 && (
@@ -133,13 +137,14 @@ export function ImageGallery({ urls }: ImageGalleryProps) {
               key={i}
               onClick={() => setLightboxIndex(i)}
               aria-label={`${i + 1}번째 후기 사진 크게 보기`}
-              className="shrink-0 focus:outline-none"
+              className="relative shrink-0 w-20 h-20 focus:outline-none"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={url}
                 alt=""
-                className="w-20 h-20 rounded-xl object-cover hover:opacity-90 transition-opacity"
+                fill
+                sizes="80px"
+                className="rounded-xl object-cover hover:opacity-90 transition-opacity"
               />
             </button>
           ))}

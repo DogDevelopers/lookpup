@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { SitterDetail } from "../types";
 import { ImageLightbox } from "@/components/common/ImageGallery";
 
@@ -33,13 +34,14 @@ export default function SitterIntroTab({ sitter }: { sitter: SitterDetail }) {
               <button
                 key={idx}
                 onClick={() => setLightboxIndex(idx)}
-                className="focus:outline-none"
+                className="relative aspect-square w-full focus:outline-none"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={url}
                   alt={`활동 사진 ${idx + 1}`}
-                  className="aspect-square rounded-lg object-cover w-full hover:opacity-90 transition-opacity"
+                  fill
+                  sizes="(max-width: 768px) 33vw, 200px"
+                  className="rounded-lg object-cover hover:opacity-90 transition-opacity"
                 />
               </button>
             ))}

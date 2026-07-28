@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Plus,
@@ -87,12 +88,11 @@ function DeleteModal({
 
           <div className="w-full flex items-center gap-3 p-4 bg-orange-300/10 rounded-xl mb-6">
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 overflow-hidden"
+              className="relative w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0 overflow-hidden"
               style={{ background: `linear-gradient(135deg, ${visual.bgFrom}, ${visual.bgTo})` }}
             >
               {pet.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                <Image src={pet.imageUrl} alt={pet.name} fill sizes="48px" className="object-cover" />
               ) : (
                 visual.emoji
               )}
@@ -295,12 +295,11 @@ function EditModal({
             <div className="flex flex-col items-center mb-6">
               <div className="relative">
                 <div
-                  className="w-25 h-25 rounded-full flex items-center justify-center text-5xl overflow-hidden"
+                  className="relative w-25 h-25 rounded-full flex items-center justify-center text-5xl overflow-hidden"
                   style={{ background: `linear-gradient(135deg, ${visual.bgFrom}, ${visual.bgTo})` }}
                 >
                   {pet.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+                    <Image src={pet.imageUrl} alt={pet.name} fill sizes="100px" className="object-cover" />
                   ) : (
                     visual.emoji
                   )}
@@ -475,8 +474,7 @@ function PetCard({
         style={{ background: `linear-gradient(135deg, ${ANIMAL_VISUAL[animalType].bgFrom}, ${ANIMAL_VISUAL[animalType].bgTo})` }}
       >
         {pet.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={pet.imageUrl} alt={pet.name} className="absolute inset-0 w-full h-full object-cover" />
+          <Image src={pet.imageUrl} alt={pet.name} fill sizes="(max-width: 1024px) 50vw, 25vw" className="object-cover" />
         ) : (
           <span className="text-6xl leading-none">{ANIMAL_VISUAL[animalType].emoji}</span>
         )}
@@ -563,12 +561,11 @@ function PetCardMobile({
     >
       <div className="relative shrink-0">
         <div
-          className="w-24 h-24 rounded-xl overflow-hidden flex items-center justify-center text-4xl"
+          className="relative w-24 h-24 rounded-xl overflow-hidden flex items-center justify-center text-4xl"
           style={{ background: `linear-gradient(135deg, ${ANIMAL_VISUAL[animalType].bgFrom}, ${ANIMAL_VISUAL[animalType].bgTo})` }}
         >
           {pet.imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={pet.imageUrl} alt={pet.name} className="w-full h-full object-cover" />
+            <Image src={pet.imageUrl} alt={pet.name} fill sizes="96px" className="object-cover" />
           ) : (
             ANIMAL_VISUAL[animalType].emoji
           )}

@@ -64,14 +64,15 @@ function ChatImageLightbox({
           </div>
           {url && (
             <div
-              className="w-full max-w-4xl px-4 md:px-6 cursor-default"
+              className="relative w-full max-w-4xl h-[78vh] px-4 md:px-6 cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={url}
                 alt=""
-                className="w-full object-contain max-h-[78vh] rounded-2xl"
+                fill
+                sizes="(max-width: 768px) 100vw, 56rem"
+                className="object-contain rounded-2xl"
               />
             </div>
           )}

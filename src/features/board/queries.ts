@@ -24,7 +24,8 @@ function formatPeriod(start: string | null, end: string | null): string {
   return sameDay ? `${sStr} (당일)` : `${sStr} - ${e.getMonth() + 1}월 ${e.getDate()}일`;
 }
 
-function formatRelativeTime(dateStr: string): string {
+function formatRelativeTime(dateStr: string | null): string {
+  if (!dateStr) return "";
   const diffH = Math.floor((Date.now() - new Date(dateStr).getTime()) / 3600000);
   if (diffH < 1) return "방금 전";
   if (diffH < 24) return `${diffH}시간 전`;
@@ -40,7 +41,7 @@ type RequestListRow = {
   budget: number | null;
   start_datetime: string | null;
   end_datetime: string | null;
-  created_at: string;
+  created_at: string | null;
   status: string;
 };
 
