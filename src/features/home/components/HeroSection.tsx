@@ -26,10 +26,7 @@ export default function HeroSection() {
             </span>
           </div>
 
-          <h1
-            className="animate-hero-text text-4xl lg:text-5xl font-bold leading-tight text-stone-900 mb-6"
-            style={{ animationDelay: "0.1s" }}
-          >
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight text-stone-900 mb-6">
             우리 아이를{" "}
             <span className="text-orange-500 whitespace-nowrap">
               믿고 맡길 수 있는
