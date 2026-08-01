@@ -24,6 +24,7 @@ interface PetsitterCardProps {
   distance: number;
   onClick: () => void;
   onConfirm: () => void;
+  priority?: boolean;
 }
 
 export default function PetsitterCard({
@@ -32,6 +33,7 @@ export default function PetsitterCard({
   distance,
   onClick,
   onConfirm,
+  priority = false,
 }: PetsitterCardProps) {
   return (
     <div onClick={isSelected ? onConfirm : onClick} className="block">
@@ -43,7 +45,13 @@ export default function PetsitterCard({
         }`}
       >
         <div className="flex items-start gap-4">
-          <Avatar initial={sitter.initial} src={sitter.profileImage} size="lg" variant="orange" />
+          <Avatar
+            initial={sitter.initial}
+            src={sitter.profileImage}
+            size="lg"
+            variant="orange"
+            priority={priority}
+          />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <span className="text-brown-900 text-base font-semibold">{sitter.name}</span>

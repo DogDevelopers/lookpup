@@ -18,6 +18,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { getNotificationIcon } from "@/lib/notification-icons";
+import { getCloudinaryThumbnail } from "@/lib/cloudinary";
 import type { HeaderNotification, HeaderUser } from "./types";
 
 function relativeTime(iso: string) {
@@ -179,7 +180,7 @@ export default function HeaderAuth({
             >
               {user.profileImage ? (
                 <Image
-                  src={user.profileImage}
+                  src={getCloudinaryThumbnail(user.profileImage, 72)}
                   alt=""
                   width={36}
                   height={36}

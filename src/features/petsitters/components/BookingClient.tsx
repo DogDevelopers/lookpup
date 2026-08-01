@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { useForm, FormProvider } from "react-hook-form";
@@ -18,10 +19,15 @@ import {
   type Step3Values,
 } from "../schema";
 import type { BookedRange, Pet, SitterBookingInfo } from "../types";
-import StepDateSelect from "./StepDateSelect";
-import StepPetService from "./StepPetService";
-import StepNotes from "./StepNotes";
-import StepConfirm from "./StepConfirm";
+
+// 네 스텝 모두 code split — StepDateSelect는 react-day-picker/date-fns를
+// 물고 있어 초기 진입(1단계)에도 무거운 JS를 그대로 내려보내던 문제.
+// SSR은 유지되므로(ssr:false 아님) 최초 페인트는 그대로 서버 렌더 HTML로 나가고,
+// 해당 청크만 별도로 분리되어 book 페이지의 초기 JS 전송량이 줄어든다.
+const StepDateSelect = dynamic(() => import("./StepDateSelect"));
+const StepPetService = dynamic(() => import("./StepPetService"));
+const StepNotes = dynamic(() => import("./StepNotes"));
+const StepConfirm = dynamic(() => import("./StepConfirm"));
 
 const STEP_LABELS = ["날짜 선택", "반려동물·서비스", "특이사항", "완료"];
 const TOTAL_STEPS = 4;
@@ -62,7 +68,11 @@ export default function BookingClient({
   const step1Form = useForm<Step1Values>({
     resolver: zodResolver(step1Schema),
     mode: "onChange",
-    defaultValues: { dateRange: dateRange ?? { from: undefined, to: undefined }, startTime: "", endTime: "" },
+    defaultValues: {
+      dateRange: dateRange ?? { from: undefined, to: undefined },
+      startTime: "",
+      endTime: "",
+    },
   });
 
   const step2Form = useForm<Step2Values>({
@@ -79,7 +89,8 @@ export default function BookingClient({
   // eslint-disable-next-line react-hooks/incompatible-library
   const startTime = step1Form.watch("startTime") ?? "";
   const endTime = step1Form.watch("endTime") ?? "";
-  const selectedService = (step2Form.watch("selectedService") || null) as ServiceKey | null;
+  const selectedService = (step2Form.watch("selectedService") ||
+    null) as ServiceKey | null;
 
   async function handleNext() {
     if (step === 1) {
@@ -182,7 +193,9 @@ export default function BookingClient({
     return (
       <>
         <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
-          <p className="text-stone-400 text-sm">시터 정보를 불러올 수 없습니다.</p>
+          <p className="text-stone-400 text-sm">
+            시터 정보를 불러올 수 없습니다.
+          </p>
         </main>
         <Footer />
       </>
@@ -260,7 +273,11 @@ export default function BookingClient({
             )}
             {step === 2 && (
               <FormProvider {...step2Form}>
-                <StepPetService pets={pets} sitterServices={sitter.services} sitter={sitter} />
+                <StepPetService
+                  pets={pets}
+                  sitterServices={sitter.services}
+                  sitter={sitter}
+                />
               </FormProvider>
             )}
             {step === 3 && (

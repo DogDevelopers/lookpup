@@ -1,5 +1,13 @@
 import { getCloudinarySignature } from "@/lib/cloudinary-signature";
 
+export function getCloudinaryThumbnail(url: string, size: number): string {
+  const marker = "/upload/";
+  const i = url.indexOf(marker);
+  if (i === -1) return url;
+  const transform = `w_${size},h_${size},c_fill,g_face,f_auto,q_auto`;
+  return `${url.slice(0, i + marker.length)}${transform}/${url.slice(i + marker.length)}`;
+}
+
 export async function uploadToCloudinary(file: File, folder: string): Promise<string> {
   const { cloudName, apiKey, timestamp, signature } = await getCloudinarySignature(folder);
 

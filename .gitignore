@@ -52,3 +52,6 @@ AGENTS.md
 
 # local code-review notes (not for commit)
 /review/
+
+# investigation/audit docs (local only, not for commit)
+/docs/

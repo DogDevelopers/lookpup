@@ -123,18 +123,17 @@ export default function SitterDetailClient({
         <div className="md:max-w-7xl md:mx-auto md:px-10 md:pb-12">
           <div className="md:flex md:gap-8 md:items-start">
             <div className="md:w-85.25 md:shrink-0">
-              <div
-                className="md:hidden relative w-full h-44 bg-linear-to-br from-stone-100 to-stone-200"
-                style={
-                  sitter?.profile_image
-                    ? {
-                        backgroundImage: `url(${sitter.profile_image})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }
-                    : undefined
-                }
-              >
+              <div className="md:hidden relative w-full h-44 bg-linear-to-br from-stone-100 to-stone-200">
+                {sitter?.profile_image && (
+                  <Image
+                    src={sitter.profile_image}
+                    alt={`${name} 프로필`}
+                    fill
+                    priority
+                    sizes="100vw"
+                    className="object-cover"
+                  />
+                )}
                 <Link
                   href={backHref}
                   aria-label={isFromChat ? "채팅으로 돌아가기" : "펫시터 목록으로 돌아가기"}
@@ -169,6 +168,7 @@ export default function SitterDetailClient({
                       src={sitter.profile_image}
                       alt={`${name} 프로필`}
                       fill
+                      priority
                       sizes="341px"
                       className="object-cover"
                     />
