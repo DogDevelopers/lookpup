@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import { useRealtimeChannel } from "@/hooks/use-realtime-channel";
 import { notificationKeys } from "@/lib/query-keys";
 import {
   getNotifications,
@@ -40,21 +41,20 @@ export function useNotifications(limit = 20) {
     queryClient.invalidateQueries({ queryKey: notificationKeys.all });
   }, [queryClient]);
 
-  useEffect(() => {
-    if (!userId) return;
-    const supabase = createClient();
-    const channel = supabase
-      .channel(`notifications:${userId}:${instanceId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` },
-        refresh,
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId, instanceId, refresh]);
+  const subscribe = useCallback(
+    (supabase: ReturnType<typeof createClient>) =>
+      supabase
+        .channel(`notifications:${userId}:${instanceId}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` },
+          refresh,
+        )
+        .subscribe(),
+    [userId, instanceId, refresh],
+  );
+
+  useRealtimeChannel(!!userId, subscribe);
 
   const data = query.data ?? EMPTY_DATA;
 
