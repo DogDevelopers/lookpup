@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { Spinner } from "@/components/ui/spinner";
 import { getMySitterProfile } from "@/features/sitter-register/actions";
 import { getMyReservations, getMySitterReservations } from "@/features/reservations/actions";
 import { getMyWrittenReviews, getReceivedReviews } from "@/features/reviews/actions";
@@ -11,7 +12,7 @@ import type { MyProfileUser, MyProfileSitterSummary } from "@/features/myprofile
 import type { EarningsData } from "@/features/earnings/types";
 import type { MyPet } from "@/features/pet-register/components/MyPetsClient";
 
-export default async function MyProfilePage() {
+async function MyProfileContent() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -100,18 +101,24 @@ export default async function MyProfilePage() {
   }));
 
   return (
-    <Suspense>
-      <MyProfileClient
-        user={myProfileUser}
-        sitter={sitterSummary}
-        bookings={bookings}
-        works={works}
-        pets={myPets}
-        posts={posts}
-        writtenReviews={writtenReviews}
-        receivedReviews={receivedReviews}
-        earnings={earnings}
-      />
+    <MyProfileClient
+      user={myProfileUser}
+      sitter={sitterSummary}
+      bookings={bookings}
+      works={works}
+      pets={myPets}
+      posts={posts}
+      writtenReviews={writtenReviews}
+      receivedReviews={receivedReviews}
+      earnings={earnings}
+    />
+  );
+}
+
+export default function MyProfilePage() {
+  return (
+    <Suspense fallback={<Spinner className="size-6 mx-auto mt-20" />}>
+      <MyProfileContent />
     </Suspense>
   );
 }

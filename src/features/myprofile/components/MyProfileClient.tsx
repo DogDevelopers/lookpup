@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import Footer from "@/components/layout/Footer";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronRight,
   Dog,
@@ -371,7 +371,6 @@ export default function MyProfileClient({
 }) {
   const isSitter = user.role === "both" || user.role === "admin";
 
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -386,7 +385,9 @@ export default function MyProfileClient({
       params.set("menu", nextMenu);
     }
     const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // page.tsx는 searchParams를 읽지 않아 role/menu가 바뀌어도 서버 응답이 동일하다.
+    // router.replace를 쓰면 같은 데이터를 다시 받으려고 RSC 왕복이 발생하므로 URL만 바꾼다.
+    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
   };
 
   const [locationData, setLocationData] = useState<LocationData | null>(
@@ -502,8 +503,8 @@ export default function MyProfileClient({
         onSave={(data) => setLocationData(data)}
       />
 
-      <div className="hidden md:block flex-1">
-        <div className="max-w-[1280px] mx-auto px-4 sm:px-10 py-12">
+      <div className="hidden md:flex md:flex-col flex-1">
+        <div className="flex-1 w-full max-w-[1280px] mx-auto px-4 sm:px-10 py-12">
           <div className="flex gap-6">
             <div className="w-72 shrink-0">
               <SectionCard
@@ -585,7 +586,7 @@ export default function MyProfileClient({
         <Footer />
       </div>
 
-      <div className="md:hidden flex-1 overflow-y-auto">
+      <div className="md:hidden flex-1 flex flex-col overflow-y-auto">
         <div className="px-5 pt-8 pb-5 border-b border-gray-100">
           {identity}
 
@@ -608,7 +609,7 @@ export default function MyProfileClient({
           )}
         </div>
 
-        <div className="px-5 py-5">
+        <div className="flex-1 px-5 py-5">
           <div className="flex gap-1 overflow-x-auto scrollbar-hide mb-5 bg-gray-50 border border-gray-100 rounded-2xl p-1">
             {menuItems
               .filter((item) => item.kind === "view")
