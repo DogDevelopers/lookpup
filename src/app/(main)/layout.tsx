@@ -1,24 +1,21 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import Header from "@/components/layout/Header";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getAuthUser } from "@/lib/supabase/server";
 import { signOut } from "@/features/auth/actions";
 import type { HeaderUser } from "@/components/layout/types";
-
-// 로그인/프로필 조회(Supabase 왕복)를 Header 서브트리에만 묶어서 Suspense로 스트리밍한다.
-// children은 이 fetch를 기다리지 않고 즉시 렌더링되어 LCP가 앞당겨진다.
 async function HeaderWithUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   let headerUser: HeaderUser | null = null;
 
   if (user) {
+    const supabase = await createClient();
     const { data: profile } = await supabase
       .from("users")
-      .select("full_name, email, profile_image, role, is_verified, suspended_until")
+      .select(
+        "full_name, email, profile_image, role, is_verified, suspended_until",
+      )
       .eq("id", user.id)
       .maybeSingle();
 
@@ -26,7 +23,9 @@ async function HeaderWithUser() {
       profile?.suspended_until &&
       new Date(profile.suspended_until) > new Date()
     ) {
-      redirect(`/suspended?until=${encodeURIComponent(profile.suspended_until)}`);
+      redirect(
+        `/suspended?until=${encodeURIComponent(profile.suspended_until)}`,
+      );
     }
 
     if (profile) {
