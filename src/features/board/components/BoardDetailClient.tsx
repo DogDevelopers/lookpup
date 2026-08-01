@@ -110,7 +110,7 @@ export default function BoardDetailClient({
   const otherPosts = initialOtherPosts ?? null;
 
   const handleApply = async () => {
-    if (!post?.id) return;
+    if (!post?.id || applying) return;
     setApplying(true);
 
     const result = await createApplication(post.id, {
