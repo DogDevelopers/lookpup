@@ -1,8 +1,6 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import LoginForm from "@/features/auth/components/LoginForm";
-import { Spinner } from "@/components/ui/spinner";
 
 export default function LoginPage() {
   return (
@@ -14,6 +12,7 @@ export default function LoginPage() {
             alt="봐주개"
             width={160}
             height={48}
+            priority
             className="object-contain h-auto"
           />
         </Link>
@@ -21,9 +20,7 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full p-8 bg-white rounded-2xl shadow-[0px_2px_12px_0px_rgba(232,116,42,0.10)] border border-orange-100 flex flex-col">
-        <Suspense fallback={<Spinner className="size-6 mx-auto" />}>
-          <LoginForm />
-        </Suspense>
+        <LoginForm />
       </div>
     </div>
   );
