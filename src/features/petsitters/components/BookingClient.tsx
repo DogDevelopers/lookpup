@@ -19,8 +19,12 @@ import {
   type Step3Values,
 } from "../schema";
 import type { BookedRange, Pet, SitterBookingInfo } from "../types";
-import StepDateSelect from "./StepDateSelect";
 
+// 네 스텝 모두 code split — StepDateSelect는 react-day-picker/date-fns를
+// 물고 있어 초기 진입(1단계)에도 무거운 JS를 그대로 내려보내던 문제.
+// SSR은 유지되므로(ssr:false 아님) 최초 페인트는 그대로 서버 렌더 HTML로 나가고,
+// 해당 청크만 별도로 분리되어 book 페이지의 초기 JS 전송량이 줄어든다.
+const StepDateSelect = dynamic(() => import("./StepDateSelect"));
 const StepPetService = dynamic(() => import("./StepPetService"));
 const StepNotes = dynamic(() => import("./StepNotes"));
 const StepConfirm = dynamic(() => import("./StepConfirm"));
