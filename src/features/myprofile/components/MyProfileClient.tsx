@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
 import Footer from "@/components/layout/Footer";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronRight,
   Dog,
@@ -371,7 +371,6 @@ export default function MyProfileClient({
 }) {
   const isSitter = user.role === "both" || user.role === "admin";
 
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -386,7 +385,9 @@ export default function MyProfileClient({
       params.set("menu", nextMenu);
     }
     const query = params.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    // page.tsx는 searchParams를 읽지 않아 role/menu가 바뀌어도 서버 응답이 동일하다.
+    // router.replace를 쓰면 같은 데이터를 다시 받으려고 RSC 왕복이 발생하므로 URL만 바꾼다.
+    window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
   };
 
   const [locationData, setLocationData] = useState<LocationData | null>(
