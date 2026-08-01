@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import { calculateDistanceKm } from "@/lib/distance";
+import { getCloudinaryThumbnail } from "@/lib/cloudinary";
 import { SERVICES } from "@/lib/sitter-options";
 import { parseArea } from "../utils";
 import { usePetsitterLocation } from "../hooks/usePetsitterLocation";
@@ -54,7 +55,7 @@ export default function PetsitterSearchClient({
       id: row.id,
       name,
       initial: name.charAt(0),
-      profileImage: row.profile_image ?? null,
+      profileImage: row.profile_image ? getCloudinaryThumbnail(row.profile_image, 112) : null,
       city,
       district,
       neighborhood,
