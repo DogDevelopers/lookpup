@@ -57,6 +57,7 @@ export default function PetsitterListPanel({
                 distance={sitter.distanceKm}
                 onClick={() => onSelectSitter(sitter.id)}
                 onConfirm={() => onConfirmSitter(sitter.id)}
+                priority={i < 3}
               />
             </div>
           ))}

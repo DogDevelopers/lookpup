@@ -2,17 +2,15 @@
 
 import Link from "next/link";
 import { useTransition } from "react";
-import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { signInWithOAuth } from "@/features/auth/actions";
 import type { Provider } from "@/features/auth/schema";
 
 export default function LoginForm() {
-  const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/";
   const [isPending, startTransition] = useTransition();
 
   const handleOAuthLogin = (provider: Provider) => {
+    const next = new URLSearchParams(window.location.search).get("next") ?? "/";
     startTransition(async () => {
       const result = await signInWithOAuth(provider, next);
       if (!result.ok) {
