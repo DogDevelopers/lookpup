@@ -21,10 +21,6 @@ export function isRecipientActive(
   return !left;
 }
 
-/**
- * roomId에 해당하는 채팅방을 조회하고, userId가 그 방의 참여자(보호자 또는 시터)인지 확인한다.
- * 메시지 삽입 등 방 참여자만 수행할 수 있는 Server Action은 실행 전 반드시 이 검증을 거쳐야 한다.
- */
 export async function getAuthorizedChatRoom(
   supabase: SupabaseClient<Database>,
   roomId: string,

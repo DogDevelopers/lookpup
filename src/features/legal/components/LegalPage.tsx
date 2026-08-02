@@ -26,7 +26,6 @@ type LegalPageProps = {
   intro: ReactNode;
   articles: LegalArticle[];
   effectiveDate: string;
-  /** [텍스트] 형태로 감싼 단어를 링크로 변환하는 맵 */
   linkMap?: Record<string, string>;
 };
 

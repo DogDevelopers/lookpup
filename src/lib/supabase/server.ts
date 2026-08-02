@@ -21,14 +21,12 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // Called from a Server Component; ignore when middleware handles refresh.
           }
         },
       },
     }
   );
 }
-
 
 export const getAuthUser = cache(async () => {
   const supabase = await createClient();

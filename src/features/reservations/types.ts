@@ -63,7 +63,6 @@ export interface ReservationDetail {
   reviewWritten: boolean;
 }
 
-/** getActiveReservationsForRoom / getReadyReservationsForRoom 공용 반환 항목 */
 export interface ActiveReservation {
   id: string;
   status: string;
@@ -75,10 +74,6 @@ export interface ActiveReservation {
   petName: string | null;
 }
 
-/**
- * getReservationRequestDetails(reservations 도메인)와
- * getRequestDetailsForReservation(applications 도메인)이 공유하는 반환 형태.
- */
 export interface ReservationRequestDetails {
   title: string;
   startDatetime: string | null;
@@ -91,7 +86,6 @@ export interface ReservationRequestDetails {
   petBreed: string | null;
 }
 
-/** getReservationsByRoom 반환 항목 (ReservationEditModal에서 사용) */
 export interface ReservationByRoomItem {
   id: string;
   start_datetime: string | null;

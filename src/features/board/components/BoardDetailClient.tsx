@@ -83,7 +83,6 @@ interface BoardDetailClientProps {
   id: string;
   initialPost?: RequestDetail | null;
   initialOtherPosts?: OtherPost[];
-  // TODO: features/auth 이식 후 실제 로그인/펫시터 상태로 교체.
   currentUserId?: string;
   isLoggedIn?: boolean;
   isSitter?: boolean;

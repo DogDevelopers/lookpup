@@ -129,7 +129,6 @@ export async function deletePet(id: string): Promise<ActionResult> {
     return { ok: false, error: "반려동물 정보를 찾을 수 없습니다." };
   }
 
-  // TODO: 예약 백엔드 이식 후, 진행 중인 예약에 연결된 반려동물이면 삭제를 차단하는 체크 추가.
   const { error } = await supabase
     .from("pets")
     .update({ deleted_at: new Date().toISOString() })

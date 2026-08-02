@@ -45,9 +45,6 @@ export function canLeaveReservationRequest(rr: {
   return rr.reservationStatus !== "pending";
 }
 
-// Intl.toLocaleString's AM/PM output depends on the runtime's ICU data,
-// which can differ between the server (Node) and the browser and trigger
-// hydration mismatches. Format manually instead so output is deterministic.
 export function formatAmPmTime(d: Date): string {
   const hour24 = d.getHours();
   const period = hour24 < 12 ? "오전" : "오후";

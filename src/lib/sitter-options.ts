@@ -1,5 +1,3 @@
-// 펫시터 등록/관리 화면에서 공유하는 서비스·동물 옵션.
-// features/sitter-register(등록 폼)와 features/admin(승인 상세) 둘 다에서 쓰여 lib으로 승격.
 
 export type SitterServiceId = "visit" | "foster" | "walk" | "pickup";
 export type SitterAnimalId = "small_dog" | "medium_dog" | "large_dog" | "cat";

@@ -16,7 +16,6 @@ const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 interface AdminDashboardProps {
-  // TODO: features/admin/queries.ts로 실데이터 조회해 전달.
   initialReports?: Report[];
   initialReservations?: Reservation[];
   initialSitters?: SitterApplication[];

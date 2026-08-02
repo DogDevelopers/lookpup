@@ -116,7 +116,6 @@ declare namespace kakao.maps {
       address_name: string;
       address?: AddressInfo;
       road_address?: RoadAddressInfo | null;
-      // addressSearch 응답이 방어적으로 `r.address ?? r` 형태로도 읽혀서 optional로 허용
       region_1depth_name?: string;
       region_2depth_name?: string;
       region_3depth_name?: string;

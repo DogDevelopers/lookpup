@@ -60,7 +60,6 @@ export default function PetRegisterClient() {
   const onSubmit = handleSubmit(async (values: PetRegisterFormValues) => {
     setIsSubmitting(true);
     setSubmitError(null);
-    // TODO: 사진 업로드(Cloudinary) 연동 후 photoFile을 image_url로 변환해 전달.
     const result = await createPet(values);
     setIsSubmitting(false);
     if (!result.ok) {
