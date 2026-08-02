@@ -103,11 +103,16 @@ export default function BookingClient({
       if (!ok) return;
     }
     setStep((s) => s + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleBack() {
-    if (step > 1) setStep((s) => s - 1);
-    else router.back();
+    if (step > 1) {
+      setStep((s) => s - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      router.back();
+    }
   }
 
   async function handleSubmit() {
@@ -161,6 +166,7 @@ export default function BookingClient({
 
     setStep(4);
     setChatRoomId(result.data.room_id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function canProceed(): boolean {
