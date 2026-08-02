@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, ChevronRight, ChevronLeft } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import LoadingPage from "@/components/common/LoadingPage";
 import { SERVICE_TYPES } from "../constants";
 import type { PostListItem } from "../types";
@@ -289,8 +288,6 @@ export default function BoardListClient({
           </div>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

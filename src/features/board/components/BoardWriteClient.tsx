@@ -16,7 +16,6 @@ import {
   Download,
   X,
 } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
@@ -923,8 +922,6 @@ export default function BoardWriteClient({
         </div>
       </div>
       </div>
-
-      <Footer />
 
       <CustomModal
         open={!!errorMessage}

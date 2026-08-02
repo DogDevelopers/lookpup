@@ -13,7 +13,6 @@ import {
   Trash2,
   Flag,
 } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import Avatar from "@/components/ui/Avatar";
 import SectionCard from "@/components/common/SectionCard";
 import { CustomModal } from "@/components/common/CustomModal";
@@ -140,7 +139,6 @@ export default function BoardDetailClient({
             게시글을 찾을 수 없습니다.
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -524,8 +522,6 @@ export default function BoardDetailClient({
           </div>
         </div>
       </main>
-
-      <Footer />
 
       <CustomModal
         open={showApplyModal}

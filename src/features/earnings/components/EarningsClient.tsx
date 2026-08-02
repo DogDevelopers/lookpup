@@ -5,7 +5,6 @@ import { MobileBackButton, DesktopBackButton } from "@/components/common/BackBut
 import EarningsSummary from "@/features/earnings/components/EarningsSummary";
 import SettlementHistory from "@/features/earnings/components/SettlementHistory";
 import type { EarningsData } from "@/features/earnings/types";
-import Footer from "@/components/layout/Footer";
 
 const EarningsStatsChart = dynamic(
   () => import("@/features/earnings/components/EarningsStatsChart"),
@@ -55,8 +54,6 @@ export default function EarningsClient({
           <SettlementHistory rows={data.rows} onViewReservations={onViewReservations} />
         </div>
       </main>
-
-      {!embedded && <Footer />}
     </div>
   );
 }
