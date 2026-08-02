@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { isOverlapViolation } from "@/lib/db-errors";
 import type {
   Report,
   ReportStatus,
@@ -165,7 +166,12 @@ export async function adminUpdateReservationStatus(
 
   const { error } = await supabase.from("reservations").update(updates).eq("id", reservationId);
 
-  if (error) return { ok: false, error: "예약 상태 변경에 실패했습니다." };
+  if (error) {
+    if (isOverlapViolation(error)) {
+      return { ok: false, error: "해당 기간에 이미 다른 예약이 있어 상태를 되돌릴 수 없습니다." };
+    }
+    return { ok: false, error: "예약 상태 변경에 실패했습니다." };
+  }
 
   revalidatePath("/admin");
   revalidatePath("/admin/state");

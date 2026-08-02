@@ -12,6 +12,7 @@ import {
   flipReservationRequestToDirect,
 } from "@/lib/chat-rooms";
 import { RESERVATION_STATUS, ROOM_TYPE } from "@/lib/constants";
+import { isOverlapViolation } from "@/lib/db-errors";
 import {
   RESERVATION_REQUEST_PREFIX,
   RESERVATION_ACCEPTED_PREFIX,
@@ -753,24 +754,22 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
   }
 
-  // 같은 시터에게 이미 진행 중인 예약이 있으면 새 예약 요청을 막는다
-  // (방 재사용 여부와 무관한 별개의 중복 방지 규칙).
-  const activeStatuses: string[] = [
-    RESERVATION_STATUS.PENDING,
-    RESERVATION_STATUS.ACCEPTED,
-    RESERVATION_STATUS.PAID,
-    RESERVATION_STATUS.IN_PROGRESS,
-  ];
-  const { data: activeReservation } = await supabase
-    .from("reservations")
-    .select("id")
-    .eq("owner_id", user.id)
-    .eq("sitter_id", input.sitter_id)
-    .in("status", activeStatuses)
-    .limit(1)
-    .maybeSingle();
-  if (activeReservation) {
-    return { ok: false, error: "이미 해당 펫시터에게 예약 요청을 보냈습니다." };
+  // 시터 일정이 겹치는 예약만 막는다(같은 시터라도 날짜가 다르면 허용).
+  // reservations를 직접 조회하면 RLS(reservations_select_participant) 때문에
+  // 다른 보호자의 예약이 안 보여 검사가 조용히 통과되므로, 캘린더가 쓰는
+  // SECURITY DEFINER RPC로 시터 전체 일정을 기준으로 판정한다.
+  const { data: bookedRanges } = await supabase.rpc("get_sitter_booked_ranges", {
+    p_sitter_id: input.sitter_id,
+  });
+  const newStart = new Date(input.start_datetime).getTime();
+  const newEnd = new Date(input.end_datetime).getTime();
+  const overlaps = (bookedRanges ?? []).some(
+    (r) =>
+      new Date(r.start_datetime).getTime() < newEnd &&
+      new Date(r.end_datetime).getTime() > newStart,
+  );
+  if (overlaps) {
+    return { ok: false, error: "선택하신 날짜에 이미 예약된 일정이 있습니다. 다른 날짜를 선택해주세요." };
   }
 
   const { data: service } = await supabase
@@ -811,7 +810,13 @@ export async function createPetsitterReservationRequest(
     .select()
     .single();
 
-  if (reservationError || !reservation) return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+  if (reservationError || !reservation) {
+    // 위 RPC 검사와 INSERT 사이의 레이스는 DB 제약만 잡을 수 있다.
+    if (isOverlapViolation(reservationError)) {
+      return { ok: false, error: "선택하신 날짜에 이미 예약된 일정이 있습니다. 다른 날짜를 선택해주세요." };
+    }
+    return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+  }
 
   const { error: itemsError } = await supabase
     .from("reservation_items")

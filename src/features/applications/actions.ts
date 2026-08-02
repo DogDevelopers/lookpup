@@ -3,7 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { findRequestRoom, findOrCreateRequestRoom, promoteApplicationRoomToDirect } from "@/lib/chat-rooms";
-import { APPLICATION_STATUS } from "@/lib/constants";
+import { APPLICATION_STATUS, RESERVATION_STATUS } from "@/lib/constants";
+import { isOverlapViolation } from "@/lib/db-errors";
 import type { ApplicationRequestDetails } from "@/features/applications/types";
 
 type CreateApplicationResult =
@@ -244,13 +245,16 @@ export async function updateApplication(
         start_datetime: startDatetime,
         end_datetime: endDatetime,
         total_price: totalPrice,
-        status: "accepted",
+        status: RESERVATION_STATUS.ACCEPTED,
         accepted_at: new Date().toISOString(),
       })
       .select("id")
       .single();
 
     if (reservationError || !reservation) {
+      if (isOverlapViolation(reservationError)) {
+        return { ok: false, error: "해당 기간에 이미 확정된 예약이 있습니다. 기존 예약을 먼저 정리해주세요." };
+      }
       return { ok: false, error: "예약 생성에 실패했습니다." };
     }
 
