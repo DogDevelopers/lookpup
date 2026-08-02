@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ChevronLeft, Bell } from "lucide-react";
 import LoadingPage from "@/components/common/LoadingPage";
-import Footer from "@/components/layout/Footer";
 import { useNotifications } from "@/features/notifications/hooks/use-notifications";
 import { NotificationItem } from "./NotificationItem";
 
@@ -129,7 +128,6 @@ export default function NotificationsClient() {
         )}
       </div>
     </main>
-    <Footer />
     </>
   );
 }

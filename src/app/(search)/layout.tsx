@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
 import HeaderWithUser from "@/components/layout/HeaderWithUser";
 
-export default function MainLayout({
+export default function SearchLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,7 +13,6 @@ export default function MainLayout({
         <HeaderWithUser />
       </Suspense>
       <main className="flex-1">{children}</main>
-      <Footer />
     </>
   );
 }

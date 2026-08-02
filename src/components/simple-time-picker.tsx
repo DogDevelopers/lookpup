@@ -158,8 +158,8 @@ export function SimpleTimePicker({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (open) {
-        hourRef.current?.scrollIntoView({ behavior: "auto" });
-        minuteRef.current?.scrollIntoView({ behavior: "auto" });
+        hourRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+        minuteRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
       }
     }, 1);
     return () => clearTimeout(timeoutId);

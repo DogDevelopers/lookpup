@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import Footer from "@/components/layout/Footer";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronRight,
@@ -582,8 +581,6 @@ export default function MyProfileClient({
             </div>
           </div>
         </div>
-
-        <Footer />
       </div>
 
       <div className="md:hidden flex-1 flex flex-col overflow-y-auto">
@@ -675,8 +672,6 @@ export default function MyProfileClient({
             </Link>
           )}
         </div>
-
-        <Footer />
       </div>
     </div>
   );

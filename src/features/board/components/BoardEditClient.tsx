@@ -13,7 +13,6 @@ import {
   LocateFixed,
   X,
 } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
@@ -217,7 +216,6 @@ export default function BoardEditClient({
             </Link>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -662,7 +660,6 @@ export default function BoardEditClient({
           </div>
         </div>
       </main>
-      <Footer />
 
       <CustomModal
         open={!!errorMessage}
