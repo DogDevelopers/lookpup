@@ -581,7 +581,12 @@ function ChatPageContent({
   }, [activeItem, activeRoomId, userId, router]);
 
   function getHeaderBadge(): Badge {
-    if (selectedKind === "room") return { label: "진행중", className: "bg-orange-50 text-orange-500" };
+    if (selectedKind === "room") {
+      const status = selectedRoom?.reservationStatus;
+      if (status === RESERVATION_STATUS.COMPLETED) return { label: "완료됨", className: "bg-green-50 text-green-600" };
+      if (status === RESERVATION_STATUS.CANCELED) return { label: "취소됨", className: "bg-stone-100 text-stone-500" };
+      return { label: "진행중", className: "bg-orange-50 text-orange-500" };
+    }
     if (selectedKind === "reservation") {
       const status = selectedReservationRequest?.reservationStatus;
       if (status === RESERVATION_STATUS.CANCELED) return { label: "거절됨", className: "bg-stone-100 text-stone-500" };
