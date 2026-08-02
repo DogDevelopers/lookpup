@@ -19,7 +19,6 @@ export default function AvailableBalanceCard({
 
   const handleWithdraw = () => {
     setWithdrawing(true);
-    // 실제 출금 처리(계좌 이체) 연동 전 단계이므로, 신청 접수만 안내합니다.
     setTimeout(() => {
       setWithdrawing(false);
       toast.success("출금 신청이 접수되었어요. 영업일 기준 1~2일 내 입금돼요.");

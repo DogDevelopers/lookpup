@@ -5,7 +5,6 @@ import Link from "next/link";
 import { AlertTriangle, CheckCircle2, PawPrint } from "lucide-react";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
-import Footer from "@/components/layout/Footer";
 import { deleteUser, signOut } from "@/features/auth/actions";
 
 const REASONS = [
@@ -253,8 +252,6 @@ export default function WithdrawClient() {
         onConfirm={() => setShowModal(false)}
         showCloseButton={false}
       />
-
-      <Footer />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import {
   flipReservationRequestToDirect,
 } from "@/lib/chat-rooms";
 import { RESERVATION_STATUS, ROOM_TYPE } from "@/lib/constants";
+import { isOverlapViolation } from "@/lib/db-errors";
 import {
   RESERVATION_REQUEST_PREFIX,
   RESERVATION_ACCEPTED_PREFIX,
@@ -37,10 +38,6 @@ const SERVICE_TYPE_LABEL: Record<string, string> = {
   hotel: "위탁 돌봄",
   pickup: "픽업",
 };
-
-// ---------------------------------------------------------------------------
-// petsitters/actions.ts에서 그대로 이동한 함수 (로직 변경 없음)
-// ---------------------------------------------------------------------------
 
 const CANCELABLE_STATUSES: string[] = [RESERVATION_STATUS.PENDING, RESERVATION_STATUS.ACCEPTED];
 
@@ -141,8 +138,6 @@ export async function getMyReservations(): Promise<MyReservation[]> {
   return (data ?? []).map((row) => {
     const start = new Date(row.start_datetime ?? "");
     const end = new Date(row.end_datetime ?? "");
-    // Supabase는 Database 제네릭 없이는 to-one 조인도 배열 타입으로 추론한다 —
-    // 실제로는 단일 행이므로 여기서 좁혀준다.
     const service = row.services as unknown as { title: string | null } | null;
     const sitter = row.sitters as unknown as {
       available_area: string | null;
@@ -304,11 +299,6 @@ export async function getReservationById(id: string): Promise<ReservationDetail 
     reviewWritten: reviewWasWritten(row.reviews),
   };
 }
-
-// ---------------------------------------------------------------------------
-// 채팅이 필요로 하는 예약 생애주기 함수 이식
-// (react/lookpup의 actions/reservations.ts 이식, service-role → RLS 준수 클라이언트로 조정)
-// ---------------------------------------------------------------------------
 
 type ActionResult<T = undefined> = T extends undefined
   ? { ok: true } | { ok: false; error: string }
@@ -753,24 +743,18 @@ export async function createPetsitterReservationRequest(
     return { ok: false, error: "본인의 반려동물만 예약에 추가할 수 있습니다." };
   }
 
-  // 같은 시터에게 이미 진행 중인 예약이 있으면 새 예약 요청을 막는다
-  // (방 재사용 여부와 무관한 별개의 중복 방지 규칙).
-  const activeStatuses: string[] = [
-    RESERVATION_STATUS.PENDING,
-    RESERVATION_STATUS.ACCEPTED,
-    RESERVATION_STATUS.PAID,
-    RESERVATION_STATUS.IN_PROGRESS,
-  ];
-  const { data: activeReservation } = await supabase
-    .from("reservations")
-    .select("id")
-    .eq("owner_id", user.id)
-    .eq("sitter_id", input.sitter_id)
-    .in("status", activeStatuses)
-    .limit(1)
-    .maybeSingle();
-  if (activeReservation) {
-    return { ok: false, error: "이미 해당 펫시터에게 예약 요청을 보냈습니다." };
+  const { data: bookedRanges } = await supabase.rpc("get_sitter_booked_ranges", {
+    p_sitter_id: input.sitter_id,
+  });
+  const newStart = new Date(input.start_datetime).getTime();
+  const newEnd = new Date(input.end_datetime).getTime();
+  const overlaps = (bookedRanges ?? []).some(
+    (r) =>
+      new Date(r.start_datetime).getTime() < newEnd &&
+      new Date(r.end_datetime).getTime() > newStart,
+  );
+  if (overlaps) {
+    return { ok: false, error: "선택하신 날짜에 이미 예약된 일정이 있습니다. 다른 날짜를 선택해주세요." };
   }
 
   const { data: service } = await supabase
@@ -789,9 +773,8 @@ export async function createPetsitterReservationRequest(
   const sitterUserId = (service.sitters as unknown as { user_id: string }).user_id;
   if (sitterUserId === user.id) return { ok: false, error: "본인에게는 예약할 수 없습니다." };
 
-  // 실제 예약 금액 = 1일 단가 × 이용 일수 (KST 달력일 기준, 시작·종료일 포함)
   const DAY_MS = 24 * 60 * 60 * 1000;
-  const KST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9
+  const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
   const toKstDayIndex = (iso: string) => Math.floor((new Date(iso).getTime() + KST_OFFSET_MS) / DAY_MS);
   const days = Math.max(1, toKstDayIndex(input.end_datetime) - toKstDayIndex(input.start_datetime) + 1);
   const totalPrice = service.price * days;
@@ -811,7 +794,12 @@ export async function createPetsitterReservationRequest(
     .select()
     .single();
 
-  if (reservationError || !reservation) return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+  if (reservationError || !reservation) {
+    if (isOverlapViolation(reservationError)) {
+      return { ok: false, error: "선택하신 날짜에 이미 예약된 일정이 있습니다. 다른 날짜를 선택해주세요." };
+    }
+    return { ok: false, error: "예약 요청 생성에 실패했습니다." };
+  }
 
   const { error: itemsError } = await supabase
     .from("reservation_items")
@@ -999,9 +987,6 @@ export async function rejectReservationRequest(
     .insert({ room_id: room.id, sender_id: user.id, content: RESERVATION_REJECTED_PREFIX })
     .select("id, sender_id, content, created_at")
     .single();
-  // room_type은 "reservation_request"로 유지한다 — "direct"로 바꾸면
-  // use-chat-rooms.ts의 수락 감지 리스너(room_type이 direct로 바뀌는 걸
-  // "수락됨"으로 해석)가 거절도 수락으로 오인해서 상대방을 잘못 이동시킨다.
   await touchRoomPreview(supabase, room.id, "예약 거절");
 
   await createNotification(supabase, {

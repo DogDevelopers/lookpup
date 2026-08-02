@@ -6,7 +6,6 @@ import { Calendar, Clock, MessageCircle, ChevronLeft, ChevronRight } from "lucid
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
-import Footer from "@/components/layout/Footer";
 import type { MySitterReservation, ReservationUiStatus } from "@/features/reservations/types";
 
 type TabId = "all" | "pending" | "in-progress" | "confirmed" | "completed" | "cancelled";
@@ -222,8 +221,6 @@ export default function WorksHistoryClient({
           </nav>
         )}
       </main>
-
-      {!embedded && <Footer />}
     </div>
   );
 }

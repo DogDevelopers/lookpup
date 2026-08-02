@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import Footer from "@/components/layout/Footer";
 import LoadingPage from "@/components/common/LoadingPage";
 import BackButton from "@/components/common/BackButton";
 import Pill from "@/components/ui/Pill";
@@ -283,7 +282,6 @@ export default function SitterDetailClient({
         )}
       </div>
 
-      <Footer />
       <div className="h-20 md:hidden" />
     </>
   );

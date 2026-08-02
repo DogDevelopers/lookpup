@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import Script from "next/script";
-import Footer from "@/components/layout/Footer";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
   ChevronRight,
@@ -385,8 +384,6 @@ export default function MyProfileClient({
       params.set("menu", nextMenu);
     }
     const query = params.toString();
-    // page.tsx는 searchParams를 읽지 않아 role/menu가 바뀌어도 서버 응답이 동일하다.
-    // router.replace를 쓰면 같은 데이터를 다시 받으려고 RSC 왕복이 발생하므로 URL만 바꾼다.
     window.history.replaceState(null, "", query ? `${pathname}?${query}` : pathname);
   };
 
@@ -582,8 +579,6 @@ export default function MyProfileClient({
             </div>
           </div>
         </div>
-
-        <Footer />
       </div>
 
       <div className="md:hidden flex-1 flex flex-col overflow-y-auto">
@@ -675,8 +670,6 @@ export default function MyProfileClient({
             </Link>
           )}
         </div>
-
-        <Footer />
       </div>
     </div>
   );

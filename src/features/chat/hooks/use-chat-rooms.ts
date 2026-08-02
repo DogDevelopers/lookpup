@@ -284,9 +284,6 @@ export function useChatRooms(
     [queryClient],
   );
 
-  // 신규/변경된 채팅방 추적 — 참고: 원본은 sitter 측 필터를 `sitter_id=eq.${userId}`로 걸어
-  // chat_rooms.sitter_id(sitters.id 참조)와 사용자 auth id를 비교하는 버그가 있었음.
-  // 여기서는 실제 sitters.id로 필터링하도록 수정.
   useEffect(() => {
     if (!userId) return;
     const supabase = createClient();

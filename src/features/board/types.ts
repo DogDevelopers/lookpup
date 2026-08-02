@@ -1,4 +1,3 @@
-// 구인게시판 작성/수정 폼에서 사용하는 반려동물 (UI 표시용으로 가공된 형태)
 export type Pet = {
   id: string;
   name: string;
@@ -9,7 +8,6 @@ export type Pet = {
   image_url: string | null;
 };
 
-// GET /api/pets 응답 행 (필요한 필드만)
 export type PetRow = {
   id: string;
   name: string;

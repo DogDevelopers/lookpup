@@ -26,7 +26,6 @@ interface KakaoMapProps {
   onMarkerClick?: (id: string | number) => void;
   onMapClick?: (lat: number, lng: number) => void;
   basePosition?: { lat: number; lng: number };
-  /** true면 markers[0]을 드래그로 이동시킬 수 있는 단일 마커 모드로 동작한다. */
   draggable?: boolean;
   onMarkerDragEnd?: (lat: number, lng: number) => void;
 }
@@ -387,13 +386,11 @@ export default function KakaoMap({
     if (mapRef.current) {
       drawMarkers();
     }
-    // drawMarkers는 ref로 최신 값을 읽으므로 의도적으로 제외
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [markers, selectedMarkerId]);
 
   useEffect(() => {
     showSelectedMarker(selectedMarkerId);
-    // 위와 동일한 이유로 의도적으로 제외
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMarkerId]);
 

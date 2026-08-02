@@ -6,6 +6,8 @@ import Avatar from "@/components/ui/Avatar";
 import { canLeaveDirectRoom, canLeaveReservationRequest } from "@/features/chat/utils";
 import type { ChatRoom, Applicant, ReservationRequest, Badge } from "@/features/chat/types";
 
+const LEAVE_BLOCKED_MESSAGE = "진행 중인 예약이 있어 나갈 수 없습니다.";
+
 function UnreadBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
@@ -41,6 +43,8 @@ function ChatRoomItemImpl({
   onClick,
   priority = false,
 }: ChatRoomItemProps) {
+  const canLeave = canLeaveDirectRoom(room);
+
   return (
     <div
       onClick={() => {
@@ -50,10 +54,14 @@ function ChatRoomItemImpl({
         !editMode ? "cursor-pointer hover:bg-orange-50" : ""
       } ${isSelected && !editMode ? "bg-orange-50" : ""}`}
     >
-      {editMode && canLeaveDirectRoom(room) && (
+      {editMode && (
         <button
           onClick={() => onDelete(room.id)}
-          className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shrink-0 mt-4"
+          disabled={!canLeave}
+          title={canLeave ? undefined : LEAVE_BLOCKED_MESSAGE}
+          className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-4 ${
+            canLeave ? "bg-red-500" : "bg-stone-300 cursor-default"
+          }`}
         >
           <Trash2 size={12} className="text-white" />
         </button>
@@ -82,6 +90,9 @@ function ChatRoomItemImpl({
           {room.lastMessage}
         </p>
         <span className="text-stone-500 text-xs">{room.time}</span>
+        {editMode && !canLeave && (
+          <p className="text-xs text-stone-400 mt-1">{LEAVE_BLOCKED_MESSAGE}</p>
+        )}
       </div>
     </div>
   );

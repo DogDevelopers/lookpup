@@ -61,8 +61,6 @@ function toPostListItem(row: RequestListRow): PostListItem {
   };
 }
 
-// 모집 완료(matched) 구인글은 검색이나 게시글 관리에서는 계속 보여야 해서 쿼리에서 제외하지 않고
-// 목록 화면(BoardListClient)에서 검색어가 없을 때만 걸러낸다.
 export async function getRequestList(): Promise<PostListItem[]> {
   const supabase = await createClient();
   const { data, error } = await supabase

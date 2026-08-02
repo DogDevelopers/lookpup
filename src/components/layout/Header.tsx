@@ -42,7 +42,6 @@ export default function Header({ user = null, isLoading = false, onLogout }: Hea
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white border-b border-orange-100 shadow-[0px_1px_8px_0px_rgba(232,116,42,0.08)]">
-      {/* 데스크톱 헤더 */}
       <div className="hidden md:flex h-16 w-full justify-center">
         <div className="relative w-full max-w-[1280px] px-10 flex items-center justify-between gap-6">
           <Link href="/" className="shrink-0" aria-label="봐주개 홈으로 이동">

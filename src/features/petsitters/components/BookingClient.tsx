@@ -8,7 +8,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useBookingStore } from "@/stores/booking-store";
-import Footer from "@/components/layout/Footer";
 import { createPetsitterReservationRequest } from "@/features/reservations/actions";
 import {
   step1Schema,
@@ -20,10 +19,6 @@ import {
 } from "../schema";
 import type { BookedRange, Pet, SitterBookingInfo } from "../types";
 
-// 네 스텝 모두 code split — StepDateSelect는 react-day-picker/date-fns를
-// 물고 있어 초기 진입(1단계)에도 무거운 JS를 그대로 내려보내던 문제.
-// SSR은 유지되므로(ssr:false 아님) 최초 페인트는 그대로 서버 렌더 HTML로 나가고,
-// 해당 청크만 별도로 분리되어 book 페이지의 초기 JS 전송량이 줄어든다.
 const StepDateSelect = dynamic(() => import("./StepDateSelect"));
 const StepPetService = dynamic(() => import("./StepPetService"));
 const StepNotes = dynamic(() => import("./StepNotes"));
@@ -85,7 +80,6 @@ export default function BookingClient({
     defaultValues: { note: "" },
   });
 
-  // react-hook-form의 watch()는 메모이제이션 불가능한 함수를 반환하는 걸로 알려진 라이브러리 제약
   // eslint-disable-next-line react-hooks/incompatible-library
   const startTime = step1Form.watch("startTime") ?? "";
   const endTime = step1Form.watch("endTime") ?? "";
@@ -103,11 +97,16 @@ export default function BookingClient({
       if (!ok) return;
     }
     setStep((s) => s + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleBack() {
-    if (step > 1) setStep((s) => s - 1);
-    else router.back();
+    if (step > 1) {
+      setStep((s) => s - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      router.back();
+    }
   }
 
   async function handleSubmit() {
@@ -161,6 +160,7 @@ export default function BookingClient({
 
     setStep(4);
     setChatRoomId(result.data.room_id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function canProceed(): boolean {
@@ -184,7 +184,6 @@ export default function BookingClient({
         <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
           <p className="text-stone-400 text-sm">불러오는 중...</p>
         </main>
-        <Footer />
       </>
     );
   }
@@ -197,7 +196,6 @@ export default function BookingClient({
             시터 정보를 불러올 수 없습니다.
           </p>
         </main>
-        <Footer />
       </>
     );
   }
@@ -339,8 +337,6 @@ export default function BookingClient({
           </div>
         </div>
       )}
-
-      <Footer />
     </>
   );
 }

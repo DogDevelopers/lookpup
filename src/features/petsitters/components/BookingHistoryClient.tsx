@@ -6,7 +6,6 @@ import { Calendar, Clock, MapPin, Star, MessageCircle, ChevronLeft, ChevronRight
 import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
-import Footer from "@/components/layout/Footer";
 import Avatar from "@/components/ui/Avatar";
 import { CustomModal } from "@/components/common/CustomModal";
 import { cancelReservation } from "@/features/reservations/actions";
@@ -359,8 +358,6 @@ export default function BookingHistoryClient({
         onClose={() => setCancelingId(null)}
         onConfirm={handleCancelConfirm}
       />
-
-      {!embedded && <Footer />}
     </div>
   );
 }

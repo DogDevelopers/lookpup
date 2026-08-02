@@ -13,7 +13,6 @@ import {
   Trash2,
   Flag,
 } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import Avatar from "@/components/ui/Avatar";
 import SectionCard from "@/components/common/SectionCard";
 import { CustomModal } from "@/components/common/CustomModal";
@@ -84,7 +83,6 @@ interface BoardDetailClientProps {
   id: string;
   initialPost?: RequestDetail | null;
   initialOtherPosts?: OtherPost[];
-  // TODO: features/auth 이식 후 실제 로그인/펫시터 상태로 교체.
   currentUserId?: string;
   isLoggedIn?: boolean;
   isSitter?: boolean;
@@ -110,7 +108,7 @@ export default function BoardDetailClient({
   const otherPosts = initialOtherPosts ?? null;
 
   const handleApply = async () => {
-    if (!post?.id) return;
+    if (!post?.id || applying) return;
     setApplying(true);
 
     const result = await createApplication(post.id, {
@@ -140,7 +138,6 @@ export default function BoardDetailClient({
             게시글을 찾을 수 없습니다.
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -524,8 +521,6 @@ export default function BoardDetailClient({
           </div>
         </div>
       </main>
-
-      <Footer />
 
       <CustomModal
         open={showApplyModal}

@@ -10,9 +10,7 @@ export interface RegionResult {
   dong: string;
 }
 
-// 자동완성 드롭다운용 주소 후보
 export interface AddressSuggestion {
-  // 표시·저장용 주소 (도로명 우선, 없으면 지번)
   addressName: string;
   roadAddress: string | null;
   jibunAddress: string | null;
@@ -20,7 +18,6 @@ export interface AddressSuggestion {
   lng: number;
 }
 
-// 입력 중 부분 주소로 여러 후보를 받아오는 검색 (도로명 자동완성)
 export function searchAddressList(query: string): Promise<AddressSuggestion[]> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || !window.kakao?.maps?.services) {
@@ -50,7 +47,6 @@ export function searchAddressList(query: string): Promise<AddressSuggestion[]> {
   });
 }
 
-// 좌표 → 주소 문자열 (도로명 우선, 없으면 지번) — 지도 클릭 시 사용
 export function coordToAddress(lat: number, lng: number): Promise<string | null> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || !window.kakao?.maps?.services) {
@@ -91,7 +87,6 @@ export function searchAddressToCoord(query: string): Promise<CoordResult | null>
   });
 }
 
-// 장소명/키워드 검색 (홍대, 삼성 서울병원 등 장소명에 적합)
 export function searchPlaceToCoord(query: string): Promise<CoordResult | null> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || !window.kakao?.maps?.services) {
@@ -115,18 +110,18 @@ export function searchPlaceToCoord(query: string): Promise<CoordResult | null> {
 
 export interface AreaSuggestion {
   type: 'area';
-  label: string;    // 예: "서울특별시 마포구 아현동"
-  city: string;     // 예: "서울특별시"
-  district: string; // 예: "마포구"
-  dong: string;     // 예: "아현동" — 구 단위 선택 시 빈 문자열
+  label: string;
+  city: string;
+  district: string;
+  dong: string;
   lat: number;
   lng: number;
 }
 
 export interface PlaceSuggestion {
   type: 'place';
-  label: string;    // 장소명 예: "홍익대학교"
-  address: string;  // 주소 예: "서울 마포구 와우산로 94"
+  label: string;
+  address: string;
   lat: number;
   lng: number;
 }
@@ -159,7 +154,6 @@ export function searchAreaList(query: string): Promise<AreaSuggestion[]> {
 
           if (!district) continue;
 
-          // 구 단위 후보
           const distKey = `${city}|${district}`;
           if (!seen.has(distKey)) {
             seen.add(distKey);
@@ -174,7 +168,6 @@ export function searchAreaList(query: string): Promise<AreaSuggestion[]> {
             });
           }
 
-          // 동 단위 후보
           if (dong) {
             const dongKey = `${city}|${district}|${dong}`;
             if (!seen.has(dongKey)) {
@@ -201,7 +194,6 @@ export function searchAreaList(query: string): Promise<AreaSuggestion[]> {
   });
 }
 
-// 장소명/키워드 자동완성 (역, 대학교, 유명 장소 등)
 export function searchPlaceList(query: string): Promise<PlaceSuggestion[]> {
   return new Promise((resolve) => {
     if (typeof window === "undefined" || !window.kakao?.maps?.services) {
@@ -242,7 +234,6 @@ export function coordToRegion(lat: number, lng: number): Promise<RegionResult | 
         resolve(null);
         return;
       }
-      // region_type 'H'(행정동) 우선, 없으면 첫 번째
       const region = result.find((r) => r.region_type === "H") ?? result[0];
       resolve({
         sido: region.region_1depth_name,

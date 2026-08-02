@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import SectionCard from "@/components/common/SectionCard";
-import Footer from "@/components/layout/Footer";
 
 export type TitledItem = { title: string; text: string };
 export type ArticleItem = string | TitledItem;
@@ -27,7 +26,6 @@ type LegalPageProps = {
   intro: ReactNode;
   articles: LegalArticle[];
   effectiveDate: string;
-  /** [텍스트] 형태로 감싼 단어를 링크로 변환하는 맵 */
   linkMap?: Record<string, string>;
 };
 
@@ -145,8 +143,6 @@ export default function LegalPage({
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

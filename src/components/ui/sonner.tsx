@@ -38,7 +38,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
         } as React.CSSProperties
       }
       toastOptions={{
-        // 헤더 유저 프로필 호버 박스/알림 드롭다운 톤에 맞춤
         classNames: {
           toast:
             "bg-white! text-stone-900! border! border-orange-100! rounded-xl! shadow-[0px_4px_20px_0px_rgba(232,116,42,0.15)]!",

@@ -13,7 +13,6 @@ import {
   LocateFixed,
   X,
 } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
@@ -121,7 +120,6 @@ export default function BoardEditClient({
     formInitialized.current = true;
 
     if (initialData.status === "matched") {
-      // 최초 1회만 실행되는 초기화 (props로 받은 데이터를 폼에 반영)
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsMatched(true);
       return;
@@ -217,7 +215,6 @@ export default function BoardEditClient({
             </Link>
           </div>
         </main>
-        <Footer />
       </>
     );
   }
@@ -662,7 +659,6 @@ export default function BoardEditClient({
           </div>
         </div>
       </main>
-      <Footer />
 
       <CustomModal
         open={!!errorMessage}

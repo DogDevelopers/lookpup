@@ -3,16 +3,12 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 import { searchAddressToCoord, coordToRegion } from "@/lib/kakao-geocode";
 
-// 폼에서 위치 관련 필드만 추려낸 제약. write/edit FormState 모두 충족.
 type LocationFields = {
   location: string;
   latitude: number | null;
   longitude: number | null;
 };
 
-// 구인게시판 작성/수정 폼의 주소 검색 · 현재 위치 사용 로직 공유 훅.
-// addressSearching / searchError / locationError 상태를 내부에서 관리하고,
-// 결과를 setForm으로 location/latitude/longitude에 반영한다.
 export function useAddressSearch<T extends LocationFields>(
   setForm: Dispatch<SetStateAction<T>>,
 ) {

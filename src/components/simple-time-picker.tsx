@@ -42,8 +42,6 @@ const PM_VALUE = 1;
  * Source:    https://github.com/huybuidac/shadcn-datetime-picker
  *
  * MIT licensed — feel free to copy, modify, and ship.
- *
- * 이 프로젝트에서는 시(時)·분(分) 단위까지만 쓰므로 원본의 초(秒) 컬럼은 제거함.
  */
 export function SimpleTimePicker({
   value,
@@ -63,8 +61,6 @@ export function SimpleTimePicker({
   className?: string;
   modal?: boolean;
 }) {
-  // hours24h = HH
-  // hours12h = hh
   const formatStr = useMemo(
     () =>
       use12HourFormat
@@ -80,8 +76,6 @@ export function SimpleTimePicker({
   );
   const [minute, setMinute] = useState(value.getMinutes());
 
-  // Sync from value/use12HourFormat during render (not in an effect) to avoid
-  // react-hooks/set-state-in-effect and a stale-state double-click bug.
   const [prevValueTime, setPrevValueTime] = useState(value.getTime());
   const [prevUse12HourFormat, setPrevUse12HourFormat] =
     useState(use12HourFormat);
@@ -158,8 +152,8 @@ export function SimpleTimePicker({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (open) {
-        hourRef.current?.scrollIntoView({ behavior: "auto" });
-        minuteRef.current?.scrollIntoView({ behavior: "auto" });
+        hourRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+        minuteRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
       }
     }, 1);
     return () => clearTimeout(timeoutId);
@@ -283,8 +277,6 @@ export function SimpleTimePicker({
       <PopoverTrigger
         nativeButton={false}
         render={
-          // base-ui Trigger가 렌더 대상에 aria-controls/aria-haspopup을 자동으로
-          // 주입해줘서 실제로는 누락이 아님 (정적 분석 오탐)
           <div
             // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
             role="combobox"
@@ -409,8 +401,6 @@ function buildTime(options: BuildTimeOptions) {
   let date: Date;
   if (use12HourFormat) {
     const dateStrRaw = format(value, formatStr);
-    // yyyy-MM-dd hh:mm.SSS a zzzz
-    // 2024-10-14 01:20.524 AM GMT+00:00
     let dateStr =
       dateStrRaw.slice(0, 11) +
       hour.toString().padStart(2, "0") +

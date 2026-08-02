@@ -3,7 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { findRequestRoom, findOrCreateRequestRoom, promoteApplicationRoomToDirect } from "@/lib/chat-rooms";
-import { APPLICATION_STATUS } from "@/lib/constants";
+import { APPLICATION_STATUS, RESERVATION_STATUS } from "@/lib/constants";
+import { isOverlapViolation } from "@/lib/db-errors";
 import type { ApplicationRequestDetails } from "@/features/applications/types";
 
 type CreateApplicationResult =
@@ -244,13 +245,16 @@ export async function updateApplication(
         start_datetime: startDatetime,
         end_datetime: endDatetime,
         total_price: totalPrice,
-        status: "accepted",
+        status: RESERVATION_STATUS.ACCEPTED,
         accepted_at: new Date().toISOString(),
       })
       .select("id")
       .single();
 
     if (reservationError || !reservation) {
+      if (isOverlapViolation(reservationError)) {
+        return { ok: false, error: "해당 기간에 이미 확정된 예약이 있습니다. 기존 예약을 먼저 정리해주세요." };
+      }
       return { ok: false, error: "예약 생성에 실패했습니다." };
     }
 
@@ -280,9 +284,6 @@ export async function updateApplication(
     }
     roomId = room.id;
 
-    // 이 시점부터는 chat_rooms.reservation_id가 이 예약을 참조하므로,
-    // 이후 실패는 reservation_items/reservations를 롤백(삭제)할 수 없다
-    // (FK 제약 위반). 에러만 반환하고 이미 만들어진 예약·채팅방은 남겨둔다.
     const { error: requestUpdateError } = await supabase
       .from("requests")
       .update({ status: "matched" })

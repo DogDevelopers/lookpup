@@ -16,7 +16,6 @@ import {
   Download,
   X,
 } from "lucide-react";
-import Footer from "@/components/layout/Footer";
 import { CustomModal } from "@/components/common/CustomModal";
 import RangePicker from "@/components/ui/RangePicker";
 import SimpleTimePicker from "@/components/ui/SimpleTimePicker";
@@ -81,7 +80,6 @@ type FormState = {
 };
 
 interface BoardWriteClientProps {
-  // TODO: 로그인 여부 확인 후 리다이렉트, features/pet-register 이식 후 pets 실데이터 조회.
   userId?: string;
   pets?: Pet[];
   userLocation?: { lat: number; lng: number } | null;
@@ -100,7 +98,6 @@ export default function BoardWriteClient({
 
   useEffect(() => {
     if (!draftKey) return;
-    // localStorage는 브라우저 전용 API라 SSR 중엔 못 읽어서 effect가 맞는 위치
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setHasDraft(localStorage.getItem(draftKey) !== null);
   }, [draftKey]);
@@ -276,7 +273,6 @@ export default function BoardWriteClient({
           : (saved.conditions ?? ""),
       });
     } catch {
-      // 손상된 초안은 무시
     }
     setDraftHidden(true);
   };
@@ -923,8 +919,6 @@ export default function BoardWriteClient({
         </div>
       </div>
       </div>
-
-      <Footer />
 
       <CustomModal
         open={!!errorMessage}
