@@ -220,8 +220,6 @@ export function useApprovalActions(params: {
           updatePreview(id, "선택 확정", msgResult.data.created_at ?? new Date().toISOString());
         }
 
-        // updateApplication이 이미 정확한 방(request_id 기준)을 direct로 전환하고
-        // 그 id를 돌려주므로 그대로 쓴다(별도 재조회 없음).
         const newRoomId = result.data.roomId;
         if (newRoomId) {
           broadcastReservationAccepted(newRoomId);

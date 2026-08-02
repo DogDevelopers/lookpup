@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 
-// TODO: 제출 시 Cloudinary(or 다른 스토리지) 업로드를 features/sitter-register/actions.ts에서 처리.
-// 여기서는 로컬 선택/미리보기만 담당한다.
 export function useSingleImageUpload() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);

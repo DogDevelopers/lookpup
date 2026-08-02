@@ -152,7 +152,6 @@ export async function deleteUser(reason: string, detail?: string): Promise<Delet
   if (!auth.ok) return auth;
   const { user } = auth;
 
-  // TODO: 예약 백엔드 이식 후, paid/in_progress 상태의 활성 예약이 있으면 탈퇴를 차단하는 체크 추가.
   const { error } = await supabase
     .from("users")
     .update({

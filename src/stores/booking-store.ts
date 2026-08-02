@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { DateRange } from "react-day-picker";
 
-// 클라이언트 UI 상태만 보관 — 서버 데이터(시터 정보 등)는 TanStack Query로 관리
 interface BookingState {
   dateRange: DateRange | undefined;
   petIds: string[];

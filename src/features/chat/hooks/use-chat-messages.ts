@@ -149,7 +149,6 @@ function toMessage(m: ChatMessageRow, userId: string): Message {
       try {
         serviceCompleteData = JSON.parse(jsonPart) as ServiceCompleteData;
       } catch {
-        // 파싱 실패 시 데이터 없이 카드만 렌더링
       }
     }
     return {
@@ -171,7 +170,6 @@ function toMessage(m: ChatMessageRow, userId: string): Message {
           jsonPart,
         ) as ServiceCompleteData;
       } catch {
-        // 파싱 실패 시 데이터 없이 카드만 렌더링
       }
     }
     return {
@@ -191,7 +189,6 @@ function toMessage(m: ChatMessageRow, userId: string): Message {
       try {
         serviceStartData = JSON.parse(jsonPart) as ServiceCompleteData;
       } catch {
-        // 파싱 실패 시 데이터 없이 카드만 렌더링
       }
     }
     return {

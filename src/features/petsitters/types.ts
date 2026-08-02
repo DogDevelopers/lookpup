@@ -90,8 +90,6 @@ export interface BookedRange {
   to: Date;
 }
 
-// features/pet-register가 아직 이식되지 않아 임시로 이 도메인에 최소 형태로 둔다.
-// TODO: pet-register 이식 후 공용 타입으로 승격 검토.
 export interface Pet {
   id: string;
   name: string;

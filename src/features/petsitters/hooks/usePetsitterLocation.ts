@@ -17,9 +17,6 @@ interface UsePetsitterLocationOptions {
   urlDong: string;
 }
 
-// TODO: 로그인 사용자의 위치 동의 여부는 features/auth 연동 후
-// Supabase users.location_consent로 옮겨서 기기 간에도 유지되게 한다.
-// 지금은 로그인 여부와 무관하게 localStorage만 사용.
 export function usePetsitterLocation({
   urlCity,
   urlDistrict,
@@ -45,7 +42,6 @@ export function usePetsitterLocation({
           return;
         }
       } catch {
-        // 일부 브라우저는 geolocation permission query를 지원하지 않음 - 아래 getCurrentPosition으로 폴백
       }
     }
     setLocationLoading(true);
@@ -81,7 +77,7 @@ export function usePetsitterLocation({
     if (window.kakao?.maps?.load) {
       window.kakao.maps.load(run);
     } else {
-      const MAX_ATTEMPTS = 100; // 100ms * 100 = 10초
+      const MAX_ATTEMPTS = 100;
       let attempts = 0;
       const id = setInterval(() => {
         attempts += 1;
@@ -102,7 +98,6 @@ export function usePetsitterLocation({
     if (urlDistrict) return;
     const hasConsent = localStorage.getItem(CONSENT_STORAGE_KEY) === "true";
     if (hasConsent) {
-      // 브라우저 Geolocation API 호출이라 effect가 맞는 위치
       // eslint-disable-next-line react-hooks/set-state-in-effect
       requestLocationSilently();
     } else {

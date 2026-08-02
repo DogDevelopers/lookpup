@@ -124,7 +124,6 @@ export default function SettlementHistory({
           />
         ) : (
           <>
-            {/* Desktop table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -185,7 +184,6 @@ export default function SettlementHistory({
               </table>
             </div>
 
-            {/* Mobile card list */}
             <div className="md:hidden flex flex-col gap-3">
               {filteredRows.map((row) => (
                 <button

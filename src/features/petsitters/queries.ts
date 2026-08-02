@@ -8,8 +8,6 @@ const ANIMAL_TYPE_LABEL: Record<string, string> = {
   other: "기타",
 };
 
-// users 테이블 RLS(users_select_own)는 본인 행만 SELECT를 허용하므로,
-// 다른 사용자가 볼 시터 이름/사진/서비스 목록은 SECURITY DEFINER RPC(get_petsitters_filtered 등)로만 조회 가능하다.
 export async function getSitterList(): Promise<SitterRow[]> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_petsitters_filtered", {});
@@ -48,9 +46,6 @@ const sitterBookingRpcSchema = z.object({
   base_price: z.number().nullable(),
 });
 
-// 예약 생성(createPetsitterReservationRequest)에는 실제 services.id(uuid)가 필요하다.
-// get_petsitter_detail RPC의 services는 service_id를 내려주지 않으므로,
-// services 테이블(공개 정책: is_active=true는 누구나 조회 가능)에서 직접 id를 가져온다.
 export async function getSitterBookingInfo(sitterId: string): Promise<SitterBookingInfo | null> {
   const supabase = await createClient();
   const [{ data, error }, { data: services }] = await Promise.all([
@@ -112,7 +107,6 @@ const sitterDetailRpcSchema = z.object({
   ),
 });
 
-// 펫시터 프로필(상세) 페이지용 전체 정보.
 export async function getSitterDetail(sitterId: string): Promise<SitterDetail | null> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_petsitter_detail", { p_sitter_id: sitterId });
@@ -121,7 +115,6 @@ export async function getSitterDetail(sitterId: string): Promise<SitterDetail | 
   const parsed = sitterDetailRpcSchema.safeParse(data);
   if (!parsed.success) return null;
 
-  // available_animals는 sitters 테이블 자체 컬럼이라 sitters_select_public 정책(승인된 시터 공개)으로 직접 조회 가능.
   const { data: sitterRow } = await supabase
     .from("sitters")
     .select("available_animals")
@@ -165,8 +158,6 @@ export async function getSitterReviews(sitterId: string): Promise<ReviewRow[]> {
   }));
 }
 
-// reservations RLS(reservations_select_participant)는 예약자 본인/해당 시터 본인만 조회를 허용하므로,
-// 다른 보호자가 예약 가능일을 계산하려면 SECURITY DEFINER RPC(get_sitter_booked_ranges)가 필요하다.
 export async function getBookedRanges(sitterId: string): Promise<BookedRange[]> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_sitter_booked_ranges", {

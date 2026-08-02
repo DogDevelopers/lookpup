@@ -154,7 +154,6 @@ export async function sendAutoPaymentRequestMessage(
   const sitter = room.sitters as unknown as { user_id: string };
   const content = `${PAYMENT_REQUEST_PREFIX}${JSON.stringify(data)}`;
 
-  // 의도적으로 sitter를 발신자로 지정 — 보호자 화면에 "받은 요청"으로 렌더링되도록 함
   const { data: message, error } = await supabase
     .from("messages")
     .insert({ room_id: roomId, sender_id: sitter.user_id, content })

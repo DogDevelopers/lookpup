@@ -1,11 +1,6 @@
 const CITY_SUFFIXES = ["특별시", "광역시", "특별자치시", "특별자치도"];
 const NEIGHBORHOOD_SUFFIX = /(동|읍|면|가|리)$/;
-// Keep in sync with public.coarsen_petsitter_area in Supabase (search-list RPCs
-// use the SQL copy of this same rule; this file backs the detail-page route).
 const APARTMENT_BUILDING_NUMBER = /^\d+(-\d+)*동$/;
-// "다"/"파" excluded from the letter class: they collide with real neighborhood
-// names (다동 in Jung-gu, Seoul; 파동 in Suwon/Ulsan), so a token ending in
-// those syllables is treated as a real neighborhood rather than a building label.
 const APARTMENT_BUILDING_LETTER = /^[가나라마바사아자차카타하]동$/;
 
 function isCityToken(s: string) {
