@@ -120,7 +120,6 @@ export default function BoardEditClient({
     formInitialized.current = true;
 
     if (initialData.status === "matched") {
-      // 최초 1회만 실행되는 초기화 (props로 받은 데이터를 폼에 반영)
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsMatched(true);
       return;

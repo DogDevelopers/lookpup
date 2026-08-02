@@ -284,9 +284,6 @@ export async function updateApplication(
     }
     roomId = room.id;
 
-    // 이 시점부터는 chat_rooms.reservation_id가 이 예약을 참조하므로,
-    // 이후 실패는 reservation_items/reservations를 롤백(삭제)할 수 없다
-    // (FK 제약 위반). 에러만 반환하고 이미 만들어진 예약·채팅방은 남겨둔다.
     const { error: requestUpdateError } = await supabase
       .from("requests")
       .update({ status: "matched" })

@@ -1,10 +1,8 @@
-// 구인게시판 작성/수정 폼에서 공유하는 상수와 매핑 헬퍼.
 
 import { Home, Heart, PawPrint, Car } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { Pet, PetRow } from "./types";
 
-// 서비스(돌봄) 유형 — value는 requests.request_type 컬럼 값
 export const SERVICE_TYPES: { label: string; icon: LucideIcon; value: string }[] =
   [
     { label: "방문 돌봄", icon: Home, value: "care" },
@@ -25,7 +23,6 @@ export const SITTER_CONDITIONS = [
   "흡연자 제외",
 ];
 
-// animal_type 컬럼 값 → 표시 라벨/이모지
 export const ANIMAL_TYPE_MAP: Record<string, { label: string; emoji: string }> =
   {
     dog: { label: "강아지", emoji: "🐶" },
@@ -33,7 +30,6 @@ export const ANIMAL_TYPE_MAP: Record<string, { label: string; emoji: string }> =
     other: { label: "기타", emoji: "🐾" },
   };
 
-// GET /api/pets 응답 행을 폼 표시용 Pet으로 변환
 export function mapPetRow(p: PetRow): Pet {
   return {
     id: p.id,

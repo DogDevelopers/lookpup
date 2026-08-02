@@ -26,7 +26,6 @@ const SERVICE_KEY_TO_TYPE: Record<string, string> = {
   pickup: "픽업",
 };
 
-
 function formatDateRange(range: DateRange | undefined): string {
   if (!range?.from) return "-";
   if (!range.to || range.from.getTime() === range.to.getTime()) {
@@ -60,8 +59,6 @@ export default function StepPetService({
   }
   const selectedService = watch("selectedService");
 
-  // 표시 금액은 base_price가 아니라 '선택한 서비스'의 단가 × 일수로 계산한다.
-  // 실제 결제(features/reservations/actions.ts)와 동일한 매칭·폴백을 사용해 표시 금액 = 청구 금액을 보장.
   const matchedService =
     sitter.services.find(
       (s) => s.title === SERVICE_KEY_TO_TYPE[selectedService || "visit"],

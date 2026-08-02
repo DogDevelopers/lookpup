@@ -4,7 +4,6 @@ import HowItWorksSection from "@/features/about/components/HowItWorksSection";
 import FaqSection from "@/features/about/components/FaqSection";
 import CtaSection from "@/features/about/components/CtaSection";
 
-// TODO: wire isLoggedIn to real auth state (features/auth) once ported.
 export default function AboutPage() {
   const isLoggedIn = false;
 

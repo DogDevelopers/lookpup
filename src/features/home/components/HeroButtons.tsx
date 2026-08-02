@@ -4,7 +4,6 @@ interface HeroButtonsProps {
   isSitter?: boolean;
 }
 
-// TODO: wire isSitter to real auth/user state (features/auth) once ported.
 export default function HeroButtons({ isSitter = false }: HeroButtonsProps) {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4 mb-10">

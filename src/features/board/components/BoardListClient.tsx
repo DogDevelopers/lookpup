@@ -13,7 +13,6 @@ const CATEGORIES = ["전체", ...SERVICE_TYPES.map((s) => s.label)];
 const ITEMS_PER_PAGE = 5;
 const PAGE_WINDOW_SIZE = 5;
 
-// 컬럼 헤더와 목록 행이 동일한 폭으로 정렬되도록 그리드 템플릿을 공유
 const ROW_GRID_COLS = "sm:grid-cols-[100px_1fr_110px_150px_100px_90px_20px]";
 
 function PostRow({ post, index = 0 }: { post: PostListItem; index?: number }) {
@@ -117,7 +116,6 @@ export default function BoardListClient({
       searchQuery === "" ||
       p.title.includes(searchQuery) ||
       p.desc.includes(searchQuery);
-    // 모집 완료(matched) 글은 구인게시판 목록에는 숨기되, 검색 중일 때는 계속 찾을 수 있어야 함
     const visible = searchQuery !== "" || p.status !== "matched";
     return matchCategory && matchSearch && visible;
   });
