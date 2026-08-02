@@ -8,7 +8,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useBookingStore } from "@/stores/booking-store";
-import Footer from "@/components/layout/Footer";
 import { createPetsitterReservationRequest } from "@/features/reservations/actions";
 import {
   step1Schema,
@@ -190,7 +189,6 @@ export default function BookingClient({
         <main className="flex-1 bg-white min-h-screen flex items-center justify-center">
           <p className="text-stone-400 text-sm">불러오는 중...</p>
         </main>
-        <Footer />
       </>
     );
   }
@@ -203,7 +201,6 @@ export default function BookingClient({
             시터 정보를 불러올 수 없습니다.
           </p>
         </main>
-        <Footer />
       </>
     );
   }
@@ -345,8 +342,6 @@ export default function BookingClient({
           </div>
         </div>
       )}
-
-      <Footer />
     </>
   );
 }

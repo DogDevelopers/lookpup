@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import SectionCard from "@/components/common/SectionCard";
-import Footer from "@/components/layout/Footer";
 
 export type TitledItem = { title: string; text: string };
 export type ArticleItem = string | TitledItem;
@@ -145,8 +144,6 @@ export default function LegalPage({
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

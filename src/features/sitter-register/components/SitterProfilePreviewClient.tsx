@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Footer from "@/components/layout/Footer";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
 import SitterProfileCard from "@/components/common/SitterProfileCard";
@@ -285,7 +284,6 @@ export default function SitterProfilePreviewClient({ sitter }: { sitter: SitterD
         </div>
       </main>
 
-      <Footer />
       <div className="h-16 md:hidden" />
     </>
   );
