@@ -1131,6 +1131,7 @@ export type Database = {
       get_public_user_profiles: {
         Args: { user_ids: string[] }
         Returns: {
+          created_at: string
           full_name: string
           id: string
           is_verified: boolean

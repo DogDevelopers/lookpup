@@ -1,8 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { REQUEST_STATUS } from "@/lib/constants";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 import { SERVICE_TYPES } from "./constants";
 import { mapPetRow } from "./constants";
 import type {
+  Application,
   Pet,
   PostListItem,
   PostData,
@@ -81,15 +83,49 @@ export async function getRequestDetail(id: string): Promise<RequestDetail | null
     .from("requests")
     .select(
       `id, owner_id, title, content, start_datetime, end_datetime, budget, location, latitude, longitude, status, view_count, created_at, image_urls,
-       users:owner_id ( full_name, profile_image, is_verified, created_at ),
        pets:pet_id ( id, name, animal_type, breed ),
-       applications ( id, message, proposed_price, status, sitters ( id, users:user_id ( full_name, profile_image ) ) )`,
+       applications ( id, message, proposed_price, status, sitters ( id, user_id ) )`,
     )
     .eq("id", id)
     .maybeSingle();
 
   if (error || !data) return null;
-  return data as unknown as RequestDetail;
+
+  const row = data as unknown as Omit<RequestDetail, "users" | "applications"> & {
+    applications: (Omit<Application, "sitters"> & { sitters: { id: string; user_id: string } | null })[];
+  };
+
+  const profiles = await fetchPublicProfiles(supabase, [
+    row.owner_id,
+    ...row.applications.map((app) => app.sitters?.user_id),
+  ]);
+  const owner = profiles.get(row.owner_id);
+
+  return {
+    ...row,
+    users: owner
+      ? {
+          full_name: owner.full_name,
+          profile_image: owner.profile_image,
+          is_verified: owner.is_verified,
+          created_at: owner.created_at,
+        }
+      : null,
+    applications: row.applications.map((app) => {
+      const sitterProfile = app.sitters ? profiles.get(app.sitters.user_id) : undefined;
+      return {
+        ...app,
+        sitters: app.sitters
+          ? {
+              id: app.sitters.id,
+              users: sitterProfile
+                ? { full_name: sitterProfile.full_name, profile_image: sitterProfile.profile_image }
+                : null,
+            }
+          : null,
+      };
+    }),
+  };
 }
 
 export async function getOtherPostsByOwner(
@@ -135,14 +171,32 @@ export async function getMyRequests(): Promise<MyRequestRow[]> {
     .select(
       `id, title, status, request_type, start_datetime, end_datetime, budget, location, created_at,
        pets:pet_id ( name, animal_type ),
-       applications ( status, sitters ( users:user_id ( full_name ) ) ),
+       applications ( status, sitters ( user_id ) ),
        reservations ( status )`,
     )
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
-  return data as unknown as MyRequestRow[];
+
+  const rows = data as unknown as (Omit<MyRequestRow, "applications"> & {
+    applications: { status: string; sitters: { user_id: string } | null }[];
+  })[];
+
+  const profiles = await fetchPublicProfiles(
+    supabase,
+    rows.flatMap((row) => row.applications.map((app) => app.sitters?.user_id)),
+  );
+
+  return rows.map((row) => ({
+    ...row,
+    applications: row.applications.map((app) => ({
+      status: app.status,
+      sitters: app.sitters
+        ? { users: { full_name: profiles.get(app.sitters.user_id)?.full_name ?? null } }
+        : null,
+    })),
+  }));
 }
 
 export async function getUserPets(userId: string): Promise<Pet[]> {

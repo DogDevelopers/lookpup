@@ -3,8 +3,11 @@
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { RESERVATION_STATUS } from "@/lib/constants";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 import type { RoomApiItem, ChatMessagesPage, ReservationByRoomItem } from "@/features/chat/types";
 import type { ActionResult } from "./shared";
+
+type SitterEmbed = { user_id: string; rating: number | null } | null;
 
 export async function getChatRoomsData(): Promise<ActionResult<RoomApiItem[]>> {
   const supabase = await createClient();
@@ -26,12 +29,7 @@ export async function getChatRoomsData(): Promise<ActionResult<RoomApiItem[]>> {
     .select(
       `id, room_type, owner_id, sitter_id, reservation_id, request_id,
        last_message, last_message_at, owner_left, sitter_left,
-       owner:users!owner_id(full_name, profile_image),
-       sitter:sitters!sitter_id(
-         user_id,
-         rating,
-         sitter_user:users(full_name, profile_image)
-       ),
+       sitter:sitters!sitter_id(user_id, rating),
        request:requests!request_id(title, status, created_at)`,
     )
     .order("last_message_at", { ascending: false, nullsFirst: false });
@@ -102,14 +100,16 @@ export async function getChatRoomsData(): Promise<ActionResult<RoomApiItem[]>> {
     unreadCounts[room_id] = Number(count);
   });
 
+  const otherUserIdOf = (room: (typeof rooms)[number]) =>
+    room.owner_id === user.id ? (room.sitter as unknown as SitterEmbed)?.user_id : room.owner_id;
+
+  const profiles = await fetchPublicProfiles(supabase, rooms.map(otherUserIdOf));
+
   const result: RoomApiItem[] = rooms.map((room) => {
     const isOwner = room.owner_id === user.id;
-    const owner = room.owner as unknown as { full_name: string | null; profile_image: string | null } | null;
-    const sitter = room.sitter as unknown as {
-      user_id: string;
-      rating: number | null;
-      sitter_user: { full_name: string | null; profile_image: string | null } | null;
-    } | null;
+    const sitter = room.sitter as unknown as SitterEmbed;
+    const otherUserId = otherUserIdOf(room);
+    const other = otherUserId ? profiles.get(otherUserId) : undefined;
     const request = room.request as unknown as {
       title: string | null;
       status: string | null;
@@ -121,12 +121,8 @@ export async function getChatRoomsData(): Promise<ActionResult<RoomApiItem[]>> {
       room_type: room.room_type as RoomApiItem["room_type"],
       owner_id: room.owner_id,
       sitter_id: room.sitter_id,
-      other_user_full_name: isOwner
-        ? (sitter?.sitter_user?.full_name ?? "")
-        : (owner?.full_name ?? ""),
-      other_user_profile_image: isOwner
-        ? (sitter?.sitter_user?.profile_image ?? null)
-        : (owner?.profile_image ?? null),
+      other_user_full_name: other?.full_name ?? "",
+      other_user_profile_image: other?.profile_image ?? null,
       sitter_rating: sitter?.rating ?? null,
       unread_count: unreadCounts[room.id] ?? 0,
       reservation_id: room.reservation_id,

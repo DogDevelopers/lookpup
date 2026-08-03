@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { getServerEnv } from "@/lib/env";
 import { RESERVATION_STATUS, EXTRA_CHARGE_STATUS, PAYMENT_STATUS } from "@/lib/constants";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 
 type PayMethod = "CARD" | "VIRTUAL_ACCOUNT" | "TRANSFER";
 
@@ -20,6 +21,17 @@ export type CreateExtraPaymentResult =
 export type CancelPaymentResult =
   | { ok: true; canceledAmount: number }
   | { ok: false; error: string };
+
+async function sitterName(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  sitters: unknown,
+): Promise<string> {
+  const sitter = sitters as { user_id: string } | null;
+  if (!sitter) return "펫시터";
+
+  const profiles = await fetchPublicProfiles(supabase, [sitter.user_id]);
+  return profiles.get(sitter.user_id)?.full_name ?? "펫시터";
+}
 
 export async function getActiveReservationBySitter(
   sitterId: string,
@@ -59,7 +71,7 @@ export async function createPayment(
 
   const { data: reservation } = await supabase
     .from("reservations")
-    .select("id, owner_id, sitter_id, total_price, status, sitters(users(full_name))")
+    .select("id, owner_id, sitter_id, total_price, status, sitters(user_id)")
     .eq("id", reservationId)
     .maybeSingle();
 
@@ -107,8 +119,7 @@ export async function createPayment(
     .update({ platform_fee: platformFee, settle_amount: settleAmount })
     .eq("id", inserted.id);
 
-  const sitter = reservation.sitters as unknown as { users: { full_name: string | null } | null } | null;
-  const orderName = `${sitter?.users?.full_name ?? "펫시터"} 펫시팅 서비스`;
+  const orderName = `${await sitterName(supabase, reservation.sitters)} 펫시팅 서비스`;
 
   return { ok: true, paymentId, amount, orderName };
 }
@@ -136,7 +147,7 @@ export async function createExtraPayment(
 
   const { data: reservation } = await supabase
     .from("reservations")
-    .select("id, sitter_id, status, sitters(users(full_name))")
+    .select("id, sitter_id, status, sitters(user_id)")
     .eq("id", pendingCharge.reservation_id)
     .maybeSingle();
 
@@ -186,8 +197,7 @@ export async function createExtraPayment(
     })
     .eq("id", pendingCharge.id);
 
-  const sitter = reservation.sitters as unknown as { users: { full_name: string | null } | null } | null;
-  const orderName = `${sitter?.users?.full_name ?? "펫시터"} 펫시팅 추가 서비스`;
+  const orderName = `${await sitterName(supabase, reservation.sitters)} 펫시팅 추가 서비스`;
 
   return { ok: true, paymentId, amount, orderName, reason: pendingCharge.reason };
 }
