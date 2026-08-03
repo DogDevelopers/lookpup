@@ -46,20 +46,19 @@ import type { RoomApiItem, ChatMessageRow, Tab, SelectedKind, Badge, Message } f
 import { createCareRecord, getInProgressReservationByOwnerAndSitter } from "@/features/care-records/actions";
 import { RESERVATION_STATUS, APPLICATION_STATUS } from "@/lib/constants";
 
+const WEEKDAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
+
 function withDateSeparators(msgs: Message[]): Message[] {
   const result: Message[] = [];
   let lastDateKey: string | null = null;
   for (const msg of msgs) {
     if (msg.rawDate) {
-      const d = new Date(msg.rawDate);
+      const d = new Date(
+        new Date(msg.rawDate).toLocaleString("en-US", { timeZone: "Asia/Seoul" }),
+      );
       const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
       if (key !== lastDateKey) {
-        const label = d.toLocaleDateString("ko-KR", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          weekday: "long",
-        });
+        const label = `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일 ${WEEKDAY_LABELS[d.getDay()]}요일`;
         result.push({ id: `__date_${key}__`, from: "date_separator", text: label });
         lastDateKey = key;
       }
