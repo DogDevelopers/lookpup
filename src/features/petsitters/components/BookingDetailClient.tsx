@@ -3,11 +3,13 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Clock, MapPin, Star, MessageCircle, BadgeCheck, ClipboardList, FileText } from "lucide-react";
+import { Calendar, Clock, MapPin, Star, MessageCircle, BadgeCheck, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
+import CareRecordTimeline from "@/features/care-records/components/CareRecordTimeline";
+import type { CareRecord } from "@/features/care-records/actions";
 import { cancelReservation } from "@/features/reservations/actions";
 import type { ReservationDetail, ReservationUiStatus } from "@/features/reservations/types";
 
@@ -70,19 +72,13 @@ function ReviewSection({ reviewWritten, bookingId }: { reviewWritten: boolean; b
   );
 }
 
-function CareRecordTimeline() {
-  return (
-    <SectionCard className="px-6 py-5 gap-0">
-      <div className="flex items-center gap-2 mb-5">
-        <ClipboardList size={18} className="text-orange-500" />
-        <h3 className="text-sm font-semibold text-stone-900">돌봄 기록</h3>
-      </div>
-      <p className="text-sm text-gray-500 text-center py-4">아직 등록된 돌봄 기록이 없어요</p>
-    </SectionCard>
-  );
-}
-
-export default function BookingDetailClient({ booking: initialBooking }: { booking: ReservationDetail }) {
+export default function BookingDetailClient({
+  booking: initialBooking,
+  careRecords,
+}: {
+  booking: ReservationDetail;
+  careRecords: CareRecord[];
+}) {
   const [booking, setBooking] = useState(initialBooking);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -235,7 +231,7 @@ export default function BookingDetailClient({ booking: initialBooking }: { booki
             </div>
           </SectionCard>
 
-          <CareRecordTimeline />
+          <CareRecordTimeline records={careRecords} />
 
           {booking.status === "completed" && <ReviewSection reviewWritten={booking.reviewWritten} bookingId={booking.id} />}
 
