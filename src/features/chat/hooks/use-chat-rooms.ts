@@ -43,10 +43,14 @@ function isReservationStatusChangeMessage(content: string): boolean {
 
 function formatTime(iso: string | null): string {
   if (!iso) return "";
-  return new Date(iso).toLocaleTimeString("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const d = new Date(
+    new Date(iso).toLocaleString("en-US", { timeZone: "Asia/Seoul" }),
+  );
+  const hours24 = d.getHours();
+  const period = hours24 < 12 ? "오전" : "오후";
+  const hours12 = hours24 % 12 || 12;
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${period} ${hours12}:${minutes}`;
 }
 
 export interface Post {
@@ -62,10 +66,14 @@ function formatRoomSub(r: RoomApiItem, fallback = "1:1 채팅"): string {
     return fallback;
   }
   const date = r.reservation_start_datetime
-    ? new Date(r.reservation_start_datetime).toLocaleDateString("ko-KR", {
-        month: "numeric",
-        day: "numeric",
-      })
+    ? (() => {
+        const d = new Date(
+          new Date(r.reservation_start_datetime).toLocaleString("en-US", {
+            timeZone: "Asia/Seoul",
+          }),
+        );
+        return `${d.getMonth() + 1}. ${d.getDate()}.`;
+      })()
     : null;
   const parts = [
     r.reservation_service_title,
@@ -338,6 +346,29 @@ export function useChatRooms(
         }
       },
     );
+
+    if (mySitterId) {
+      channel = channel.on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "chat_rooms",
+          filter: `sitter_id=eq.${mySitterId}`,
+        },
+        (payload) => {
+          const updated = payload.new as { id?: string; room_type?: string };
+          if (
+            updated?.room_type === "direct" &&
+            updated.id &&
+            reservationRequestIdsRef.current.has(updated.id)
+          ) {
+            refresh();
+            setAcceptedDirectRoomId(updated.id);
+          }
+        },
+      );
+    }
 
     channel.subscribe();
     return () => {
