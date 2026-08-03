@@ -115,7 +115,6 @@ function reviewWasWritten(review: unknown): boolean {
 
 type PublicProfile = { full_name: string; profile_image: string; is_verified: boolean };
 
-// users의 SELECT 정책은 본인 행만 허용하므로 상대방 프로필은 중첩 조인으로 못 읽는다.
 async function fetchPublicProfiles(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userIds: (string | null | undefined)[],
