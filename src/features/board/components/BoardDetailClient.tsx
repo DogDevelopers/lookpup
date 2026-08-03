@@ -80,7 +80,6 @@ function formatJoinDate(dateStr: string) {
 }
 
 interface BoardDetailClientProps {
-  id: string;
   initialPost?: RequestDetail | null;
   initialOtherPosts?: OtherPost[];
   currentUserId?: string;
@@ -90,7 +89,6 @@ interface BoardDetailClientProps {
 }
 
 export default function BoardDetailClient({
-  id: _id,
   initialPost,
   initialOtherPosts,
   currentUserId,

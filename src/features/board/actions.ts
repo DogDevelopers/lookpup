@@ -118,3 +118,12 @@ export async function deleteRequest(id: string): Promise<ActionResult> {
   revalidatePath("/board");
   return { ok: true, data: undefined };
 }
+
+// 비로그인 방문자의 조회도 집계하므로 인증을 요구하지 않는다.
+// RPC가 view_count 외의 컬럼은 건드리지 않아 다른 필드 위변조 경로가 되지 않는다.
+export async function incrementRequestViewCount(id: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("increment_request_view_count", { p_id: id });
+  if (error) return { ok: false, error: "조회수 반영에 실패했습니다." };
+  return { ok: true, data: undefined };
+}
