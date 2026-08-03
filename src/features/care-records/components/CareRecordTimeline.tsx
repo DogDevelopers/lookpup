@@ -7,7 +7,9 @@ import type { CareRecord } from "@/features/care-records/actions";
 
 const fieldsSchema = z.record(z.string(), z.string());
 
-const CONFIG_BY_TYPE = new Map(CARE_RECORD_TYPES.map((c) => [c.type as string, c]));
+const CONFIG_BY_TYPE = new Map(
+  CARE_RECORD_TYPES.map((c) => [c.type as string, c]),
+);
 
 const dateTimeFormat = new Intl.DateTimeFormat("ko-KR", {
   timeZone: "Asia/Seoul",
@@ -17,7 +19,6 @@ const dateTimeFormat = new Intl.DateTimeFormat("ko-KR", {
   minute: "2-digit",
 });
 
-/** memo는 content로 따로 노출되고, photo는 image_urls로 렌더되므로 필드 목록에서 제외한다. */
 function visibleFields(record: CareRecord) {
   const parsed = fieldsSchema.safeParse(record.fields);
   if (!parsed.success) return [];
@@ -31,7 +32,13 @@ function visibleFields(record: CareRecord) {
     .filter((f) => f.value.trim().length > 0);
 }
 
-function CareRecordItem({ record, last }: { record: CareRecord; last: boolean }) {
+function CareRecordItem({
+  record,
+  last,
+}: {
+  record: CareRecord;
+  last: boolean;
+}) {
   const config = CONFIG_BY_TYPE.get(record.type);
   const fields = visibleFields(record);
 
@@ -46,7 +53,9 @@ function CareRecordItem({ record, last }: { record: CareRecord; last: boolean })
 
       <div className={`flex-1 min-w-0 ${last ? "" : "pb-5"}`}>
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-sm font-semibold text-stone-900">{record.title}</span>
+          <span className="text-sm font-semibold text-stone-900">
+            {record.title}
+          </span>
           <span className="text-[11px] text-gray-500 shrink-0">
             {dateTimeFormat.format(new Date(record.created_at))}
           </span>
@@ -75,8 +84,17 @@ function CareRecordItem({ record, last }: { record: CareRecord; last: boolean })
         {record.image_urls.length > 0 && (
           <div className="mt-3 grid grid-cols-3 gap-2">
             {record.image_urls.map((url) => (
-              <div key={url} className="relative aspect-square rounded-xl overflow-hidden bg-orange-50">
-                <Image src={url} alt={record.title} fill sizes="120px" className="object-cover" />
+              <div
+                key={url}
+                className="relative aspect-square rounded-xl overflow-hidden bg-orange-50"
+              >
+                <Image
+                  src={url}
+                  alt={record.title}
+                  fill
+                  sizes="120px"
+                  className="object-cover"
+                />
               </div>
             ))}
           </div>
@@ -86,7 +104,11 @@ function CareRecordItem({ record, last }: { record: CareRecord; last: boolean })
   );
 }
 
-export default function CareRecordTimeline({ records }: { records: CareRecord[] }) {
+export default function CareRecordTimeline({
+  records,
+}: {
+  records: CareRecord[];
+}) {
   return (
     <SectionCard className="px-6 py-5 gap-0">
       <div className="flex items-center gap-2 mb-5">
@@ -98,11 +120,17 @@ export default function CareRecordTimeline({ records }: { records: CareRecord[] 
       </div>
 
       {records.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-4">아직 등록된 돌봄 기록이 없어요</p>
+        <p className="text-sm text-gray-500 text-center py-4">
+          아직 등록된 돌봄 기록이 없어요
+        </p>
       ) : (
         <ol>
           {records.map((record, i) => (
-            <CareRecordItem key={record.id} record={record} last={i === records.length - 1} />
+            <CareRecordItem
+              key={record.id}
+              record={record}
+              last={i === records.length - 1}
+            />
           ))}
         </ol>
       )}
