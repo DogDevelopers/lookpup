@@ -13,6 +13,7 @@ import {
 } from "@/lib/chat-rooms";
 import { RESERVATION_STATUS, ROOM_TYPE } from "@/lib/constants";
 import { isOverlapViolation } from "@/lib/db-errors";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 import {
   RESERVATION_REQUEST_PREFIX,
   RESERVATION_ACCEPTED_PREFIX,
@@ -111,19 +112,6 @@ function bookingNumber(id: string, createdAt: string) {
 
 function reviewWasWritten(review: unknown): boolean {
   return Array.isArray(review) ? review.length > 0 : review != null;
-}
-
-type PublicProfile = { full_name: string; profile_image: string; is_verified: boolean };
-
-async function fetchPublicProfiles(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  userIds: (string | null | undefined)[],
-): Promise<Map<string, PublicProfile>> {
-  const ids = [...new Set(userIds.filter((id): id is string => !!id))];
-  if (!ids.length) return new Map();
-
-  const { data } = await supabase.rpc("get_public_user_profiles", { user_ids: ids });
-  return new Map((data ?? []).map((p) => [p.id, p]));
 }
 
 type SitterEmbed = { user_id: string; available_area: string | null; rating: number | null } | null;
