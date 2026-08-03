@@ -11,18 +11,6 @@ type ActionResult = { ok: true } | { ok: false; error: string };
 
 const REVIEW_WINDOW_DAYS = 7;
 
-async function recalculateSitterRating(sitterId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data: rows } = await supabase.from("reviews").select("rating").eq("sitter_id", sitterId);
-  if (!rows) return;
-
-  const avg = rows.length > 0 ? rows.reduce((sum, r) => sum + r.rating, 0) / rows.length : 0;
-  await supabase
-    .from("sitters")
-    .update({ rating: Math.round(avg * 10) / 10 })
-    .eq("id", sitterId);
-}
-
 export async function createReview(input: ReviewCreateInput): Promise<ActionResult> {
   const parsed = reviewCreateSchema.safeParse(input);
   if (!parsed.success) {
@@ -71,8 +59,6 @@ export async function createReview(input: ReviewCreateInput): Promise<ActionResu
 
   if (error) return { ok: false, error: "후기 등록에 실패했습니다." };
 
-  await recalculateSitterRating(reservation.sitter_id);
-
   revalidatePath("/myprofile/reviews");
   revalidatePath("/myprofile/booking-history");
   revalidatePath(`/myprofile/booking-history/${reservation.id}`);
@@ -95,8 +81,6 @@ export async function deleteReview(id: string): Promise<ActionResult> {
 
   const { error } = await supabase.from("reviews").delete().eq("id", id);
   if (error) return { ok: false, error: "후기 삭제에 실패했습니다." };
-
-  await recalculateSitterRating(review.sitter_id);
 
   revalidatePath("/myprofile/reviews");
   return { ok: true };
