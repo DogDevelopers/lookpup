@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { reviewCreateSchema, type ReviewCreateInput } from "@/features/reviews/schema";
-import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
+import type { WrittenReview, ReceivedReview, ReservationReview } from "@/features/reviews/types";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -131,6 +131,33 @@ export async function getMyWrittenReviews(): Promise<WrittenReview[]> {
       sitter_profile_image: sitter?.users?.profile_image ?? null,
     };
   });
+}
+
+export async function getReviewByReservationId(reservationId: string): Promise<ReservationReview | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from("reviews")
+    .select("id, rating, content, image_urls, tags, detail_ratings, created_at")
+    .eq("reservation_id", reservationId)
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    rating: data.rating,
+    content: data.content,
+    image_urls: (data.image_urls as string[]) ?? [],
+    tags: (data.tags as string[]) ?? [],
+    detail_ratings: (data.detail_ratings as Record<string, number>) ?? {},
+    created_at: data.created_at ?? "",
+  };
 }
 
 export async function getReviewedReservationIds(ids: string[]): Promise<string[]> {
