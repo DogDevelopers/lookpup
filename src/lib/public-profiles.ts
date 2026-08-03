@@ -3,7 +3,12 @@ import type { Database } from "@/types/database.types";
 
 type Supabase = SupabaseClient<Database>;
 
-export type PublicProfile = { full_name: string; profile_image: string; is_verified: boolean };
+export type PublicProfile = {
+  full_name: string;
+  profile_image: string;
+  is_verified: boolean;
+  created_at: string;
+};
 
 export async function fetchPublicProfiles(
   supabase: Supabase,
