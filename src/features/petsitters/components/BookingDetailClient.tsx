@@ -3,23 +3,65 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Clock, MapPin, Star, MessageCircle, BadgeCheck, FileText } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Star,
+  MessageCircle,
+  BadgeCheck,
+  FileText,
+} from "lucide-react";
 import { toast } from "sonner";
-import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
+import {
+  MobileBackButton,
+  DesktopBackButton,
+} from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
 import CareRecordTimeline from "@/features/care-records/components/CareRecordTimeline";
 import type { CareRecord } from "@/features/care-records/actions";
 import type { ReservationReview } from "@/features/reviews/types";
 import { cancelReservation } from "@/features/reservations/actions";
-import type { ReservationDetail, ReservationUiStatus } from "@/features/reservations/types";
+import type {
+  ReservationDetail,
+  ReservationUiStatus,
+} from "@/features/reservations/types";
 
-const STATUS_CONFIG: Record<ReservationUiStatus, { label: string; bg: string; text: string; border: string }> = {
-  pending: { label: "예약 요청", bg: "#F3F4F6", text: "#6B7280", border: "#E5E7EB" },
-  confirmed: { label: "예약 확정", bg: "#EFF6FF", text: "#1D4ED8", border: "#BFDBFE" },
-  "in-progress": { label: "진행중", bg: "#FFF7ED", text: "#EA580C", border: "#FED7AA" },
-  completed: { label: "완료", bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0" },
-  cancelled: { label: "취소", bg: "#FEF2F2", text: "#DC2626", border: "#FECACA" },
+const STATUS_CONFIG: Record<
+  ReservationUiStatus,
+  { label: string; bg: string; text: string; border: string }
+> = {
+  pending: {
+    label: "예약 요청",
+    bg: "#F3F4F6",
+    text: "#6B7280",
+    border: "#E5E7EB",
+  },
+  confirmed: {
+    label: "예약 확정",
+    bg: "#EFF6FF",
+    text: "#1D4ED8",
+    border: "#BFDBFE",
+  },
+  "in-progress": {
+    label: "진행중",
+    bg: "#FFF7ED",
+    text: "#EA580C",
+    border: "#FED7AA",
+  },
+  completed: {
+    label: "완료",
+    bg: "#F0FDF4",
+    text: "#16A34A",
+    border: "#BBF7D0",
+  },
+  cancelled: {
+    label: "취소",
+    bg: "#FEF2F2",
+    text: "#DC2626",
+    border: "#FECACA",
+  },
 };
 
 const SERVICE_BADGE_COLOR: Record<string, string> = {
@@ -41,14 +83,24 @@ function StarRow({ value, size }: { value: number; size: number }) {
         <Star
           key={s}
           size={size}
-          className={s <= value ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"}
+          className={
+            s <= value
+              ? "fill-yellow-400 text-yellow-400"
+              : "fill-gray-200 text-gray-200"
+          }
         />
       ))}
     </div>
   );
 }
 
-function ReviewSection({ review, bookingId }: { review: ReservationReview | null; bookingId: string }) {
+function ReviewSection({
+  review,
+  bookingId,
+}: {
+  review: ReservationReview | null;
+  bookingId: string;
+}) {
   if (!review) {
     return (
       <div className="bg-white border-2 border-[var(--color-orange-500)] rounded-2xl p-6">
@@ -57,8 +109,12 @@ function ReviewSection({ review, bookingId }: { review: ReservationReview | null
             <Star size={20} className="text-orange-500" />
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-stone-900 mb-1">후기를 남겨주세요</p>
-            <p className="text-sm text-gray-500">소중한 경험을 다른 보호자와 공유해주세요</p>
+            <p className="font-semibold text-stone-900 mb-1">
+              후기를 남겨주세요
+            </p>
+            <p className="text-sm text-gray-500">
+              소중한 경험을 다른 보호자와 공유해주세요
+            </p>
           </div>
         </div>
         <Link
@@ -87,7 +143,9 @@ function ReviewSection({ review, bookingId }: { review: ReservationReview | null
 
       <div className="flex items-center gap-2 mb-4">
         <StarRow value={review.rating} size={16} />
-        <span className="text-sm text-gray-500">{review.rating.toFixed(1)}</span>
+        <span className="text-sm text-gray-500">
+          {review.rating.toFixed(1)}
+        </span>
       </div>
 
       {Object.keys(review.detail_ratings).length > 0 && (
@@ -104,8 +162,17 @@ function ReviewSection({ review, bookingId }: { review: ReservationReview | null
       {review.image_urls.length > 0 && (
         <div className="grid grid-cols-3 gap-2 mt-4">
           {review.image_urls.map((url) => (
-            <div key={url} className="relative aspect-square rounded-xl overflow-hidden bg-orange-50">
-              <Image src={url} alt="후기 사진" fill sizes="120px" className="object-cover" />
+            <div
+              key={url}
+              className="relative aspect-square rounded-xl overflow-hidden bg-orange-50"
+            >
+              <Image
+                src={url}
+                alt="후기 사진"
+                fill
+                sizes="120px"
+                className="object-cover"
+              />
             </div>
           ))}
         </div>
@@ -188,20 +255,29 @@ export default function BookingDetailClient({
               <div className="flex items-center gap-2">
                 <span
                   className="text-xs font-semibold px-3 py-1 rounded-full text-stone-900"
-                  style={{ background: SERVICE_BADGE_COLOR[booking.serviceType] ?? "#FFF7ED" }}
+                  style={{
+                    background:
+                      SERVICE_BADGE_COLOR[booking.serviceType] ?? "#FFF7ED",
+                  }}
                 >
                   {booking.serviceType}
                 </span>
                 <span
                   className="text-xs font-semibold px-3 py-1 rounded-full border"
-                  style={{ background: status.bg, color: status.text, borderColor: status.border }}
+                  style={{
+                    background: status.bg,
+                    color: status.text,
+                    borderColor: status.border,
+                  }}
                 >
                   {status.label}
                 </span>
               </div>
               <div className="flex flex-col items-end">
                 <span className="text-[11px] text-gray-500">총 결제 금액</span>
-                <span className="font-bold text-orange-500">{booking.price.toLocaleString()}원</span>
+                <span className="font-bold text-orange-500">
+                  {booking.price.toLocaleString()}원
+                </span>
               </div>
             </div>
             <div className="space-y-2">
@@ -221,7 +297,9 @@ export default function BookingDetailClient({
           </SectionCard>
 
           <SectionCard className="px-6 py-5 gap-0">
-            <h3 className="text-sm font-semibold text-gray-500 mb-4">반려동물 정보</h3>
+            <h3 className="text-sm font-semibold text-gray-500 mb-4">
+              반려동물 정보
+            </h3>
             <div className="flex items-center gap-4">
               <div
                 className="relative w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0 overflow-hidden"
@@ -242,31 +320,48 @@ export default function BookingDetailClient({
               <div className="grid grid-cols-2 gap-x-8 gap-y-2 flex-1">
                 <div>
                   <p className="text-xs text-gray-500">이름</p>
-                  <p className="text-sm font-semibold text-stone-900">{booking.pet.name}</p>
+                  <p className="text-sm font-semibold text-stone-900">
+                    {booking.pet.name}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">품종</p>
-                  <p className="text-sm font-semibold text-stone-900">{booking.pet.breed}</p>
+                  <p className="text-sm font-semibold text-stone-900">
+                    {booking.pet.breed}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">나이</p>
-                  <p className="text-sm font-semibold text-stone-900">{booking.pet.age}살</p>
+                  <p className="text-sm font-semibold text-stone-900">
+                    {booking.pet.age}살
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">몸무게</p>
-                  <p className="text-sm font-semibold text-stone-900">{booking.pet.weight}kg</p>
+                  <p className="text-sm font-semibold text-stone-900">
+                    {booking.pet.weight}kg
+                  </p>
                 </div>
               </div>
             </div>
           </SectionCard>
 
           <SectionCard className="px-6 py-5 gap-0">
-            <h3 className="text-sm font-semibold text-gray-500 mb-4">펫시터 정보</h3>
+            <h3 className="text-sm font-semibold text-gray-500 mb-4">
+              펫시터 정보
+            </h3>
             <div className="flex items-center gap-4">
-              <Avatar initial={booking.sitter.name.charAt(0)} src={booking.sitter.image} size="md" variant="orange" />
+              <Avatar
+                initial={booking.sitter.name.charAt(0)}
+                src={booking.sitter.image}
+                size="md"
+                variant="orange"
+              />
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-stone-900">{booking.sitter.name}</span>
+                  <span className="font-semibold text-stone-900">
+                    {booking.sitter.name}
+                  </span>
                   {booking.sitter.certified && (
                     <span className="flex items-center gap-1 text-xs text-[#1976D2] bg-[#E3F2FD] px-2 py-0.5 rounded-full">
                       <BadgeCheck size={11} />
@@ -276,8 +371,12 @@ export default function BookingDetailClient({
                 </div>
                 <div className="flex items-center gap-1">
                   <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-semibold">{booking.sitter.rating}</span>
-                  <span className="text-xs text-gray-500">({booking.sitter.reviewCount}건)</span>
+                  <span className="text-sm font-semibold">
+                    {booking.sitter.rating}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    ({booking.sitter.reviewCount}건)
+                  </span>
                 </div>
               </div>
               {(booking.status === "in-progress" ||
@@ -296,14 +395,22 @@ export default function BookingDetailClient({
 
           <CareRecordTimeline records={careRecords} />
 
-          {booking.status === "completed" && <ReviewSection review={review} bookingId={booking.id} />}
+          {booking.status === "completed" && (
+            <ReviewSection review={review} bookingId={booking.id} />
+          )}
 
           {(booking.status === "pending" || booking.status === "confirmed") && (
             <>
-              {cancelError && <p className="text-xs text-red-500 text-center">{cancelError}</p>}
+              {cancelError && (
+                <p className="text-xs text-red-500 text-center">
+                  {cancelError}
+                </p>
+              )}
               {cancelConfirm ? (
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm text-center text-gray-500">정말 예약을 취소할까요? 되돌릴 수 없습니다.</p>
+                  <p className="text-sm text-center text-gray-500">
+                    정말 예약을 취소할까요? 되돌릴 수 없습니다.
+                  </p>
                   <div className="flex gap-2">
                     <button
                       type="button"

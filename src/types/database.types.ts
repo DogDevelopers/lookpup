@@ -1133,6 +1133,7 @@ export type Database = {
         Returns: {
           full_name: string
           id: string
+          is_verified: boolean
           profile_image: string
         }[]
       }
