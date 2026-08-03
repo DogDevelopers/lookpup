@@ -12,12 +12,19 @@ import { MapPin, ChevronLeft, Eye } from "lucide-react";
 import StarRow from "@/components/ui/StarRow";
 import StatGrid from "@/components/ui/StatGrid";
 import { ImageLightbox } from "@/components/common/ImageGallery";
-import type { SitterDetail } from "@/features/petsitters/types";
+import SitterReviewTab from "@/features/petsitters/components/SitterReviewTab";
+import type { ReviewRow, SitterDetail } from "@/features/petsitters/types";
 
 const TABS = ["소개", "서비스", "후기", "위치"] as const;
 type Tab = (typeof TABS)[number];
 
-export default function SitterProfilePreviewClient({ sitter }: { sitter: SitterDetail }) {
+export default function SitterProfilePreviewClient({
+  sitter,
+  reviews,
+}: {
+  sitter: SitterDetail;
+  reviews: ReviewRow[];
+}) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("소개");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -28,7 +35,6 @@ export default function SitterProfilePreviewClient({ sitter }: { sitter: SitterD
   ];
 
   const areaText = sitter.display_area ?? sitter.available_area ?? "-";
-  const ratingCounts = [5, 4, 3, 2, 1].map((r) => ({ r, count: 0 }));
 
   const renderTabContent = () => (
     <>
@@ -104,31 +110,7 @@ export default function SitterProfilePreviewClient({ sitter }: { sitter: SitterD
       )}
 
       {activeTab === "후기" && (
-        <div className="flex flex-col gap-4">
-          <SectionCard className="p-6 gap-0">
-            <div className="flex items-center gap-8">
-              <div className="text-center">
-                <p className="text-5xl font-bold text-orange-500 mb-1">{sitter.rating.toFixed(1)}</p>
-                <div className="flex items-center gap-0.5 justify-center mb-1">
-                  <StarRow size={14} count={Math.round(sitter.rating)} />
-                </div>
-                <p className="text-xs text-gray-400">{sitter.review_count}개 리뷰</p>
-              </div>
-              <div className="flex-1 flex flex-col gap-2">
-                {ratingCounts.map(({ r, count }) => (
-                  <div key={r} className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500 w-6">{r}점</span>
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-400 rounded-full" style={{ width: "0%" }} />
-                    </div>
-                    <span className="text-xs text-gray-400 w-4 text-right">{count}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </SectionCard>
-          <div className="flex items-center justify-center py-10 text-gray-400 text-sm">아직 후기가 없습니다.</div>
-        </div>
+        <SitterReviewTab reviews={reviews} rating={sitter.rating} reviewCount={sitter.review_count} />
       )}
 
       {activeTab === "위치" && (
