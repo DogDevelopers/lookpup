@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { PAYMENT_STATUS } from "@/lib/constants";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 import type {
   EarningsData,
   EarningsPaymentRow,
@@ -60,7 +61,7 @@ export async function getMyEarnings(): Promise<EarningsData> {
       .from("payments")
       .select(
         `id, reservation_id, amount, settle_amount, platform_fee, status, paid_at, settled_at, auto_confirm_at,
-         reservations(created_at, start_datetime, services(title), owner:users!owner_id(full_name))`,
+         reservations(created_at, start_datetime, owner_id, services(title))`,
       )
       .eq("sitter_id", sitter.id)
       .in("status", [
@@ -77,20 +78,27 @@ export async function getMyEarnings(): Promise<EarningsData> {
       .maybeSingle(),
   ]);
 
+  type ReservationEmbed = {
+    created_at: string | null;
+    start_datetime: string | null;
+    owner_id: string;
+    services: { title: string | null } | null;
+  } | null;
+
+  const profiles = await fetchPublicProfiles(
+    supabase,
+    (paymentRows ?? []).map((row) => (row.reservations as unknown as ReservationEmbed)?.owner_id),
+  );
+
   const rows: EarningsPaymentRow[] = (paymentRows ?? []).map((row) => {
-    const reservation = row.reservations as unknown as {
-      created_at: string | null;
-      start_datetime: string | null;
-      services: { title: string | null } | null;
-      owner: { full_name: string | null } | null;
-    } | null;
+    const reservation = row.reservations as unknown as ReservationEmbed;
 
     return {
       id: row.id,
       reservationId: row.reservation_id,
       bookingNo: bookingNumber(row.reservation_id, reservation?.created_at ?? null),
       careDate: reservation?.start_datetime ?? null,
-      ownerName: reservation?.owner?.full_name ?? "-",
+      ownerName: (reservation ? profiles.get(reservation.owner_id) : undefined)?.full_name ?? "-",
       serviceType: reservation?.services?.title ?? "-",
       amount: row.amount,
       settleAmount: row.settle_amount,
