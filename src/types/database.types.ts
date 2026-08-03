@@ -1152,6 +1152,7 @@ export type Database = {
           room_id: string
         }[]
       }
+      increment_request_view_count: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       search_reportable_users: {
         Args: { p_query: string }
