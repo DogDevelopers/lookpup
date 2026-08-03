@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Star, Camera, AlertCircle, PawPrint, BadgeCheck } from "lucide-react";
+import { Star, Camera, AlertCircle, PawPrint, BadgeCheck, X, Loader2 } from "lucide-react";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import { CustomModal } from "@/components/common/CustomModal";
 import Avatar from "@/components/ui/Avatar";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { createReview } from "@/features/reviews/actions";
 import type { ReservationDetail } from "@/features/reservations/types";
 
@@ -85,47 +87,107 @@ function DetailRatingRow({
   );
 }
 
-function PhotoUploadSlots({ onAdd, maxPhotos = 5, columns = 4, slotWidth = 129, slotHeight = 136 }: {
+function PhotoRemoveButton({ onClick, index }: { onClick: () => void; index: number }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={`사진 ${index + 1} 삭제`}
+      className="absolute -top-2 -right-2 size-6 bg-red-500 rounded-full flex items-center justify-center shadow-sm z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-1"
+    >
+      <X size={13} className="text-white" />
+    </button>
+  );
+}
+
+function PhotoUploadSlots({ urls, uploadingCount, onAdd, onRemove, maxPhotos = 5, columns = 4, slotWidth = 129, slotHeight = 136 }: {
+  urls: string[];
+  uploadingCount: number;
   onAdd: () => void;
+  onRemove: (index: number) => void;
   maxPhotos?: number;
   columns?: number;
   slotWidth?: number;
   slotHeight?: number;
 }) {
+  const used = urls.length + uploadingCount;
+  const showAdd = used < maxPhotos;
+  const slotStyle = { width: slotWidth, height: slotHeight };
+
   return (
     <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${columns}, ${slotWidth}px)` }}>
-      <button
-        type="button"
-        onClick={onAdd}
-        style={{ width: slotWidth, height: slotHeight }}
-        className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-100 hover:border-orange-500/60 hover:bg-orange-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
-      >
-        <Camera size={28} className="text-orange-500" />
-        <span className="text-xs text-gray-500">사진 추가</span>
-      </button>
-      {Array.from({ length: maxPhotos - 1 }).map((_, idx) => (
-        <div key={idx} style={{ width: slotWidth, height: slotHeight }} className="rounded-xl border-2 border-dashed border-orange-100 bg-orange-50" />
+      {urls.map((url, idx) => (
+        <div key={url} className="relative" style={slotStyle}>
+          <Image src={url} alt={`후기 사진 ${idx + 1}`} fill sizes="200px" className="rounded-xl object-cover" />
+          <PhotoRemoveButton index={idx} onClick={() => onRemove(idx)} />
+        </div>
+      ))}
+      {Array.from({ length: uploadingCount }).map((_, idx) => (
+        <div key={`uploading-${idx}`} style={slotStyle} className="flex items-center justify-center rounded-xl border-2 border-dashed border-orange-100 bg-orange-50">
+          <Loader2 size={22} className="text-orange-500 animate-spin" />
+        </div>
+      ))}
+      {showAdd && (
+        <button
+          type="button"
+          onClick={onAdd}
+          style={slotStyle}
+          className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-orange-100 hover:border-orange-500/60 hover:bg-orange-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
+        >
+          <Camera size={28} className="text-orange-500" />
+          <span className="text-xs text-gray-500">사진 추가</span>
+        </button>
+      )}
+      {Array.from({ length: maxPhotos - used - (showAdd ? 1 : 0) }).map((_, idx) => (
+        <div key={`empty-${idx}`} style={slotStyle} className="rounded-xl border-2 border-dashed border-orange-100 bg-orange-50" />
       ))}
     </div>
   );
 }
 
-function PhotoUploadHScroll({ onAdd, maxPhotos = MAX_REVIEW_PHOTOS }: { onAdd: () => void; maxPhotos?: number }) {
+function PhotoUploadHScroll({ urls, uploadingCount, onAdd, onRemove, maxPhotos = MAX_REVIEW_PHOTOS }: {
+  urls: string[];
+  uploadingCount: number;
+  onAdd: () => void;
+  onRemove: (index: number) => void;
+  maxPhotos?: number;
+}) {
+  const used = urls.length + uploadingCount;
+  const showAdd = used < maxPhotos;
+  const slotClass = "relative w-[calc((100%-24px)/3)] rounded-xl";
+
   return (
     <div className="flex flex-wrap gap-3">
-      <button
-        type="button"
-        onClick={onAdd}
-        className="relative w-[calc((100%-24px)/3)] rounded-xl border-2 border-dashed border-orange-100 bg-white hover:border-orange-500/60 hover:bg-orange-50 transition-all overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
-      >
-        <div className="pb-[100%]" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <Camera size={24} className="text-orange-500" />
-          <span className="text-xs text-gray-500">사진 추가</span>
+      {urls.map((url, idx) => (
+        <div key={url} className={slotClass}>
+          <div className="pb-[100%]" />
+          <Image src={url} alt={`후기 사진 ${idx + 1}`} fill sizes="120px" className="rounded-xl object-cover" />
+          <PhotoRemoveButton index={idx} onClick={() => onRemove(idx)} />
         </div>
-      </button>
-      {Array.from({ length: maxPhotos - 1 }).map((_, i) => (
-        <div key={i} className="relative w-[calc((100%-24px)/3)] rounded-xl border-2 border-dashed border-orange-100 bg-orange-50">
+      ))}
+      {Array.from({ length: uploadingCount }).map((_, idx) => (
+        <div key={`uploading-${idx}`} className={`${slotClass} border-2 border-dashed border-orange-100 bg-orange-50`}>
+          <div className="pb-[100%]" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 size={20} className="text-orange-500 animate-spin" />
+          </div>
+        </div>
+      ))}
+      {showAdd && (
+        <button
+          type="button"
+          onClick={onAdd}
+          className={`${slotClass} border-2 border-dashed border-orange-100 bg-white hover:border-orange-500/60 hover:bg-orange-50 transition-all overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2`}
+        >
+          <div className="pb-[100%]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <Camera size={24} className="text-orange-500" />
+            <span className="text-xs text-gray-500">사진 추가</span>
+          </div>
+        </button>
+      )}
+      {Array.from({ length: maxPhotos - used - (showAdd ? 1 : 0) }).map((_, idx) => (
+        <div key={`empty-${idx}`} className={`${slotClass} border-2 border-dashed border-orange-100 bg-orange-50`}>
           <div className="pb-[100%]" />
         </div>
       ))}
@@ -174,6 +236,9 @@ export default function ReviewWriteClient({
   booking: ReservationDetail | null;
 }) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [uploadingCount, setUploadingCount] = useState(0);
   const [mobileScreen, setMobileScreen] = useState<1 | 2>(1);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -194,7 +259,46 @@ export default function ReviewWriteClient({
   const setDetailRating = (label: string, val: number) =>
     setReviewData((prev) => ({ ...prev, detailRatings: { ...prev.detailRatings, [label]: val } }));
 
-  const notifyPhotoStub = () => toast.error("사진 업로드는 아직 준비 중이에요.");
+  const remainingSlots = MAX_REVIEW_PHOTOS - photos.length - uploadingCount;
+
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (selected.length === 0) return;
+
+    if (selected.length > remainingSlots) {
+      toast.error(`사진은 최대 ${MAX_REVIEW_PHOTOS}장까지 첨부할 수 있어요.`);
+    }
+    const files = selected.slice(0, remainingSlots).filter((file) => {
+      if (!file.type.startsWith("image/")) {
+        toast.error("이미지 파일만 첨부할 수 있어요.");
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("10MB 이하의 이미지만 첨부할 수 있어요.");
+        return false;
+      }
+      return true;
+    });
+    if (files.length === 0) return;
+
+    setUploadingCount((c) => c + files.length);
+    const uploaded = await Promise.all(
+      files.map(async (file) => {
+        try {
+          return await uploadToCloudinary(file, "reviews/photos");
+        } catch {
+          toast.error("사진 업로드에 실패했어요.");
+          return null;
+        } finally {
+          setUploadingCount((c) => c - 1);
+        }
+      }),
+    );
+    setPhotos((prev) => [...prev, ...uploaded.filter((url) => url !== null)]);
+  };
+
+  const removePhoto = (index: number) => setPhotos((prev) => prev.filter((_, i) => i !== index));
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
@@ -205,7 +309,7 @@ export default function ReviewWriteClient({
       reservation_id: reservationId,
       rating: reviewData.overallRating,
       content: reviewData.content,
-      image_urls: [],
+      image_urls: photos,
       tags: reviewData.tags,
       detail_ratings: reviewData.detailRatings,
     });
@@ -223,10 +327,18 @@ export default function ReviewWriteClient({
   };
 
   const bookingError = booking ? null : "예약 정보를 찾을 수 없습니다.";
-  const canSubmit = reviewData.overallRating > 0 && !isSubmitting;
+  const canSubmit = reviewData.overallRating > 0 && !isSubmitting && uploadingCount === 0;
 
   return (
     <div className="min-h-screen bg-white">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handlePhotoSelect}
+      />
       <main>
         <div className="md:hidden sticky top-16 z-50 bg-white border-b border-orange-100">
           <div className="h-14 px-5 flex items-center">
@@ -331,7 +443,16 @@ export default function ReviewWriteClient({
                     <span className="text-xs px-2 py-0.5 bg-orange-50 border border-orange-100 rounded-full text-gray-500">선택</span>
                     <span className="ml-auto text-xs text-gray-500">최대 {MAX_REVIEW_PHOTOS}장</span>
                   </div>
-                  <PhotoUploadSlots onAdd={notifyPhotoStub} maxPhotos={MAX_REVIEW_PHOTOS} columns={4} slotWidth={129} slotHeight={136} />
+                  <PhotoUploadSlots
+                    urls={photos}
+                    uploadingCount={uploadingCount}
+                    onAdd={() => fileInputRef.current?.click()}
+                    onRemove={removePhoto}
+                    maxPhotos={MAX_REVIEW_PHOTOS}
+                    columns={4}
+                    slotWidth={129}
+                    slotHeight={136}
+                  />
                 </div>
 
                 <div className="flex flex-col items-center gap-1.5 py-2">
@@ -464,7 +585,13 @@ export default function ReviewWriteClient({
                       <span className="text-xs px-2 py-0.5 bg-orange-50 border border-orange-100 rounded-full text-gray-500">선택</span>
                       <span className="ml-auto text-xs text-gray-500">최대 {MAX_REVIEW_PHOTOS}장</span>
                     </div>
-                    <PhotoUploadHScroll onAdd={notifyPhotoStub} maxPhotos={MAX_REVIEW_PHOTOS} />
+                    <PhotoUploadHScroll
+                      urls={photos}
+                      uploadingCount={uploadingCount}
+                      onAdd={() => fileInputRef.current?.click()}
+                      onRemove={removePhoto}
+                      maxPhotos={MAX_REVIEW_PHOTOS}
+                    />
                   </div>
 
                   <div className="flex items-start gap-2 bg-orange-50 border border-orange-100 rounded-xl px-4 py-3">
@@ -478,7 +605,7 @@ export default function ReviewWriteClient({
                   <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-orange-100 px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] z-40">
                     <button
                       type="button"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || uploadingCount > 0}
                       onClick={() => setShowSubmitModal(true)}
                       className="w-full h-13 rounded-xl bg-orange-500 text-white font-semibold text-base mb-3 hover:bg-orange-600 transition-colors disabled:bg-orange-100 disabled:text-gray-400 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2"
                     >
