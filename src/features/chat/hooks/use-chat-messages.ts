@@ -36,10 +36,14 @@ import {
 } from "@/lib/chat-message-prefixes";
 
 function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("ko-KR", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const d = new Date(
+    new Date(iso).toLocaleString("en-US", { timeZone: "Asia/Seoul" }),
+  );
+  const hours24 = d.getHours();
+  const period = hours24 < 12 ? "오전" : "오후";
+  const hours12 = hours24 % 12 || 12;
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  return `${period} ${hours12}:${minutes}`;
 }
 
 function toMessage(m: ChatMessageRow, userId: string): Message {
