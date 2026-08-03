@@ -14,7 +14,6 @@ export default async function BoardDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 조회 전에 증가시켜야 방금 올린 조회가 화면에 반영된다.
   await incrementRequestViewCount(id);
 
   const post = await getRequestDetail(id);
