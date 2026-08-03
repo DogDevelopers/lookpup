@@ -206,6 +206,7 @@ export function useApprovalActions(params: {
         }
         confirmApplicant(id);
         updateApplicantStatus(id, APPLICATION_STATUS.ACCEPTED);
+        refresh();
         broadcastConfirmation();
         const confirmingApplicant = applicants.find((a) => a.id === id);
         const postTitle = confirmingApplicant ? (posts.find((p) => p.id === confirmingApplicant.postId)?.title ?? "") : "";
@@ -252,6 +253,7 @@ export function useApprovalActions(params: {
       actioningId,
       confirmApplicant,
       updateApplicantStatus,
+      refresh,
       broadcastConfirmation,
       applicants,
       posts,
