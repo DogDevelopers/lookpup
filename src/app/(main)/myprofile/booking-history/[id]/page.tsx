@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getReservationById } from "@/features/reservations/actions";
 import { getCareRecordsByReservationId } from "@/features/care-records/actions";
+import { getReviewByReservationId } from "@/features/reviews/actions";
 import BookingDetailClient from "@/features/petsitters/components/BookingDetailClient";
 
 export default async function BookingDetailPage({
@@ -15,12 +16,16 @@ export default async function BookingDetailPage({
     notFound();
   }
 
-  const careRecords = await getCareRecordsByReservationId(id);
+  const [careRecords, review] = await Promise.all([
+    getCareRecordsByReservationId(id),
+    getReviewByReservationId(id),
+  ]);
 
   return (
     <BookingDetailClient
       booking={booking}
       careRecords={careRecords.ok ? careRecords.data : []}
+      review={review}
     />
   );
 }
