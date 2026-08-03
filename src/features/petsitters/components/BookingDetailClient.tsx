@@ -3,11 +3,14 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Calendar, Clock, MapPin, Star, MessageCircle, BadgeCheck, ClipboardList, FileText } from "lucide-react";
+import { Calendar, Clock, MapPin, Star, MessageCircle, BadgeCheck, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
+import CareRecordTimeline from "@/features/care-records/components/CareRecordTimeline";
+import type { CareRecord } from "@/features/care-records/actions";
+import type { ReservationReview } from "@/features/reviews/types";
 import { cancelReservation } from "@/features/reservations/actions";
 import type { ReservationDetail, ReservationUiStatus } from "@/features/reservations/types";
 
@@ -31,8 +34,22 @@ const PET_VISUAL: Record<string, { emoji: string; gradient: string }> = {
   other: { emoji: "🐾", gradient: "linear-gradient(135deg, #D5F5E3, #A9DFBF)" },
 };
 
-function ReviewSection({ reviewWritten, bookingId }: { reviewWritten: boolean; bookingId: string }) {
-  if (!reviewWritten) {
+function StarRow({ value, size }: { value: number; size: number }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          size={size}
+          className={s <= value ? "fill-yellow-400 text-yellow-400" : "fill-gray-200 text-gray-200"}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ReviewSection({ review, bookingId }: { review: ReservationReview | null; bookingId: string }) {
+  if (!review) {
     return (
       <div className="bg-white border-2 border-[var(--color-orange-500)] rounded-2xl p-6">
         <div className="flex items-start gap-4">
@@ -56,33 +73,75 @@ function ReviewSection({ reviewWritten, bookingId }: { reviewWritten: boolean; b
 
   return (
     <SectionCard className="p-6 gap-0">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <FileText size={18} className="text-gray-500" />
+          <span className="font-semibold text-stone-900">작성한 후기</span>
+        </div>
+        {review.created_at && (
+          <span className="text-xs text-gray-500">
+            {new Date(review.created_at).toLocaleDateString("ko-KR")}
+          </span>
+        )}
+      </div>
+
       <div className="flex items-center gap-2 mb-4">
-        <FileText size={18} className="text-gray-500" />
-        <span className="font-semibold text-stone-900">작성한 후기</span>
+        <StarRow value={review.rating} size={16} />
+        <span className="text-sm text-gray-500">{review.rating.toFixed(1)}</span>
       </div>
-      <div className="flex items-center gap-1 mb-3">
-        {[1, 2, 3, 4, 5].map((s) => (
-          <Star key={s} size={16} className="fill-yellow-400 text-yellow-400" />
-        ))}
-        <span className="text-sm text-gray-500 ml-1">5.0</span>
-      </div>
+
+      {Object.keys(review.detail_ratings).length > 0 && (
+        <div className="space-y-2 pt-3 border-t border-orange-100">
+          {Object.entries(review.detail_ratings).map(([label, val]) => (
+            <div key={label} className="flex items-center justify-between">
+              <span className="text-xs text-gray-500">{label}</span>
+              <StarRow value={val} size={12} />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {review.image_urls.length > 0 && (
+        <div className="grid grid-cols-3 gap-2 mt-4">
+          {review.image_urls.map((url) => (
+            <div key={url} className="relative aspect-square rounded-xl overflow-hidden bg-orange-50">
+              <Image src={url} alt="후기 사진" fill sizes="120px" className="object-cover" />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {review.content.trim().length > 0 && (
+        <p className="text-sm text-stone-900 leading-relaxed whitespace-pre-wrap mt-4">
+          {review.content}
+        </p>
+      )}
+
+      {review.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-4">
+          {review.tags.map((tag) => (
+            <span
+              key={tag}
+              className="px-2.5 py-1 bg-orange-50 text-orange-600 text-xs font-medium rounded-full border border-orange-100"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
     </SectionCard>
   );
 }
 
-function CareRecordTimeline() {
-  return (
-    <SectionCard className="px-6 py-5 gap-0">
-      <div className="flex items-center gap-2 mb-5">
-        <ClipboardList size={18} className="text-orange-500" />
-        <h3 className="text-sm font-semibold text-stone-900">돌봄 기록</h3>
-      </div>
-      <p className="text-sm text-gray-500 text-center py-4">아직 등록된 돌봄 기록이 없어요</p>
-    </SectionCard>
-  );
-}
-
-export default function BookingDetailClient({ booking: initialBooking }: { booking: ReservationDetail }) {
+export default function BookingDetailClient({
+  booking: initialBooking,
+  careRecords,
+  review,
+}: {
+  booking: ReservationDetail;
+  careRecords: CareRecord[];
+  review: ReservationReview | null;
+}) {
   const [booking, setBooking] = useState(initialBooking);
   const [cancelConfirm, setCancelConfirm] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
@@ -235,9 +294,9 @@ export default function BookingDetailClient({ booking: initialBooking }: { booki
             </div>
           </SectionCard>
 
-          <CareRecordTimeline />
+          <CareRecordTimeline records={careRecords} />
 
-          {booking.status === "completed" && <ReviewSection reviewWritten={booking.reviewWritten} bookingId={booking.id} />}
+          {booking.status === "completed" && <ReviewSection review={review} bookingId={booking.id} />}
 
           {(booking.status === "pending" || booking.status === "confirmed") && (
             <>

@@ -10,6 +10,8 @@ export interface WrittenReview {
   sitter_profile_image: string | null;
 }
 
+export type ReservationReview = Omit<WrittenReview, "sitter_full_name" | "sitter_profile_image">;
+
 export interface ReceivedReview {
   id: string;
   owner_id: string;
