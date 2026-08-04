@@ -50,9 +50,12 @@ export function usePaymentFlow(params: {
       try {
         const deadline = getPaymentDeadline();
         const isExtra = data.type === "extra";
-        const reservationId = isExtra
-          ? (selectedRoom?.reservationId ?? (selectedRoom?.sitterId ? await getActiveReservationBySitter(selectedRoom.sitterId, { includePaid: true }) : null))
-          : undefined;
+        // base도 예약 id가 필요하다 — 금액 미정 예약이면 서버가 합의 금액을 예약에 반영한다
+        const reservationId =
+          selectedRoom?.reservationId ??
+          (selectedRoom?.sitterId
+            ? await getActiveReservationBySitter(selectedRoom.sitterId, isExtra ? { includePaid: true } : undefined)
+            : null);
         const result = await sendPaymentRequestMessage(
           activeRoomId,
           { amount: data.amount, reason: data.reason, deadline, isExtra },
