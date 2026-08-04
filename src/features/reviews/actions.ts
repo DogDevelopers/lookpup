@@ -3,24 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 import { reviewCreateSchema, type ReviewCreateInput } from "@/features/reviews/schema";
-import type { WrittenReview, ReceivedReview } from "@/features/reviews/types";
+import type { WrittenReview, ReceivedReview, ReservationReview } from "@/features/reviews/types";
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
 const REVIEW_WINDOW_DAYS = 7;
-
-async function recalculateSitterRating(sitterId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data: rows } = await supabase.from("reviews").select("rating").eq("sitter_id", sitterId);
-  if (!rows) return;
-
-  const avg = rows.length > 0 ? rows.reduce((sum, r) => sum + r.rating, 0) / rows.length : 0;
-  await supabase
-    .from("sitters")
-    .update({ rating: Math.round(avg * 10) / 10 })
-    .eq("id", sitterId);
-}
 
 export async function createReview(input: ReviewCreateInput): Promise<ActionResult> {
   const parsed = reviewCreateSchema.safeParse(input);
@@ -70,8 +59,6 @@ export async function createReview(input: ReviewCreateInput): Promise<ActionResu
 
   if (error) return { ok: false, error: "후기 등록에 실패했습니다." };
 
-  await recalculateSitterRating(reservation.sitter_id);
-
   revalidatePath("/myprofile/reviews");
   revalidatePath("/myprofile/booking-history");
   revalidatePath(`/myprofile/booking-history/${reservation.id}`);
@@ -95,8 +82,6 @@ export async function deleteReview(id: string): Promise<ActionResult> {
   const { error } = await supabase.from("reviews").delete().eq("id", id);
   if (error) return { ok: false, error: "후기 삭제에 실패했습니다." };
 
-  await recalculateSitterRating(review.sitter_id);
-
   revalidatePath("/myprofile/reviews");
   return { ok: true };
 }
@@ -110,15 +95,20 @@ export async function getMyWrittenReviews(): Promise<WrittenReview[]> {
 
   const { data } = await supabase
     .from("reviews")
-    .select("id, rating, content, image_urls, tags, detail_ratings, created_at, sitters(users(full_name, profile_image))")
+    .select("id, rating, content, image_urls, tags, detail_ratings, created_at, sitters(user_id)")
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false })
     .limit(100);
 
-  return (data ?? []).map((row) => {
-    const sitter = row.sitters as unknown as {
-      users: { full_name: string | null; profile_image: string | null } | null;
-    } | null;
+  const rows = data ?? [];
+  const profiles = await fetchPublicProfiles(
+    supabase,
+    rows.map((row) => (row.sitters as unknown as { user_id: string } | null)?.user_id),
+  );
+
+  return rows.map((row) => {
+    const sitter = row.sitters as unknown as { user_id: string } | null;
+    const sitterProfile = sitter ? profiles.get(sitter.user_id) : undefined;
     return {
       id: row.id,
       rating: row.rating,
@@ -127,10 +117,37 @@ export async function getMyWrittenReviews(): Promise<WrittenReview[]> {
       tags: (row.tags as string[]) ?? [],
       detail_ratings: (row.detail_ratings as Record<string, number>) ?? {},
       created_at: row.created_at ?? "",
-      sitter_full_name: sitter?.users?.full_name ?? "알 수 없음",
-      sitter_profile_image: sitter?.users?.profile_image ?? null,
+      sitter_full_name: sitterProfile?.full_name ?? "알 수 없음",
+      sitter_profile_image: sitterProfile?.profile_image ?? null,
     };
   });
+}
+
+export async function getReviewByReservationId(reservationId: string): Promise<ReservationReview | null> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from("reviews")
+    .select("id, rating, content, image_urls, tags, detail_ratings, created_at")
+    .eq("reservation_id", reservationId)
+    .eq("owner_id", user.id)
+    .maybeSingle();
+
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    rating: data.rating,
+    content: data.content,
+    image_urls: (data.image_urls as string[]) ?? [],
+    tags: (data.tags as string[]) ?? [],
+    detail_ratings: (data.detail_ratings as Record<string, number>) ?? {},
+    created_at: data.created_at ?? "",
+  };
 }
 
 export async function getReviewedReservationIds(ids: string[]): Promise<string[]> {
@@ -162,13 +179,16 @@ export async function getReceivedReviews(): Promise<ReceivedReview[]> {
 
   const { data } = await supabase
     .from("reviews")
-    .select("id, owner_id, rating, content, image_urls, tags, detail_ratings, created_at, users(full_name, profile_image)")
+    .select("id, owner_id, rating, content, image_urls, tags, detail_ratings, created_at")
     .eq("sitter_id", sitter.id)
     .order("created_at", { ascending: false })
     .limit(100);
 
-  return (data ?? []).map((row) => {
-    const owner = row.users as unknown as { full_name: string | null; profile_image: string | null } | null;
+  const rows = data ?? [];
+  const profiles = await fetchPublicProfiles(supabase, rows.map((row) => row.owner_id));
+
+  return rows.map((row) => {
+    const owner = profiles.get(row.owner_id);
     return {
       id: row.id,
       owner_id: row.owner_id,

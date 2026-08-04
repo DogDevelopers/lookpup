@@ -118,3 +118,10 @@ export async function deleteRequest(id: string): Promise<ActionResult> {
   revalidatePath("/board");
   return { ok: true, data: undefined };
 }
+
+export async function incrementRequestViewCount(id: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("increment_request_view_count", { p_id: id });
+  if (error) return { ok: false, error: "조회수 반영에 실패했습니다." };
+  return { ok: true, data: undefined };
+}

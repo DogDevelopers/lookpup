@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Header from "@/components/layout/Header";
 import HeaderWithUser from "@/components/layout/HeaderWithUser";
 
-export default function SearchLayout({
+export default function NoFooterLayout({
   children,
 }: {
   children: React.ReactNode;

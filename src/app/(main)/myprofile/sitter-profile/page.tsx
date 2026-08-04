@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getMySitterProfile } from "@/features/sitter-register/actions";
+import { getSitterReviews } from "@/features/petsitters/queries";
 import SitterProfilePreviewClient from "@/features/sitter-register/components/SitterProfilePreviewClient";
 
 export default async function SitterProfilePreviewPage() {
@@ -9,5 +10,7 @@ export default async function SitterProfilePreviewPage() {
     redirect("/sitter-register");
   }
 
-  return <SitterProfilePreviewClient sitter={sitter} />;
+  const reviews = await getSitterReviews(sitter.id);
+
+  return <SitterProfilePreviewClient sitter={sitter} reviews={reviews} />;
 }

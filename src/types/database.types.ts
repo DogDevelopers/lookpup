@@ -1131,8 +1131,10 @@ export type Database = {
       get_public_user_profiles: {
         Args: { user_ids: string[] }
         Returns: {
+          created_at: string
           full_name: string
           id: string
+          is_verified: boolean
           profile_image: string
         }[]
       }
@@ -1150,6 +1152,7 @@ export type Database = {
           room_id: string
         }[]
       }
+      increment_request_view_count: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: never; Returns: boolean }
       search_reportable_users: {
         Args: { p_query: string }

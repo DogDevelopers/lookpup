@@ -13,6 +13,7 @@ import {
 } from "@/lib/chat-rooms";
 import { RESERVATION_STATUS, ROOM_TYPE } from "@/lib/constants";
 import { isOverlapViolation } from "@/lib/db-errors";
+import { fetchPublicProfiles } from "@/lib/public-profiles";
 import {
   RESERVATION_REQUEST_PREFIX,
   RESERVATION_ACCEPTED_PREFIX,
@@ -113,10 +114,12 @@ function reviewWasWritten(review: unknown): boolean {
   return Array.isArray(review) ? review.length > 0 : review != null;
 }
 
+type SitterEmbed = { user_id: string; available_area: string | null; rating: number | null } | null;
+
 const RESERVATION_LIST_SELECT = `
   id, status, start_datetime, end_datetime, total_price, created_at,
   services(title),
-  sitters(available_area, rating, users(full_name, profile_image)),
+  sitters(user_id, available_area, rating),
   reservation_items(pets(name, breed, animal_type)),
   reviews(id)
 `;
@@ -135,15 +138,18 @@ export async function getMyReservations(): Promise<MyReservation[]> {
     .eq("owner_id", user.id)
     .order("created_at", { ascending: false });
 
-  return (data ?? []).map((row) => {
+  const rows = data ?? [];
+  const profiles = await fetchPublicProfiles(
+    supabase,
+    rows.map((row) => (row.sitters as unknown as SitterEmbed)?.user_id),
+  );
+
+  return rows.map((row) => {
     const start = new Date(row.start_datetime ?? "");
     const end = new Date(row.end_datetime ?? "");
     const service = row.services as unknown as { title: string | null } | null;
-    const sitter = row.sitters as unknown as {
-      available_area: string | null;
-      rating: number | null;
-      users: { full_name: string | null; profile_image: string | null } | null;
-    } | null;
+    const sitter = row.sitters as unknown as SitterEmbed;
+    const sitterProfile = sitter ? profiles.get(sitter.user_id) : undefined;
     const items = row.reservation_items as unknown as {
       pets: { name: string; breed: string | null; animal_type: string } | null;
     }[];
@@ -154,8 +160,8 @@ export async function getMyReservations(): Promise<MyReservation[]> {
       bookingNo: bookingNumber(row.id, row.created_at ?? ""),
       serviceType: service?.title ?? "-",
       status: STATUS_MAP[row.status] ?? "pending",
-      sitterName: sitter?.users?.full_name ?? "-",
-      sitterImage: sitter?.users?.profile_image ?? null,
+      sitterName: sitterProfile?.full_name ?? "-",
+      sitterImage: sitterProfile?.profile_image ?? null,
       sitterRating: sitter?.rating ?? 0,
       date: formatDate(start),
       time: formatTime(start, end),
@@ -187,19 +193,21 @@ export async function getMySitterReservations(): Promise<MySitterReservation[]> 
   const { data } = await supabase
     .from("reservations")
     .select(
-      `id, status, start_datetime, end_datetime, total_price, created_at,
+      `id, status, start_datetime, end_datetime, total_price, created_at, owner_id,
        services(title),
-       owner:users!owner_id(full_name, profile_image),
        reservation_items(pets(name, breed, animal_type))`,
     )
     .eq("sitter_id", sitter.id)
     .order("created_at", { ascending: false });
 
-  return (data ?? []).map((row) => {
+  const rows = data ?? [];
+  const profiles = await fetchPublicProfiles(supabase, rows.map((row) => row.owner_id));
+
+  return rows.map((row) => {
     const start = new Date(row.start_datetime ?? "");
     const end = new Date(row.end_datetime ?? "");
     const service = row.services as unknown as { title: string | null } | null;
-    const owner = row.owner as unknown as { full_name: string | null; profile_image: string | null } | null;
+    const owner = profiles.get(row.owner_id);
     const items = row.reservation_items as unknown as {
       pets: { name: string; breed: string | null; animal_type: string } | null;
     }[];
@@ -234,7 +242,7 @@ export async function getReservationById(id: string): Promise<ReservationDetail 
     .select(
       `id, status, start_datetime, end_datetime, total_price, created_at, owner_id, sitter_id,
        services(title),
-       sitters(available_area, rating, users(full_name, is_verified, profile_image)),
+       sitters(user_id, available_area, rating),
        reservation_items(pets(name, breed, animal_type, age, weight, image_url)),
        reviews(id)`,
     )
@@ -243,23 +251,17 @@ export async function getReservationById(id: string): Promise<ReservationDetail 
 
   if (!row || row.owner_id !== user.id) return null;
 
-  const { count: reviewCount } = await supabase
-    .from("reviews")
-    .select("id", { count: "exact", head: true })
-    .eq("sitter_id", row.sitter_id);
+  const sitter = row.sitters as unknown as SitterEmbed;
+
+  const [{ count: reviewCount }, profiles] = await Promise.all([
+    supabase.from("reviews").select("id", { count: "exact", head: true }).eq("sitter_id", row.sitter_id),
+    fetchPublicProfiles(supabase, [sitter?.user_id]),
+  ]);
+  const sitterProfile = sitter ? profiles.get(sitter.user_id) : undefined;
 
   const start = new Date(row.start_datetime ?? "");
   const end = new Date(row.end_datetime ?? "");
   const service = row.services as unknown as { title: string | null } | null;
-  const sitter = row.sitters as unknown as {
-    available_area: string | null;
-    rating: number | null;
-    users: {
-      full_name: string | null;
-      is_verified: boolean | null;
-      profile_image: string | null;
-    } | null;
-  } | null;
   const items = row.reservation_items as unknown as {
     pets: {
       name: string;
@@ -278,11 +280,11 @@ export async function getReservationById(id: string): Promise<ReservationDetail 
     serviceType: service?.title ?? "-",
     status: STATUS_MAP[row.status] ?? "pending",
     sitter: {
-      name: sitter?.users?.full_name ?? "-",
-      image: sitter?.users?.profile_image ?? null,
+      name: sitterProfile?.full_name ?? "-",
+      image: sitterProfile?.profile_image ?? null,
       rating: sitter?.rating ?? 0,
       reviewCount: reviewCount ?? 0,
-      certified: sitter?.users?.is_verified ?? false,
+      certified: sitterProfile?.is_verified ?? false,
     },
     date: formatDate(start),
     time: formatTime(start, end),

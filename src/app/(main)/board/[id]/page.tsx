@@ -1,5 +1,6 @@
 import BoardDetailClient from "@/features/board/components/BoardDetailClient";
 import { getRequestDetail, getOtherPostsByOwner } from "@/features/board/queries";
+import { incrementRequestViewCount } from "@/features/board/actions";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function BoardDetailPage({
@@ -12,6 +13,8 @@ export default async function BoardDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  await incrementRequestViewCount(id);
 
   const post = await getRequestDetail(id);
   const otherPosts = post ? await getOtherPostsByOwner(post.owner_id, id) : [];
@@ -30,7 +33,6 @@ export default async function BoardDetailPage({
 
   return (
     <BoardDetailClient
-      id={id}
       initialPost={post}
       initialOtherPosts={otherPosts}
       currentUserId={user?.id}
