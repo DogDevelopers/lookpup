@@ -234,8 +234,6 @@ export function useApprovalActions(params: {
               postId: confirmingApplicant?.postId,
             });
             if (payResult.ok) {
-              // 방 승격은 기존 request 방을 UPDATE하므로 roomId가 그대로다.
-              // activeRoomId가 안 바뀌어 refetch가 없으니 캐시에 직접 넣어야 한다.
               deliverMessage(newRoomId, toRow(payResult.data));
               updatePreview(newRoomId, "결제 요청", payResult.data.created_at ?? new Date().toISOString());
             } else {

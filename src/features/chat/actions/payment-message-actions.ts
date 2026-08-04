@@ -43,9 +43,6 @@ export async function sendPaymentRequestMessage(
     return { ok: false, error: "추가금은 1,000원 이상 500,000원 이하여야 합니다." };
   }
 
-  // 협의 가능(금액 미정) 구인글은 예약이 total_price=0으로 만들어진다. createPayment가
-  // reservations.total_price로 결제 금액을 계산하므로, 시터가 합의 금액을 여기서 확정하지
-  // 않으면 보호자가 결제할 수 없다. 이미 금액이 정해진 예약은 건드리지 않는다.
   if (!data.isExtra && reservationId) {
     const { data: reservation } = await supabase
       .from("reservations")
@@ -68,8 +65,6 @@ export async function sendPaymentRequestMessage(
         return { ok: false, error: "결제 금액은 1,000원 이상 500,000원 이하여야 합니다." };
       }
 
-      // total_price=0 조건을 걸어 동시 요청이 금액을 덮어쓰지 못하게 한다.
-      // 0행 갱신은 에러가 아니므로 반환된 행으로 반영 여부를 직접 확인한다.
       const { data: updated, error: priceError } = await supabase
         .from("reservations")
         .update({ total_price: data.amount })

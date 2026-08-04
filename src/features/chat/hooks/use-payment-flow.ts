@@ -50,7 +50,6 @@ export function usePaymentFlow(params: {
       try {
         const deadline = getPaymentDeadline();
         const isExtra = data.type === "extra";
-        // base도 예약 id가 필요하다 — 금액 미정 예약이면 서버가 합의 금액을 예약에 반영한다
         const reservationId =
           selectedRoom?.reservationId ??
           (selectedRoom?.sitterId
