@@ -367,7 +367,7 @@ function ChatPageContent({
     }
     const applicant = applicants.find((a) => a.id === initialRoomId);
     if (applicant) {
-      if (!userId) return; // userId 로딩 전에는 owner/sitter 탭을 잘못 판정할 수 있으므로 대기
+      if (!userId) return;
       hasAutoSelected.current = true;
       setActiveTab(applicant.ownerId === userId ? "owner" : "sitter");
       setSelectedApplicantId(applicant.id);
@@ -376,7 +376,7 @@ function ChatPageContent({
     }
     const rr = reservationRequests.find((r) => r.id === initialRoomId);
     if (rr) {
-      if (!userId) return; // userId 로딩 전에는 owner/sitter 탭을 잘못 판정할 수 있으므로 대기
+      if (!userId) return;
       hasAutoSelected.current = true;
       setActiveTab(rr.ownerId === userId ? "owner" : "sitter");
       setSelectedReservationRequestId(rr.id);
