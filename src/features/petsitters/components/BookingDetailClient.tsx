@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Calendar,
   Clock,
@@ -23,6 +24,7 @@ import CareRecordTimeline from "@/features/care-records/components/CareRecordTim
 import type { CareRecord } from "@/features/care-records/actions";
 import type { ReservationReview } from "@/features/reviews/types";
 import { cancelReservation } from "@/features/reservations/actions";
+import { getRoomIdByReservationId } from "@/features/chat/actions/room-actions";
 import type {
   ReservationDetail,
   ReservationUiStatus,
@@ -197,6 +199,28 @@ function ReviewSection({
         </div>
       )}
     </SectionCard>
+  );
+}
+
+function ChatButton({ reservationId, className, children }: { reservationId: string; className: string; children: ReactNode }) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+
+  const handleClick = async () => {
+    setPending(true);
+    const result = await getRoomIdByReservationId(reservationId);
+    setPending(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    router.push(result.data ? `/chat?roomId=${result.data.roomId}` : "/chat");
+  };
+
+  return (
+    <button type="button" onClick={handleClick} disabled={pending} className={className}>
+      {children}
+    </button>
   );
 }
 
@@ -382,13 +406,13 @@ export default function BookingDetailClient({
               {(booking.status === "in-progress" ||
                 booking.status === "confirmed" ||
                 booking.status === "pending") && (
-                <Link
-                  href="/chat"
+                <ChatButton
+                  reservationId={booking.id}
                   className="flex items-center gap-2 px-4 py-2.5 bg-orange-50 text-orange-500 rounded-xl text-sm font-semibold hover:bg-orange-100 transition-colors shrink-0"
                 >
                   <MessageCircle size={15} />
                   채팅
-                </Link>
+                </ChatButton>
               )}
             </div>
           </SectionCard>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Calendar, Clock, MapPin, Star, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
@@ -9,6 +10,7 @@ import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
 import { CustomModal } from "@/components/common/CustomModal";
 import { cancelReservation } from "@/features/reservations/actions";
+import { getRoomIdByReservationId } from "@/features/chat/actions/room-actions";
 import type { MyReservation, ReservationUiStatus } from "@/features/reservations/types";
 
 type TabId = "all" | "in-progress" | "confirmed" | "completed" | "cancelled";
@@ -36,6 +38,28 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 const ITEMS_PER_PAGE = 6;
+
+function ChatButton({ reservationId, className, children }: { reservationId: string; className: string; children: ReactNode }) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+
+  const handleClick = async () => {
+    setPending(true);
+    const result = await getRoomIdByReservationId(reservationId);
+    setPending(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    router.push(result.data ? `/chat?roomId=${result.data.roomId}` : "/chat");
+  };
+
+  return (
+    <button type="button" onClick={handleClick} disabled={pending} className={className}>
+      {children}
+    </button>
+  );
+}
 
 function BookingCard({
   booking,
@@ -126,13 +150,13 @@ function BookingCard({
         )}
         {booking.status === "confirmed" && (
           <>
-            <Link
-              href="/chat"
+            <ChatButton
+              reservationId={booking.id}
               className="flex-1 h-10 rounded-xl border border-orange-300/20 text-stone-900 text-sm font-medium hover:border-orange-300 transition-colors flex items-center justify-center gap-1.5"
             >
               <MessageCircle size={15} />
               채팅하기
-            </Link>
+            </ChatButton>
             <button
               type="button"
               onClick={() => onCancel(booking.id)}
@@ -150,13 +174,13 @@ function BookingCard({
             >
               예약 상세보기
             </Link>
-            <Link
-              href="/chat"
+            <ChatButton
+              reservationId={booking.id}
               className="flex-1 h-10 rounded-xl bg-orange-300/10 text-orange-300 text-sm font-semibold hover:bg-orange-300/20 transition-colors flex items-center justify-center gap-1.5"
             >
               <MessageCircle size={15} />
               채팅하기
-            </Link>
+            </ChatButton>
           </>
         )}
         {booking.status === "completed" && (
