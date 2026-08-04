@@ -193,8 +193,9 @@ export async function getMySitterReservations(): Promise<MySitterReservation[]> 
   const { data } = await supabase
     .from("reservations")
     .select(
-      `id, status, start_datetime, end_datetime, total_price, created_at, owner_id,
+      `id, status, start_datetime, end_datetime, total_price, created_at, owner_id, request_id,
        services(title),
+       requests(title),
        reservation_items(pets(name, breed, animal_type))`,
     )
     .eq("sitter_id", sitter.id)
@@ -207,6 +208,7 @@ export async function getMySitterReservations(): Promise<MySitterReservation[]> 
     const start = new Date(row.start_datetime ?? "");
     const end = new Date(row.end_datetime ?? "");
     const service = row.services as unknown as { title: string | null } | null;
+    const request = row.requests as unknown as { title: string | null } | null;
     const owner = profiles.get(row.owner_id);
     const items = row.reservation_items as unknown as {
       pets: { name: string; breed: string | null; animal_type: string } | null;
@@ -220,6 +222,7 @@ export async function getMySitterReservations(): Promise<MySitterReservation[]> 
       status: STATUS_MAP[row.status] ?? "pending",
       ownerName: owner?.full_name ?? "-",
       ownerImage: owner?.profile_image ?? null,
+      requestTitle: row.request_id ? (request?.title ?? null) : null,
       date: formatDate(start),
       time: formatTime(start, end),
       petName: firstPet?.name ?? "-",
