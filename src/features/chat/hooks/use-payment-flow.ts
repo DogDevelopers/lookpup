@@ -50,9 +50,11 @@ export function usePaymentFlow(params: {
       try {
         const deadline = getPaymentDeadline();
         const isExtra = data.type === "extra";
-        const reservationId = isExtra
-          ? (selectedRoom?.reservationId ?? (selectedRoom?.sitterId ? await getActiveReservationBySitter(selectedRoom.sitterId, { includePaid: true }) : null))
-          : undefined;
+        const reservationId =
+          selectedRoom?.reservationId ??
+          (selectedRoom?.sitterId
+            ? await getActiveReservationBySitter(selectedRoom.sitterId, isExtra ? { includePaid: true } : undefined)
+            : null);
         const result = await sendPaymentRequestMessage(
           activeRoomId,
           { amount: data.amount, reason: data.reason, deadline, isExtra },

@@ -71,18 +71,12 @@ export function PaymentRequestModal({
 
   const isBaseType = requestType === "base";
   const amountNum = Number(amount.replace(/,/g, ""));
-  const total = isBaseType
-    ? paymentAmount && paymentAmount > 0
-      ? paymentAmount
-      : null
-    : amount && !isNaN(amountNum) && amountNum > 0
-      ? amountNum
-      : null;
-  const displayAmount = isBaseType
-    ? paymentAmount
-      ? paymentAmount.toLocaleString("ko-KR")
-      : ""
-    : amount;
+  const typedAmount = amount && !isNaN(amountNum) && amountNum > 0 ? amountNum : null;
+  const hasFixedAmount = !!paymentAmount && paymentAmount > 0;
+  const amountLocked = isBaseType && hasFixedAmount;
+  const total = amountLocked ? paymentAmount : typedAmount;
+  const displayAmount = amountLocked ? paymentAmount.toLocaleString("ko-KR") : amount;
+  const amountOutOfRange = !amountLocked && total !== null && (total < 1000 || total > 500000);
 
   function handleAmountChange(value: string) {
     const digits = value.replace(/[^0-9]/g, "");
@@ -189,15 +183,19 @@ export function PaymentRequestModal({
                 type="text"
                 inputMode="numeric"
                 value={displayAmount}
-                onChange={(e) => !isBaseType && handleAmountChange(e.target.value)}
-                readOnly={isBaseType}
+                onChange={(e) => !amountLocked && handleAmountChange(e.target.value)}
+                readOnly={amountLocked}
                 placeholder="20,000"
-                className={`w-full h-13.5 pl-4 pr-10 rounded-xl outline outline-orange-200 outline-offset-[-1.11px] text-[15px] text-[#281A0E] placeholder-[rgba(40,26,14,0.50)] transition-colors ${isBaseType ? "bg-gray-50 cursor-default" : "focus:outline-orange-500"}`}
+                className={`w-full h-13.5 pl-4 pr-10 rounded-xl outline outline-orange-200 outline-offset-[-1.11px] text-[15px] text-[#281A0E] placeholder-[rgba(40,26,14,0.50)] transition-colors ${amountLocked ? "bg-gray-50 cursor-default" : "focus:outline-orange-500"}`}
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-500">원</span>
             </div>
             <p className="text-[#9CA3AF] text-xs mt-1.5">
-              {isBaseType ? "예약 시 확정된 금액입니다" : "0원보다 큰 금액을 입력해주세요"}
+              {amountLocked
+                ? "예약 시 확정된 금액입니다"
+                : isBaseType
+                  ? "금액 미정 예약입니다. 보호자와 합의한 금액을 입력해주세요 (1,000원 ~ 500,000원)"
+                  : "0원보다 큰 금액을 입력해주세요"}
             </p>
           </div>
 
@@ -239,6 +237,12 @@ export function PaymentRequestModal({
             </p>
           )}
 
+          {amountOutOfRange && (
+            <p className="text-red-500 text-sm text-center">
+              금액은 1,000원 이상 500,000원 이하로 입력해주세요.
+            </p>
+          )}
+
           {submitError && <p className="text-red-500 text-sm text-center">{submitError}</p>}
         </div>
 
@@ -255,7 +259,11 @@ export function PaymentRequestModal({
             type="button"
             onClick={handleSubmit}
             disabled={
-              !total || (requestType === "extra" && !reason.trim()) || (isBaseType && isAlreadyPaid) || submitting
+              !total ||
+              amountOutOfRange ||
+              (requestType === "extra" && !reason.trim()) ||
+              (isBaseType && isAlreadyPaid) ||
+              submitting
             }
             className="flex-1 h-13 rounded-xl bg-orange-500 flex items-center justify-center gap-2 text-white text-[15px] font-semibold hover:bg-orange-600 transition-colors disabled:opacity-40 disabled:cursor-default"
           >

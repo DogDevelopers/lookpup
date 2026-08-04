@@ -233,7 +233,12 @@ export function useApprovalActions(params: {
               deadline,
               postId: confirmingApplicant?.postId,
             });
-            if (payResult.ok) updatePreview(newRoomId, "결제 요청", payResult.data.created_at ?? new Date().toISOString());
+            if (payResult.ok) {
+              deliverMessage(newRoomId, toRow(payResult.data));
+              updatePreview(newRoomId, "결제 요청", payResult.data.created_at ?? new Date().toISOString());
+            } else {
+              setApplicationActionError(payResult.error);
+            }
           }
 
           setActiveTab("one_on_one");

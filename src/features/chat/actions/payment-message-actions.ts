@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireActiveUser } from "@/lib/auth-guard";
 import { createNotification } from "@/lib/notifications";
 import { touchRoomPreview } from "@/lib/chat-rooms";
-import { EXTRA_CHARGE_STATUS } from "@/lib/constants";
+import { EXTRA_CHARGE_STATUS, RESERVATION_STATUS } from "@/lib/constants";
 import { PAYMENT_REQUEST_PREFIX, PAYMENT_COMPLETE_PREFIX } from "@/lib/chat-message-prefixes";
 import { isRecipientActive, getAuthorizedChatRoom, type ActionResult } from "./shared";
 
@@ -41,6 +41,40 @@ export async function sendPaymentRequestMessage(
   if (data.isExtra && !reservationId) return { ok: false, error: "추가금을 요청할 예약을 찾을 수 없습니다." };
   if (data.isExtra && (data.amount < 1000 || data.amount > 500000)) {
     return { ok: false, error: "추가금은 1,000원 이상 500,000원 이하여야 합니다." };
+  }
+
+  if (!data.isExtra && reservationId) {
+    const { data: reservation } = await supabase
+      .from("reservations")
+      .select("id, owner_id, sitter_id, status, total_price")
+      .eq("id", reservationId)
+      .maybeSingle();
+
+    if (!reservation || reservation.owner_id !== room.owner_id || reservation.sitter_id !== sitter.id) {
+      return { ok: false, error: "이 채팅방과 관련 없는 예약입니다." };
+    }
+
+    if (reservation.total_price === 0) {
+      if (sitter.user_id !== user.id) {
+        return { ok: false, error: "펫시터만 결제 금액을 확정할 수 있습니다." };
+      }
+      if (reservation.status !== RESERVATION_STATUS.ACCEPTED) {
+        return { ok: false, error: "수락된 예약만 금액을 확정할 수 있습니다." };
+      }
+      if (data.amount < 1000 || data.amount > 500000) {
+        return { ok: false, error: "결제 금액은 1,000원 이상 500,000원 이하여야 합니다." };
+      }
+
+      const { data: updated, error: priceError } = await supabase
+        .from("reservations")
+        .update({ total_price: data.amount })
+        .eq("id", reservationId)
+        .eq("total_price", 0)
+        .select("id");
+      if (priceError || !updated || updated.length === 0) {
+        return { ok: false, error: "예약 금액 확정에 실패했습니다. 다시 시도해주세요." };
+      }
+    }
   }
 
   let extraChargeId: string | undefined;
