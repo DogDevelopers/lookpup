@@ -284,6 +284,35 @@ export async function getReservationsByRoom(
   return { ok: true, data: reservations };
 }
 
+export async function getRoomIdByReservationId(
+  reservationId: string,
+): Promise<ActionResult<{ roomId: string } | null>> {
+  const supabase = await createClient();
+  const auth = await requireActiveUser(supabase);
+  if (!auth.ok) return auth;
+  const { user } = auth;
+
+  const { data: reservation } = await supabase
+    .from("reservations")
+    .select("owner_id, sitters!inner(user_id)")
+    .eq("id", reservationId)
+    .single();
+  if (!reservation) return { ok: false, error: "예약을 찾을 수 없습니다." };
+
+  const sitterRow = reservation.sitters as unknown as { user_id: string };
+  if (reservation.owner_id !== user.id && sitterRow.user_id !== user.id) {
+    return { ok: false, error: "예약 당사자만 조회할 수 있습니다." };
+  }
+
+  const { data: room } = await supabase
+    .from("chat_rooms")
+    .select("id")
+    .eq("reservation_id", reservationId)
+    .maybeSingle();
+
+  return { ok: true, data: room ? { roomId: room.id } : null };
+}
+
 export async function leaveRoom(roomId: string): Promise<ActionResult<{ id: string }>> {
   const supabase = await createClient();
   const auth = await requireActiveUser(supabase);
