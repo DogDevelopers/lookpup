@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import type { BookedRange, Pet, ReviewRow, SitterBookingInfo, SitterDetail, SitterRow } from "./types";
@@ -107,7 +108,8 @@ const sitterDetailRpcSchema = z.object({
   ),
 });
 
-export async function getSitterDetail(sitterId: string): Promise<SitterDetail | null> {
+// generateMetadata와 page가 같은 요청에서 각각 호출하므로 cache로 한 번만 조회한다.
+export const getSitterDetail = cache(async (sitterId: string): Promise<SitterDetail | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_petsitter_detail", { p_sitter_id: sitterId });
   if (error || !data) return null;
@@ -123,7 +125,7 @@ export async function getSitterDetail(sitterId: string): Promise<SitterDetail | 
     .maybeSingle();
 
   return { ...parsed.data, available_animals: sitterRow?.available_animals ?? [] };
-}
+});
 
 export async function getSitterReviews(sitterId: string): Promise<ReviewRow[]> {
   const supabase = await createClient();

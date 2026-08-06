@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { getMyEarnings } from "@/features/earnings/actions";
 import EarningsClient from "@/features/earnings/components/EarningsClient";
+import { privatePage } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata = privatePage("정산 관리");
 
 export default async function EarningsPage() {
   const supabase = await createClient();

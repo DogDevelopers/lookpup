@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient, getAuthUser } from "@/lib/supabase/server";
 import BookingClient from "@/features/petsitters/components/BookingClient";
 import { getSitterBookingInfo, getBookedRanges, getUserPets } from "@/features/petsitters/queries";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("예약하기");
 
 export default async function BookPage({
   params,

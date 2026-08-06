@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { getMySitterReservations } from "@/features/reservations/actions";
 import WorksHistoryClient from "@/features/petsitters/components/WorksHistoryClient";
+import { privatePage } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata = privatePage("작업 관리");
 
 export default async function WorksPage() {
   const supabase = await createClient();

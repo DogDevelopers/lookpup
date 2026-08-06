@@ -279,7 +279,8 @@ export async function updateSitterProfile(
   if (deletedServiceIds.length > 0) {
     await supabase
       .from("services")
-      .update({ deleted_at: new Date().toISOString() })
+      // services_select_public RLS가 is_active만 보므로 함께 내려야 조회에서도 빠진다.
+      .update({ deleted_at: new Date().toISOString(), is_active: false })
       .in("id", deletedServiceIds);
   }
 

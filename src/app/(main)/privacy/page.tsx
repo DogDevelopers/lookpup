@@ -1,4 +1,11 @@
 import LegalPage, { type LegalArticle } from "@/features/legal/components/LegalPage";
+import { publicPage } from "@/lib/metadata";
+
+export const metadata = publicPage({
+  title: "개인정보처리방침",
+  description: "봐주개가 수집하는 개인정보의 항목과 이용 목적, 보관 기간을 안내합니다.",
+  path: "/privacy",
+});
 
 const ARTICLES: LegalArticle[] = [
   {

@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import MyPetsClient, { type MyPet } from "@/features/pet-register/components/MyPetsClient";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("내 반려동물");
 
 export default async function MyPetsPage() {
   const supabase = await createClient();

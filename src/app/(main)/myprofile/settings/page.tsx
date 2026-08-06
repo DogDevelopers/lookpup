@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import SettingsClient from "@/features/myprofile/components/SettingsClient";
 import type { MyProfileUser } from "@/features/myprofile/types";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("설정");
 
 export default async function SettingsPage() {
   const supabase = await createClient();

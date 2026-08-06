@@ -1,4 +1,11 @@
 import LegalPage, { type LegalArticle } from "@/features/legal/components/LegalPage";
+import { publicPage } from "@/lib/metadata";
+
+export const metadata = publicPage({
+  title: "이용약관",
+  description: "봐주개 서비스 이용에 관한 회원과 회사의 권리·의무 및 책임 사항을 안내합니다.",
+  path: "/terms",
+});
 
 const LINK_MAP: Record<string, string> = {
   개인정보처리방침: "/privacy",

@@ -1,4 +1,7 @@
 import { AlertTriangle } from "lucide-react";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("이용 제한 안내");
 
 export default async function SuspendedPage({
   searchParams,

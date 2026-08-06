@@ -766,6 +766,7 @@ export async function createPetsitterReservationRequest(
     .from("services")
     .select("id, sitter_id, price, title, service_type, is_active, sitters!inner(user_id)")
     .eq("id", input.service_id)
+    .is("deleted_at", null)
     .single();
 
   if (!service) return { ok: false, error: "서비스를 찾을 수 없습니다." };
