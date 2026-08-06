@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "@/components/ui/sonner";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, siteUrl } from "@/lib/metadata";
 import NotificationToaster from "@/features/notifications/components/NotificationToaster";
 
 const pretendard = localFont({
@@ -18,8 +19,22 @@ const pretendard = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "봐주개",
-  description: "믿고 맡기는 우리 동네 펫시터 매칭 사이트 - 봐주개",
+  // 미설정 시 Next가 VERCEL_URL로 대체한다. 빌드를 막지 않도록 필수로 두지 않는다.
+  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
+  title: {
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "ko_KR",
+    url: "/",
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/lookpup_logo.png"],
+  },
 };
 
 export default function RootLayout({

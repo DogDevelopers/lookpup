@@ -1,5 +1,8 @@
 import { getReservationById } from "@/features/reservations/actions";
 import ReviewWriteClient from "@/features/reviews/components/ReviewWriteClient";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("후기 작성");
 
 export default async function ReviewWritePage({
   searchParams,

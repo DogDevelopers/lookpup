@@ -2,6 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { AlertTriangle } from "lucide-react";
 import RestoreForm from "@/features/auth/components/RestoreForm";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("계정 복구");
 
 const RESTORE_NOTES = [
   "기존 반려동물 정보가 복구됩니다",

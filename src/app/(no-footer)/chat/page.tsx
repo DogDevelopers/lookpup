@@ -3,7 +3,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getChatRoomsData } from "@/features/chat/actions/room-actions";
 import ChatClient from "@/features/chat/components/ChatClient";
+import { privatePage } from "@/lib/metadata";
 import { Spinner } from "@/components/ui/spinner";
+
+export const metadata = privatePage("채팅");
 
 export default async function ChatPage() {
   const supabase = await createClient();

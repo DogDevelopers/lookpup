@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import LoginForm from "@/features/auth/components/LoginForm";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("로그인");
 
 export default function LoginPage() {
   return (

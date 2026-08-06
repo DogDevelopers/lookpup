@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import SitterRegisterClient from "@/features/sitter-register/components/SitterRegisterClient";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("펫시터 등록");
 
 export default async function PetsitterRegisterPage() {
   const supabase = await createClient();
