@@ -1,7 +1,10 @@
 import { redirect, notFound } from "next/navigation";
 import BoardEditClient from "@/features/board/components/BoardEditClient";
 import { getRequestForEdit, getUserPets } from "@/features/board/queries";
+import { privatePage } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata = privatePage("구인글 수정");
 
 export default async function BoardEditPage({
   params,

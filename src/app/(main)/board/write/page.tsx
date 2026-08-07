@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import BoardWriteClient from "@/features/board/components/BoardWriteClient";
 import { getUserPets } from "@/features/board/queries";
+import { privatePage } from "@/lib/metadata";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata = privatePage("구인글 작성");
 
 export default async function BoardWritePage() {
   const supabase = await createClient();

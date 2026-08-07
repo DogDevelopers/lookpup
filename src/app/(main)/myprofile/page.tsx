@@ -11,6 +11,9 @@ import MyProfileClient from "@/features/myprofile/components/MyProfileClient";
 import type { MyProfileUser, MyProfileSitterSummary } from "@/features/myprofile/types";
 import type { EarningsData } from "@/features/earnings/types";
 import type { MyPet } from "@/features/pet-register/components/MyPetsClient";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("마이페이지");
 
 async function MyProfileContent() {
   const supabase = await createClient();

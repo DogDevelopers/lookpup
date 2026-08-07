@@ -3,6 +3,9 @@ import { getReservationById } from "@/features/reservations/actions";
 import { getCareRecordsByReservationId } from "@/features/care-records/actions";
 import { getReviewByReservationId } from "@/features/reviews/actions";
 import BookingDetailClient from "@/features/petsitters/components/BookingDetailClient";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("예약 상세");
 
 export default async function BookingDetailPage({
   params,

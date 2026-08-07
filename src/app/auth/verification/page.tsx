@@ -3,6 +3,9 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import VerificationForm from "@/features/auth/components/VerificationForm";
+import { privatePage } from "@/lib/metadata";
+
+export const metadata = privatePage("본인인증");
 
 export default async function VerificationPage({
   searchParams,

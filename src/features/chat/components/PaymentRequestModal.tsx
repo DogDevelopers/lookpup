@@ -72,12 +72,10 @@ export function PaymentRequestModal({
   const isBaseType = requestType === "base";
   const amountNum = Number(amount.replace(/,/g, ""));
   const typedAmount = amount && !isNaN(amountNum) && amountNum > 0 ? amountNum : null;
-  // 금액 미정(협의 가능) 예약이면 시터가 합의 금액을 직접 입력한다
   const hasFixedAmount = !!paymentAmount && paymentAmount > 0;
   const amountLocked = isBaseType && hasFixedAmount;
   const total = amountLocked ? paymentAmount : typedAmount;
   const displayAmount = amountLocked ? paymentAmount.toLocaleString("ko-KR") : amount;
-  // 서버(sendPaymentRequestMessage)의 협의 금액 범위와 맞춘다
   const amountOutOfRange = !amountLocked && total !== null && (total < 1000 || total > 500000);
 
   function handleAmountChange(value: string) {

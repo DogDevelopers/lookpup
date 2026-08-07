@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
 import { Calendar, Clock, MessageCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { MobileBackButton, DesktopBackButton } from "@/components/common/BackButton";
 import SectionCard from "@/components/common/SectionCard";
 import Avatar from "@/components/ui/Avatar";
+import { getRoomIdByReservationId } from "@/features/chat/actions/room-actions";
 import type { MySitterReservation, ReservationUiStatus } from "@/features/reservations/types";
 
 type TabId = "all" | "pending" | "in-progress" | "confirmed" | "completed" | "cancelled";
@@ -35,6 +37,28 @@ const TABS: { id: TabId; label: string }[] = [
 
 const ITEMS_PER_PAGE = 6;
 
+function ChatButton({ reservationId, className, children }: { reservationId: string; className: string; children: ReactNode }) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+
+  const handleClick = async () => {
+    setPending(true);
+    const result = await getRoomIdByReservationId(reservationId);
+    setPending(false);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    router.push(result.data ? `/chat?roomId=${result.data.roomId}` : "/chat");
+  };
+
+  return (
+    <button type="button" onClick={handleClick} disabled={pending} className={className}>
+      {children}
+    </button>
+  );
+}
+
 function WorkCard({ work }: { work: MySitterReservation }) {
   const status = STATUS_CONFIG[work.status];
 
@@ -62,6 +86,9 @@ function WorkCard({ work }: { work: MySitterReservation }) {
         <div className="flex items-start gap-4">
           <Avatar initial={work.ownerName.charAt(0)} src={work.ownerImage} />
           <div className="flex-1 min-w-0">
+            <p className="text-xs text-gray-400 truncate">
+              {work.requestTitle ? `게시글 · ${work.requestTitle}` : "찾아온 예약자"}
+            </p>
             <span className="font-semibold text-stone-900">{work.ownerName}</span>
             <div className="space-y-1.5 mt-2">
               <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -86,13 +113,13 @@ function WorkCard({ work }: { work: MySitterReservation }) {
       </div>
 
       <div className="px-6 pb-5 flex gap-2 border-t border-gray-100 pt-4">
-        <Link
-          href="/chat"
+        <ChatButton
+          reservationId={work.id}
           className="flex-1 h-10 rounded-xl border border-gray-100 text-stone-900 text-sm font-medium hover:border-orange-400 transition-colors flex items-center justify-center gap-1.5"
         >
           <MessageCircle size={15} />
           채팅하기
-        </Link>
+        </ChatButton>
       </div>
     </SectionCard>
   );

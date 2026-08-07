@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { REQUEST_STATUS } from "@/lib/constants";
 import { fetchPublicProfiles } from "@/lib/public-profiles";
@@ -77,7 +78,8 @@ export async function getRequestList(): Promise<PostListItem[]> {
   return data.map(toPostListItem);
 }
 
-export async function getRequestDetail(id: string): Promise<RequestDetail | null> {
+// generateMetadata와 page가 같은 요청에서 각각 호출하므로 cache로 한 번만 조회한다.
+export const getRequestDetail = cache(async (id: string): Promise<RequestDetail | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("requests")
@@ -126,7 +128,7 @@ export async function getRequestDetail(id: string): Promise<RequestDetail | null
       };
     }),
   };
-}
+});
 
 export async function getOtherPostsByOwner(
   ownerId: string,

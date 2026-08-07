@@ -29,6 +29,7 @@ export interface MySitterReservation {
   status: ReservationUiStatus;
   ownerName: string;
   ownerImage: string | null;
+  requestTitle: string | null;
   date: string;
   time: string;
   petName: string;
